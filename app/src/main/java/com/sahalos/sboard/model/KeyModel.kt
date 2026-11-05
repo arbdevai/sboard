@@ -10,7 +10,8 @@ enum class KeyType {
     SYM,
     ACTION,
     CLIPBOARD,
-    SETTINGS
+    SETTINGS,
+    SPACER
 }
 
 data class KeyModel(

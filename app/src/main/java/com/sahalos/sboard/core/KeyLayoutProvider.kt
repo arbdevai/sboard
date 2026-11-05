@@ -20,6 +20,7 @@ object KeyLayoutProvider {
         )
 
         val row2 = listOf(
+            KeyModel(-10, "", null, 0.5f, KeyType.SPACER),
             KeyModel('a'.code, "a", "@", 1.0f),
             KeyModel('s'.code, "s", "#", 1.0f),
             KeyModel('d'.code, "d", "$", 1.0f),
@@ -28,7 +29,8 @@ object KeyLayoutProvider {
             KeyModel('h'.code, "h", "*", 1.0f),
             KeyModel('j'.code, "j", "-", 1.0f),
             KeyModel('k'.code, "k", "+", 1.0f),
-            KeyModel('l'.code, "l", "/", 1.0f)
+            KeyModel('l'.code, "l", "/", 1.0f),
+            KeyModel(-11, "", null, 0.5f, KeyType.SPACER)
         )
 
         val row3 = listOf(

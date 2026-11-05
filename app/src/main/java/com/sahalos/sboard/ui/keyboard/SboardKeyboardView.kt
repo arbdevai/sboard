@@ -1,6 +1,8 @@
 package com.sahalos.sboard.ui.keyboard
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -18,6 +20,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -106,26 +109,79 @@ fun SboardKeyboardView(
                         val keyWeight = key.weight
 
                         when (key.type) {
+                            KeyType.SPACER -> {
+                                Spacer(
+                                    modifier = Modifier
+                                        .weight(keyWeight)
+                                        .fillMaxHeight()
+                                )
+                            }
                             KeyType.SPACE -> {
-                                var dragAccumulatorPx by remember { mutableFloatStateOf(0f) }
+                                val currentOnKeyClick by rememberUpdatedState(onKeyClick)
+                                val currentOnCursorMove by rememberUpdatedState(onCursorMove)
+                                val currentOnShowImePicker by rememberUpdatedState(onShowImePicker)
+
                                 Box(
                                     modifier = Modifier
                                         .weight(keyWeight)
                                         .fillMaxHeight()
-                                        .pointerInput(Unit) {
-                                            detectDragGestures(
-                                                onDragStart = { dragAccumulatorPx = 0f },
-                                                onDrag = { _, dragAmount ->
-                                                    dragAccumulatorPx += dragAmount.x
-                                                    if (dragAccumulatorPx >= glideThresholdPx) {
-                                                        onCursorMove(1)
-                                                        dragAccumulatorPx -= glideThresholdPx
-                                                    } else if (dragAccumulatorPx <= -glideThresholdPx) {
-                                                        onCursorMove(-1)
-                                                        dragAccumulatorPx += glideThresholdPx
+                                        .pointerInput(key) {
+                                            awaitEachGesture {
+                                                val down = awaitFirstDown(requireUnconsumed = false)
+                                                val startX = down.position.x
+                                                val startY = down.position.y
+                                                var isDragging = false
+                                                var hasTriggeredLongPress = false
+                                                var dragAccumulatorPx = 0f
+
+                                                val longPressJob = coroutineScope.launch {
+                                                    delay(450L)
+                                                    if (!isDragging) {
+                                                        hasTriggeredLongPress = true
+                                                        currentOnShowImePicker()
                                                     }
                                                 }
-                                            )
+
+                                                try {
+                                                    while (true) {
+                                                        val event = awaitPointerEvent()
+                                                        val change = event.changes.firstOrNull { it.id == down.id } ?: break
+
+                                                        if (!change.pressed) {
+                                                            // Finger lifted
+                                                            if (!isDragging && !hasTriggeredLongPress) {
+                                                                currentOnKeyClick(key)
+                                                            }
+                                                            break
+                                                        }
+
+                                                        val totalDx = change.position.x - startX
+                                                        val totalDy = change.position.y - startY
+
+                                                        if (!isDragging && !hasTriggeredLongPress) {
+                                                            if (kotlin.math.abs(totalDx) > 16f && kotlin.math.abs(totalDx) > kotlin.math.abs(totalDy) * 1.2f) {
+                                                                isDragging = true
+                                                                longPressJob.cancel()
+                                                            }
+                                                        }
+
+                                                        if (isDragging) {
+                                                            val deltaX = change.position.x - change.previousPosition.x
+                                                            dragAccumulatorPx += deltaX
+                                                            if (dragAccumulatorPx >= glideThresholdPx) {
+                                                                currentOnCursorMove(1)
+                                                                dragAccumulatorPx -= glideThresholdPx
+                                                            } else if (dragAccumulatorPx <= -glideThresholdPx) {
+                                                                currentOnCursorMove(-1)
+                                                                dragAccumulatorPx += glideThresholdPx
+                                                            }
+                                                            change.consume()
+                                                        }
+                                                    }
+                                                } finally {
+                                                    longPressJob.cancel()
+                                                }
+                                            }
                                         }
                                 ) {
                                     KeyView(
@@ -133,8 +189,8 @@ fun SboardKeyboardView(
                                         modifierState = modifierState,
                                         theme = theme,
                                         modifier = Modifier.fillMaxSize(),
-                                        onClick = { onKeyClick(key) },
-                                        onLongClick = { onShowImePicker() }
+                                        onClick = null,
+                                        onLongClick = null
                                     )
                                 }
                             }

@@ -487,10 +487,12 @@ class SboardIME : InputMethodService(),
     }
 
     private fun moveCursor(offset: Int) {
-        val ic = currentInputConnection ?: return
-        val before = ic.getTextBeforeCursor(1000, 0)?.length ?: 0
-        val targetPos = (before + offset).coerceAtLeast(0)
-        ic.setSelection(targetPos, targetPos)
+        triggerHaptic()
+        val keyCode = if (offset > 0) KeyEvent.KEYCODE_DPAD_RIGHT else KeyEvent.KEYCODE_DPAD_LEFT
+        val count = kotlin.math.abs(offset)
+        for (i in 0 until count) {
+            sendDownUpKeyEvents(keyCode)
+        }
     }
 
     private fun commitSuggestion(word: String) {
