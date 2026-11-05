@@ -6,16 +6,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -45,7 +42,7 @@ fun ResizeOverlayView(
     modifier: Modifier = Modifier
 ) {
     val accentColor = Color(theme.accentColor)
-    val overlayBg = Color.Black.copy(alpha = 0.45f)
+    val overlayBg = Color.Black.copy(alpha = 0.50f)
     val controlBarBg = Color(theme.surfaceColor).copy(alpha = 0.95f)
     val textColor = Color(theme.keyTextColor)
 
@@ -53,17 +50,17 @@ fun ResizeOverlayView(
         modifier = modifier
             .fillMaxSize()
             .background(overlayBg)
-            .border(2.dp, accentColor.copy(alpha = 0.6f), RoundedCornerShape(8.dp))
+            .border(2.dp, accentColor.copy(alpha = 0.7f), RoundedCornerShape(8.dp))
     ) {
         // Control Bar at Top (Batal, Reset, Simpan)
         Row(
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 6.dp)
+                .padding(horizontal = 8.dp, vertical = 4.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(controlBarBg)
-                .padding(horizontal = 10.dp, vertical = 6.dp),
+                .padding(horizontal = 8.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -95,7 +92,7 @@ fun ResizeOverlayView(
             ) {
                 Text(
                     text = "Tinggi ${(currentHeightRatio * 100).toInt()}% • Reset",
-                    color = textColor.copy(alpha = 0.8f),
+                    color = textColor.copy(alpha = 0.85f),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -107,7 +104,7 @@ fun ResizeOverlayView(
                     .clip(RoundedCornerShape(6.dp))
                     .background(accentColor)
                     .clickable { onSave() }
-                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                    .padding(horizontal = 10.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -125,22 +122,22 @@ fun ResizeOverlayView(
         Box(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(top = 46.dp)
+                .padding(top = 42.dp)
                 .pointerInput(Unit) {
                     detectDragGestures { _, dragAmount ->
                         // Drag up -> increase height, Drag down -> decrease height
-                        val deltaRatio = -dragAmount.y / 250f
-                        val newRatio = (currentHeightRatio + deltaRatio).coerceIn(0.75f, 1.35f)
+                        val deltaRatio = -dragAmount.y / 280f
+                        val newRatio = (currentHeightRatio + deltaRatio).coerceIn(0.80f, 1.25f)
                         onHeightRatioChange(newRatio)
                     }
                 }
                 .clip(RoundedCornerShape(12.dp))
                 .background(accentColor)
-                .padding(horizontal = 24.dp, vertical = 5.dp),
+                .padding(horizontal = 20.dp, vertical = 4.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "▲ Tarik Atas / Bawah (Tinggi) ▼",
+                text = "▲ Tarik Tinggi Keyboard ▼",
                 color = Color.White,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold
@@ -151,22 +148,22 @@ fun ResizeOverlayView(
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 8.dp)
+                .padding(bottom = 6.dp)
                 .pointerInput(Unit) {
                     detectDragGestures { _, dragAmount ->
                         // Drag up -> increase bottom padding, Drag down -> decrease
                         val deltaDp = (-dragAmount.y / 3f).toInt()
-                        val newPadding = (currentBottomPaddingDp + deltaDp).coerceIn(0, 48)
+                        val newPadding = (currentBottomPaddingDp + deltaDp).coerceIn(0, 36)
                         onBottomPaddingChange(newPadding)
                     }
                 }
                 .clip(RoundedCornerShape(12.dp))
                 .background(accentColor)
-                .padding(horizontal = 24.dp, vertical = 5.dp),
+                .padding(horizontal = 20.dp, vertical = 4.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "▲ Tarik Posisi Bawah (${currentBottomPaddingDp} dp) ▼",
+                text = "▲ Jarak Bawah: ${currentBottomPaddingDp} dp ▼",
                 color = Color.White,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold

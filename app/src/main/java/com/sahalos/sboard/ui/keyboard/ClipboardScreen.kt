@@ -15,15 +15,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +40,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sahalos.sboard.R
@@ -48,6 +51,7 @@ import com.sahalos.sboard.model.SboardTheme
 fun ClipboardScreen(
     clips: List<ClipItem>,
     theme: SboardTheme,
+    totalKeyboardHeight: Dp,
     onClipClick: (String) -> Unit,
     onTogglePin: (String) -> Unit,
     onDeleteClip: (String) -> Unit,
@@ -66,191 +70,255 @@ fun ClipboardScreen(
     val pinnedClips = clips.filter { it.isPinned }
     val unpinnedClips = clips.filter { !it.isPinned }
 
-    Column(
+    Box(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .height(totalKeyboardHeight)
             .background(bgColor)
     ) {
-        // Gboard-style Top Navigation Header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(44.dp)
-                .background(surfaceColor)
-                .padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Gboard-style Top Navigation Header
             Row(
-                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .clip(RoundedCornerShape(6.dp))
-                    .clickable { onBackToKeyboard() }
-                    .padding(horizontal = 6.dp, vertical = 4.dp)
+                    .fillMaxWidth()
+                    .height(42.dp)
+                    .background(surfaceColor)
+                    .padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_arrow_left),
-                    contentDescription = "Kembali ke Keyboard",
-                    tint = textColor,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Papan Klip",
-                    color = textColor,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-
-            if (unpinnedClips.isNotEmpty()) {
-                Text(
-                    text = "Hapus Semua",
-                    color = accentColor,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
-                        .clickable { onClearAll() }
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                )
-            }
-        }
-
-        // Content List
-        if (clips.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(32.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Papan klip Anda kosong.\nTeks yang disalin akan tersimpan di sini.",
-                    color = textColor.copy(alpha = 0.5f),
-                    fontSize = 13.sp,
-                    lineHeight = 18.sp
-                )
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 10.dp),
-                contentPadding = PaddingValues(vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                if (pinnedClips.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = "DISEMATKAN",
-                            color = accentColor,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(start = 4.dp, top = 4.dp, bottom = 2.dp)
-                        )
-                    }
-                    items(pinnedClips, key = { it.id }) { clip ->
-                        ClipCardItem(
-                            clip = clip,
-                            cardColor = cardColor,
-                            textColor = textColor,
-                            accentColor = accentColor,
-                            onClick = { onClipClick(clip.text) },
-                            onLongClick = { selectedClipForAction = clip }
-                        )
-                    }
+                        .clickable { onBackToKeyboard() }
+                        .padding(horizontal = 6.dp, vertical = 4.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_arrow_left),
+                        contentDescription = "Kembali ke Keyboard",
+                        tint = textColor,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "Papan Klip",
+                        color = textColor,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
 
                 if (unpinnedClips.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = "TERBARU",
-                            color = textColor.copy(alpha = 0.6f),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(start = 4.dp, top = 6.dp, bottom = 2.dp)
-                        )
+                    Text(
+                        text = "Hapus Semua",
+                        color = accentColor,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .clickable { onClearAll() }
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
+            }
+
+            // Content: 2-Column Grid of Clips
+            if (clips.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Papan klip kosong.\nTeks yang disalin akan muncul di sini.",
+                        color = textColor.copy(alpha = 0.5f),
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp
+                    )
+                }
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 6.dp),
+                    contentPadding = PaddingValues(top = 4.dp, bottom = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    if (pinnedClips.isNotEmpty()) {
+                        item(span = { GridItemSpan(2) }) {
+                            Text(
+                                text = "DISEMATKAN",
+                                color = accentColor,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(start = 2.dp, top = 4.dp, bottom = 2.dp)
+                            )
+                        }
+                        items(pinnedClips, key = { it.id }) { clip ->
+                            ClipGridCard(
+                                clip = clip,
+                                cardColor = cardColor,
+                                textColor = textColor,
+                                accentColor = accentColor,
+                                onClick = { onClipClick(clip.text) },
+                                onLongClick = { selectedClipForAction = clip }
+                            )
+                        }
                     }
-                    items(unpinnedClips, key = { it.id }) { clip ->
-                        ClipCardItem(
-                            clip = clip,
-                            cardColor = cardColor,
-                            textColor = textColor,
-                            accentColor = accentColor,
-                            onClick = { onClipClick(clip.text) },
-                            onLongClick = { selectedClipForAction = clip }
-                        )
+
+                    if (unpinnedClips.isNotEmpty()) {
+                        item(span = { GridItemSpan(2) }) {
+                            Text(
+                                text = "TERBARU",
+                                color = textColor.copy(alpha = 0.6f),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(start = 2.dp, top = 4.dp, bottom = 2.dp)
+                            )
+                        }
+                        items(unpinnedClips, key = { it.id }) { clip ->
+                            ClipGridCard(
+                                clip = clip,
+                                cardColor = cardColor,
+                                textColor = textColor,
+                                accentColor = accentColor,
+                                onClick = { onClipClick(clip.text) },
+                                onLongClick = { selectedClipForAction = clip }
+                            )
+                        }
                     }
                 }
             }
         }
-    }
 
-    // Contextual Action Dialog for Long-Pressed Card (Pin/Unpin & Delete)
-    selectedClipForAction?.let { clip ->
-        AlertDialog(
-            onDismissRequest = { selectedClipForAction = null },
-            title = {
-                Text(
-                    text = "Opsi Klip",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Text(
-                    text = if (clip.isSensitive) "••••••••" else clip.text,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = 13.sp
-                )
-            },
-            confirmButton = {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    TextButton(
-                        onClick = {
-                            onTogglePin(clip.id)
-                            selectedClipForAction = null
+        // Safe Inline Modal Overlay (No AlertDialog, Zero BadTokenException in IME Service)
+        selectedClipForAction?.let { clip ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.65f))
+                    .clickable { selectedClipForAction = null },
+                contentAlignment = Alignment.Center
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(0.88f)
+                        .clickable(enabled = false) {}, // prevent dismissing when tapping card
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = surfaceColor)
+                ) {
+                    Column(modifier = Modifier.padding(14.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Opsi Klip",
+                                color = textColor,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_close),
+                                contentDescription = "Tutup",
+                                tint = textColor.copy(alpha = 0.7f),
+                                modifier = Modifier
+                                    .size(18.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .clickable { selectedClipForAction = null }
+                            )
                         }
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_pin),
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = accentColor
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        Text(
+                            text = if (clip.isSensitive) "•••••••• (Data Sensitif)" else clip.text,
+                            color = textColor.copy(alpha = 0.85f),
+                            fontSize = 12.sp,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(if (clip.isPinned) "Lepas Sematan" else "Sematkan")
+
+                        Spacer(modifier = Modifier.height(10.dp))
+                        HorizontalDivider(color = textColor.copy(alpha = 0.12f))
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            // Pin / Unpin Button
+                            Row(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(cardColor)
+                                    .clickable {
+                                        onTogglePin(clip.id)
+                                        selectedClipForAction = null
+                                    }
+                                    .padding(vertical = 8.dp),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_pin),
+                                    contentDescription = null,
+                                    tint = accentColor,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = if (clip.isPinned) "Lepas" else "Sematkan",
+                                    color = textColor,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+
+                            // Delete Button
+                            Row(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.error.copy(alpha = 0.2f))
+                                    .clickable {
+                                        onDeleteClip(clip.id)
+                                        selectedClipForAction = null
+                                    }
+                                    .padding(vertical = 8.dp),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_delete),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "Hapus",
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
                     }
-                    TextButton(
-                        onClick = {
-                            onDeleteClip(clip.id)
-                            selectedClipForAction = null
-                        },
-                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_delete),
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Hapus")
-                    }
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { selectedClipForAction = null }) {
-                    Text("Tutup")
                 }
             }
-        )
+        }
     }
 }
 
 @Composable
-private fun ClipCardItem(
+private fun ClipGridCard(
     clip: ClipItem,
     cardColor: Color,
     textColor: Color,
@@ -261,9 +329,10 @@ private fun ClipCardItem(
 ) {
     val shape = RoundedCornerShape(8.dp)
 
-    Row(
+    Box(
         modifier = modifier
             .fillMaxWidth()
+            .height(56.dp)
             .shadow(1.dp, shape = shape)
             .clip(shape)
             .background(cardColor)
@@ -273,25 +342,24 @@ private fun ClipCardItem(
                     onLongPress = { onLongClick() }
                 )
             }
-            .padding(horizontal = 14.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(horizontal = 8.dp, vertical = 6.dp)
     ) {
         Text(
             text = if (clip.isSensitive) "•••••••• (Data Sensitif)" else clip.text,
             color = textColor,
-            fontSize = 13.sp,
+            fontSize = 11.sp,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.align(Alignment.CenterStart)
         )
         if (clip.isPinned) {
-            Spacer(modifier = Modifier.width(8.dp))
             Icon(
                 painter = painterResource(id = R.drawable.ic_pin),
                 contentDescription = "Disematkan",
                 tint = accentColor,
-                modifier = Modifier.size(14.dp)
+                modifier = Modifier
+                    .size(12.dp)
+                    .align(Alignment.TopEnd)
             )
         }
     }

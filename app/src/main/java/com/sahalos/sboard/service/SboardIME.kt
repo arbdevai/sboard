@@ -18,16 +18,18 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -166,9 +168,15 @@ class SboardIME : InputMethodService(),
 
                 val activeTheme = SboardTheme.AvailableThemes.find { it.id == themeId } ?: SboardTheme.NordDark
 
+                // Calculate exact keyboard bounds
+                val baseRowHeightDp = (48 * heightRatio).toInt()
+                val totalKeyboardHeightDp = (42 + (baseRowHeightDp * 4) + bottomPadding).dp
+
                 // Local states for live resize preview
-                var previewHeightRatio by androidx.compose.runtime.remember(heightRatio) { mutableFloatStateOf(heightRatio) }
-                var previewBottomPaddingDp by androidx.compose.runtime.remember(bottomPadding) { mutableIntStateOf(bottomPadding) }
+                var previewHeightRatio by remember(heightRatio) { mutableFloatStateOf(heightRatio) }
+                var previewBottomPaddingDp by remember(bottomPadding) { mutableIntStateOf(bottomPadding) }
+                val previewBaseRowHeightDp = (48 * previewHeightRatio).toInt()
+                val previewTotalHeightDp = (42 + (previewBaseRowHeightDp * 4) + previewBottomPaddingDp).dp
 
                 AnimatedContent(
                     targetState = keyboardMode,
@@ -206,6 +214,7 @@ class SboardIME : InputMethodService(),
                             ClipboardScreen(
                                 clips = clips,
                                 theme = activeTheme,
+                                totalKeyboardHeight = totalKeyboardHeightDp,
                                 onClipClick = { text ->
                                     commitTextDirectly(text)
                                     keyboardMode = KeyboardMode.KEYBOARD
@@ -217,7 +226,11 @@ class SboardIME : InputMethodService(),
                             )
                         }
                         KeyboardMode.RESIZE -> {
-                            Box(modifier = Modifier.fillMaxSize()) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(previewTotalHeightDp)
+                            ) {
                                 // Keyboard rendered underneath with preview dimensions
                                 SboardKeyboardView(
                                     modifierState = modifierState,
@@ -462,7 +475,10 @@ class SboardIME : InputMethodService(),
         if (!selectedText.isNullOrEmpty()) {
             ic.commitText("", 1)
         } else {
-            ic.deleteSurroundingText(1, 0)
+            val deleted = ic.deleteSurroundingText(1, 0)
+            if (!deleted) {
+                sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
+            }
         }
         if (currentComposingWord.isNotEmpty()) {
             currentComposingWord = currentComposingWord.dropLast(1)

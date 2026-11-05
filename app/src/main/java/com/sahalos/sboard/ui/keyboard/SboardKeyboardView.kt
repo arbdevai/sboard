@@ -172,7 +172,8 @@ fun SboardKeyboardView(
                                         modifierState = modifierState,
                                         theme = theme,
                                         modifier = Modifier.fillMaxSize(),
-                                        onClick = { /* handled by outer pointerInput */ }
+                                        onClick = null,
+                                        onLongClick = null
                                     )
                                 }
                             }

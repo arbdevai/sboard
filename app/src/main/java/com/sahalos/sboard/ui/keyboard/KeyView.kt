@@ -37,7 +37,7 @@ fun KeyView(
     actionImeLabel: String? = null,
     actionIconRes: Int = R.drawable.ic_enter,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -62,19 +62,23 @@ fun KeyView(
         .clip(shape)
         .background(keyBgColor)
 
-    val interactiveModifier = if (onLongClick != null) {
-        baseModifier.pointerInput(key) {
-            detectTapGestures(
-                onTap = { onClick() },
-                onLongPress = { onLongClick() }
+    val interactiveModifier = when {
+        onClick != null && onLongClick != null -> {
+            baseModifier.pointerInput(key) {
+                detectTapGestures(
+                    onTap = { onClick() },
+                    onLongPress = { onLongClick() }
+                )
+            }
+        }
+        onClick != null -> {
+            baseModifier.clickable(
+                interactionSource = interactionSource,
+                indication = ripple(bounded = true, color = textColor.copy(alpha = 0.2f)),
+                onClick = onClick
             )
         }
-    } else {
-        baseModifier.clickable(
-            interactionSource = interactionSource,
-            indication = ripple(bounded = true, color = textColor.copy(alpha = 0.2f)),
-            onClick = onClick
-        )
+        else -> baseModifier
     }
 
     Box(
