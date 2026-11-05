@@ -90,3 +90,24 @@ Handle drag atas pada `ResizeOverlayView.kt` mengupdate `previewHeightRatio` pad
 - [x] Update `ResizeOverlayView.kt`: Stabilkan akumulasi drag gesture dengan `rememberUpdatedState` dan tambahkan tombol preset ukuran cepat (85%, 100%, 115%, 125%).
 - [x] Verifikasi sintaks via `verify_kotlin_syntax.py` (0 error, 0 warning).
 - [x] Build sukses di GitHub Actions CI (Run ID: `41974586281`) dan file APK `Sboard-v1.0.7.apk` siap di `/home/coder/storage/downloads/`.
+
+---
+
+## Ringkasan Eksekusi Rilis v1.0.8:
+- [x] **Redesain Settings Profesional (`SettingsScreen.kt`)**:
+  - Hero Header dengan status aktif/default IME Android, dot status dinamis, dan tombol pintasan sistem.
+  - Seksi Tampilan & Tema: Pemilih tema horizontal dengan swatch warna riil, Slider Ketinggian Keyboard (75%-135%), Slider Jarak Dagu Bawah (0-36 dp), dan switch Key Popup.
+  - Seksi Pengetikan & Gestur: Toggle Saran Kata Pasif, Umpan Balik Getar Haptik, Simbol Tekan Lama + Slider durasi, dan Navigasi Kursor Spasi.
+  - Seksi Papan Klip: Toggle Riwayat Papan Klip dan tombol Bersihkan Riwayat Tidak Disematkan.
+  - Seksi Pembaruan Aplikasi: Integrasi modul In-App Updater dengan status dan progress bar.
+- [x] **Floating Key Preview Melayang (`KeyView.kt` & `SboardKeyboardView.kt`)**:
+  - Deteksi sentuhan instan pada *touch down* memunculkan gelembung huruf berukuran besar (26sp bold, shadow 8dp) melayang di atas tombol `-52.dp`.
+  - Gelembung hilang seketika saat jari diangkat (*touch up*).
+  - Terkoneksi dengan master switch `enableKeyPopupPreview` di `SboardPreferences.kt`.
+- [x] **In-App Updater via GitHub Releases (`UpdateManager.kt` & `AndroidManifest.xml`)**:
+  - Pengecekan versi rilis terbaru dari API GitHub (`arbdevai/sboard/releases/latest`).
+  - Pengunduhan berkas APK ke cache internal dengan progress bar real-time.
+  - Peluncuran otomatis installer APK via Android `FileProvider` (`content://...fileprovider`).
+  - Izin `INTERNET` dan `REQUEST_INSTALL_PACKAGES` terisolasi ketat di `MainActivity`; `SboardIME` tetap 100% offline dan zero telemetry.
+- [x] Verifikasi sintaks via `verify_kotlin_syntax.py` (0 error, 0 warning).
+- [x] Build sukses di GitHub Actions CI (Run ID: `41978513723`) dan APK `Sboard-v1.0.8.apk` siap di `/home/coder/storage/downloads/`.
