@@ -1,100 +1,89 @@
-# 🤝 AGENT HANDOFF: Panduan Arsitektur Sboard v1.0.6
+# 🤝 AGENT HANDOFF: Panduan Bugfix Layout QWERTY, Spasi Kursor, & Resize (v1.0.7)
 
-Dokumen ini memuat panduan perbaikan bug dan spesifikasi fitur baru yang telah diaudit dan diselaraskan dengan cetak biru `SPEC.md`.
-
----
-
-## 1. Perbaikan Prioritas: Bug Kritis & UX Keyboard (Wajib Selesai Dulu)
-1. **Perbaiki Crash `BadTokenException`:**
-   - Hapus pemanggilan `AlertDialog` di `ClipboardScreen.kt`.
-   - Ganti dialog pop-up dengan **Inline Modal Overlay** di dalam hierarki ComposeView keyboard (misal: `Box` dengan latar semi-transparan `Color.Black.copy(0.45f)` yang memunculkan kartu aksi Pin & Hapus di dalam area keyboard).
-2. **Tombol Hapus (Backspace):**
-   - Hapus `.clickable` kosong di child `KeyView` yang memakan touch event pembungkus luar.
-   - Tambahkan fallback resmi `sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)` di method `performBackspace()`.
-3. **Ketinggian ClipboardScreen:**
-   - Kunci tinggi `ClipboardScreen` sama persis dengan tinggi keyboard (`Modifier.fillMaxWidth().height(keyboardHeightDp)`).
-   - Ubah tampilan menjadi **2 Kolom (Grid)** menggunakan `LazyVerticalGrid(columns = GridCells.Fixed(2))` dengan `maxLines = 2` dan `TextOverflow.Ellipsis`.
-4. **Ketinggian ResizeOverlayView:**
-   - Kunci tinggi `ResizeOverlayView` setinggi keyboard (jangan gunakan `fillMaxSize()` yang membuat jendela IME melayang ke atas layar).
+Dokumen ini memuat investigasi teknis dan solusi pasti untuk 3 masalah UX yang dilaporkan pengguna pada `v1.0.6`.
 
 ---
 
-## 2. Fitur Baru 1: Floating Key Preview (Pratinjau Huruf Melayang saat Mengetik)
-* **Kebutuhan:** Saat pengguna menekan tombol huruf/angka (touch down), muncul gelembung pratinjau (*key popup magnifier*) melayang di atas tombol tersebut setinggi `-50.dp` dengan huruf besar (26sp, bold). Gelembung hilang seketika saat jari diangkat (touch up).
-* **Implementasi:**
-  - Simpan state tombol yang sedang ditekan: `activePressedKey: KeyModel?`.
-  - Pada [`SboardKeyboardView.kt`](file:///home/coder/projects/sahalOS/sboard/app/src/main/java/com/sahalos/sboard/ui/keyboard/SboardKeyboardView.kt), jika `activePressedKey != null`, render `Box` gelembung pratinjau melayang di posisi koordinat tombol dengan bayangan halus (`shadow(4.dp, shape = RoundedCornerShape(8.dp))`), warna latar tema sedikit lebih terang, dan huruf kontras.
-  - Sediakan master toggle `enableKeyPopupPreview` (default: `true`) di `SboardPreferences.kt`.
+## 1. Layout Huruf ASDFGHJKL Mepet Kiri Kanan (Tidak Sesuai Gboard)
+
+### Akar Masalah (Root Cause):
+Di `KeyLayoutProvider.kt`:
+* Baris 1 (`QWERTYUIOP`): 10 tombol dengan bobot 1.0f (Total bobot = 10.0f).
+* Baris 2 (`ASDFGHJKL`): 9 tombol dengan bobot 1.0f (Total bobot = 9.0f) **TANPA SPACER DI KIRI DAN KANAN**.
+* Akibatnya:
+  1. Lebar tiap tombol baris 2 membesar menjadi `1/9` layar (~11.1%) bukan 10%.
+  2. Huruf `A` menempel tepat di tepi kiri layar ($X = 0$), dan huruf `L` menempel tepat di tepi kanan layar ($X = \text{max}$).
+  3. Tata letak tidak bersilang (*staggered*) segitiga khas QWERTY standar Gboard/iOS.
+
+### Solusi Wajib:
+Di `KeyLayoutProvider.getQwertyRows()`:
+Tambahkan spacer `0.5f` di awal dan di akhir Baris 2, sehingga total bobot baris 2 menjadi `0.5 + 9.0 + 0.5 = 10.0f`:
+```kotlin
+// Pada baris 2 Qwerty:
+val row2 = listOf(
+    KeyModel(-10, "", null, 0.5f, KeyType.SPACER), // Spacer kiri
+    KeyModel('a'.code, "a", "@", 1.0f),
+    KeyModel('s'.code, "s", "#", 1.0f),
+    KeyModel('d'.code, "d", "$", 1.0f),
+    KeyModel('f'.code, "f", "%", 1.0f),
+    KeyModel('g'.code, "g", "&", 1.0f),
+    KeyModel('h'.code, "h", "*", 1.0f),
+    KeyModel('j'.code, "j", "-", 1.0f),
+    KeyModel('k'.code, "k", "+", 1.0f),
+    KeyModel('l'.code, "l", "/", 1.0f),
+    KeyModel(-11, "", null, 0.5f, KeyType.SPACER)  // Spacer kanan
+)
+```
+Pada `SboardKeyboardView.kt`, jika `key.type == KeyType.SPACER`, cukup render `Spacer(modifier = Modifier.weight(key.weight))`.
+Hasil: Huruf `A` s/d `L` langsung bergeser rapi ke tengah dengan lekukan 5% di kiri dan kanan, presisi seperti Gboard!
 
 ---
 
-## 3. Fitur Baru 2: Redesain Halaman Pengaturan Profesional (`SettingsScreen.kt`)
-Strukturkan halaman pengaturan menjadi kartu-kartu Material 3 yang rapi, elegan, dan terkelompok:
-1. **Hero Header (Status Aktivasi IME):**
-   - Kartu status: Menampilkan apakah Sboard sudah aktif dan dipilih sebagai keyboard utama atau belum, disertai tombol cepat: *"Aktifkan di Pengaturan"* dan *"Pilih Keyboard Utama"*.
-2. **Seksi Tampilan & Tema:**
-   - Pemilih tema horizontal (Nord Dark, Cyberpunk, AMOLED Black, Dracula, Monokai) dengan swatch warna riil.
-   - Slider Ketinggian Keyboard (75% s/d 135%) dengan indikator persentase real-time.
-   - Slider Jarak Dagu Bawah (0 s/d 36 dp) untuk ergonomi jempol.
-   - Switch: *"Pratinjau Huruf Melayang (Key Popup)"*.
-3. **Seksi Pengetikan & Gestur:**
-   - Switch: *"Saran Kata Pasif (Non-agresif)"*.
-   - Switch: *"Getaran Saat Mengetik (Haptic)"*.
-   - Switch: *"Tekan Lama Simbol"* + Slider durasi (150 ms - 450 ms).
-   - Switch: *"Navigasi Kursor Spasi (Cursor Glide)"*.
-4. **Seksi Papan Klip (Clipboard):**
-   - Switch: *"Papan Klip Aktif (FIFO 30 klip)"*.
-   - Tombol outline: *"Bersihkan Riwayat Klip Tidak Disematkan"*.
-5. **Seksi Pembaruan Aplikasi (In-App Updater):**
-   - Kartu terdedikasi: Menampilkan versi aplikasi terpasang (`v1.0.x`), status update, dan tombol *"Periksa Pembaruan"*.
+## 2. Fitur Kursor pada Spasi Gak Fungsi (Spacebar Glide Cursor)
 
----
+### Akar Masalah (Root Cause):
+1. **Konflik Gesture Compose:**
+   Di `SboardKeyboardView.kt`, tombol spasi dibungkus `Box.pointerInput { detectDragGestures }`, namun child `KeyView` di dalamnya memiliki `detectTapGestures(onTap, onLongPress)` sendiri. Di Compose, child `detectTapGestures` menelan sentuhan sehingga `detectDragGestures` pada pembungkus luar tidak pernah menerima event seret (*drag*).
+2. **Kelemahan `setSelection` pada `moveCursor`:**
+   Method `moveCursor()` di `SboardIME.kt` memakai `getTextBeforeCursor(1000, 0)` yang sering gagal membaca panjang teks riil pada beberapa aplikasi.
 
-## 4. Fitur Baru 3: In-App Updater via GitHub Releases (Non-Play Store Distribution)
-Karena Sboard didistribusikan mandiri tanpa Google Play Store, aplikasi memerlukan kemampuan update langsung dari GitHub Releases:
-
-1. **Manifest & Izin Jaringan:**
-   - Di `AndroidManifest.xml`, tambahkan izin:
-     ```xml
-     <uses-permission android:name="android.permission.INTERNET" />
-     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-     ```
-   - Tambahkan `FileProvider`:
-     ```xml
-     <provider
-         android:name="androidx.core.content.FileProvider"
-         android:authorities="${applicationId}.fileprovider"
-         android:exported="false"
-         android:grantUriPermissions="true">
-         <meta-data
-             android:name="android.support.FILE_PROVIDER_PATHS"
-             android:resource="@xml/file_paths" />
-     </provider>
-     ```
-   - Buat `app/src/main/res/xml/file_paths.xml`:
-     ```xml
-     <?xml version="1.0" encoding="utf-8"?>
-     <paths>
-         <external-files-path name="apk_downloads" path="Download/" />
-         <cache-path name="apk_cache" path="updates/" />
-     </paths>
-     ```
-2. **UpdateManager (`data/UpdateManager.kt`):**
-   - Panggil GitHub API: `https://api.github.com/repos/arbdevai/sboard/releases/latest`.
-   - Parse respons JSON menggunakan `kotlinx.serialization.json`: ambil `tag_name`, `body` (Changelog Markdown formal tanpa emoji lebay), dan URL file `.apk` dari `assets`.
-   - Bandingkan tag remote (misal `v1.0.6`) dengan `BuildConfig.VERSION_NAME`.
-   - Jika versi baru tersedia:
-     - Tampilkan modal konfirmasi dengan catatan rilis.
-     - Unduh berkas APK ke cache aplikasi atau unduhan via `HttpURLConnection` / `DownloadManager`.
-     - Luncurkan Intent instalasi paket:
-       ```kotlin
-       val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", apkFile)
-       val intent = Intent(Intent.ACTION_VIEW).apply {
-           setDataAndType(uri, "application/vnd.android.package-archive")
-           addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+### Solusi Wajib:
+1. Satukan penanganan gesture spasi: Saat merender `KeyView` untuk spasi, jangan berikan `onLongClick` terpisah ke child jika memakai gesture drag luar. Atau gunakan `detectHorizontalDragGestures` dengan `onDragStart`, `onHorizontalDrag`, dan deteksi tap jika tidak terjadi drag.
+2. Di `SboardIME.kt`, ganti navigasi kursor menggunakan KeyEvent resmi sistem Android (**100% universal dan kompatibel di semua aplikasi**):
+   ```kotlin
+   private fun moveCursor(offset: Int) {
+       triggerHaptic()
+       val keyCode = if (offset > 0) KeyEvent.KEYCODE_DPAD_RIGHT else KeyEvent.KEYCODE_DPAD_LEFT
+       val count = kotlin.math.abs(offset)
+       for (i in 0 until count) {
+           sendDownUpKeyEvents(keyCode)
        }
-       context.startActivity(intent)
-       ```
-3. **Komitmen Privasi:**
-   - Izin internet diisolasi ketat **hanya** untuk modul pembaruan di `MainActivity`.
-   - Kelas `SboardIME` **100% offline**, tidak ada telemetri dan data ketikan tidak pernah dikirim ke jaringan.
+   }
+   ```
+   Pengiriman `KEYCODE_DPAD_LEFT` dan `KEYCODE_DPAD_RIGHT` dijamin menggerakkan kursor 1 karakter di aplikasi apa pun (termasuk WhatsApp, Chrome, Termux, editor teks).
+
+---
+
+## 3. Fitur Resize "Ngejelly" & Gak Bisa Digeser
+
+### Akar Masalah (Root Cause):
+Handle drag atas pada `ResizeOverlayView.kt` mengupdate `previewHeightRatio` pada setiap frame drag delta. Ini memicu `previewTotalHeightDp` di parent Box langsung membesar/mengecil saat jari masih menempel. Karena handle berada di `Alignment.TopCenter`, membesarnya view mengubah posisi koordinat lokal handle di bawah jari pengguna, menciptakan *feedback loop* osilasi bolak-balik yang terasa seperti membal/karet (*jelly*).
+
+### Solusi Wajib:
+1. **Stabilkan Drag Gesture:**
+   Gunakan akumulasi drag dari posisi awal sentuh (*drag start baseline*) atau gunakan rentang rasio per langkah (*step-based ratio* misal step 0.05).
+2. **Sediakan Tombol Preset Cepat (Quick Preset Pills) di Bar Atas Overlay:**
+   Tambahkan tombol pill ukuran siap pakai di bar kontrol atas:
+   * **Kompak (85%)**
+   * **Normal (100%)**
+   * **Tinggi (115%)**
+   * **Maksimal (125%)**
+   Ini memberikan kepastian 1-ketukan bagi pengguna untuk langsung mengubah ukuran tanpa harus bergulat dengan drag gesture di layar sentuh HP.
+
+---
+
+## Ringkasan untuk Agent Eksekutor:
+1. Update `KeyLayoutProvider.kt`: Berikan spacer `0.5f` di kiri dan kanan baris 2 (`ASDFGHJKL`).
+2. Update `SboardIME.kt`: Ubah `moveCursor` menjadi pengiriman `sendDownUpKeyEvents(KeyEvent.KEYCODE_DPAD_LEFT / RIGHT)`.
+3. Update `SboardKeyboardView.kt`: Perbaiki gesture seret spasi agar tidak ditelan child `KeyView`.
+4. Update `ResizeOverlayView.kt`: Stabilkan gesture drag dan tambahkan tombol preset ukuran (85%, 100%, 115%, 125%).
