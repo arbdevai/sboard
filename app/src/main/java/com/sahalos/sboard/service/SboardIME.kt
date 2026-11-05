@@ -9,6 +9,7 @@ import android.os.Vibrator
 import android.text.InputType
 import android.view.KeyEvent
 import android.view.View
+import android.view.Window
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.runtime.getValue
@@ -77,7 +78,7 @@ class SboardIME : InputMethodService(),
 
     override fun onCreate() {
         super.onCreate()
-        savedStateRegistryController.performRestore(Bundle())
+        savedStateRegistryController.performRestore(null)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
 
         preferences = SboardPreferences(this)
@@ -91,7 +92,26 @@ class SboardIME : InputMethodService(),
 
     override fun onEvaluateFullscreenMode(): Boolean = false
 
+    private fun installViewTreeOwners() {
+        window?.window?.decorView?.let { decorView ->
+            decorView.setViewTreeLifecycleOwner(this)
+            decorView.setViewTreeViewModelStoreOwner(this)
+            decorView.setViewTreeSavedStateRegistryOwner(this)
+        }
+    }
+
+    override fun onConfigureWindow(win: Window, isFullscreen: Boolean, isCandidatesOnly: Boolean) {
+        super.onConfigureWindow(win, isFullscreen, isCandidatesOnly)
+        win.decorView.let { decorView ->
+            decorView.setViewTreeLifecycleOwner(this)
+            decorView.setViewTreeViewModelStoreOwner(this)
+            decorView.setViewTreeSavedStateRegistryOwner(this)
+        }
+    }
+
     override fun onCreateInputView(): View {
+        installViewTreeOwners()
+
         val composeView = ComposeView(this).apply {
             setViewTreeLifecycleOwner(this@SboardIME)
             setViewTreeViewModelStoreOwner(this@SboardIME)
@@ -136,8 +156,8 @@ class SboardIME : InputMethodService(),
 
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         super.onStartInputView(info, restarting)
+        installViewTreeOwners()
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
 
         currentComposingWord = ""
         currentSuggestions = emptyList()
@@ -153,21 +173,27 @@ class SboardIME : InputMethodService(),
         resolveImeAction(info)
     }
 
-    override fun onFinishInputView(finishingInput: Boolean) {
-        super.onFinishInputView(finishingInput)
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-        currentComposingWord = ""
-        currentSuggestions = emptyList()
+    override fun onWindowShown() {
+        super.onWindowShown()
+        installViewTreeOwners()
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
     }
 
     override fun onWindowHidden() {
         super.onWindowHidden()
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
         isClipboardOpen = false
+    }
+
+    override fun onFinishInputView(finishingInput: Boolean) {
+        super.onFinishInputView(finishingInput)
+        currentComposingWord = ""
+        currentSuggestions = emptyList()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         store.clear()
         serviceScope.cancel()
