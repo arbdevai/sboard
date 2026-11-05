@@ -1,0 +1,121 @@
+package com.sahalos.sboard.core
+
+import com.sahalos.sboard.model.KeyModel
+import com.sahalos.sboard.model.KeyType
+
+object KeyLayoutProvider {
+
+    fun getQwertyRows(): List<List<KeyModel>> {
+        val row1 = listOf(
+            KeyModel('q'.code, "q", "1", 1.0f),
+            KeyModel('w'.code, "w", "2", 1.0f),
+            KeyModel('e'.code, "e", "3", 1.0f),
+            KeyModel('r'.code, "r", "4", 1.0f),
+            KeyModel('t'.code, "t", "5", 1.0f),
+            KeyModel('y'.code, "y", "6", 1.0f),
+            KeyModel('u'.code, "u", "7", 1.0f),
+            KeyModel('i'.code, "i", "8", 1.0f),
+            KeyModel('o'.code, "o", "9", 1.0f),
+            KeyModel('p'.code, "p", "0", 1.0f)
+        )
+
+        val row2 = listOf(
+            KeyModel('a'.code, "a", "@", 1.0f),
+            KeyModel('s'.code, "s", "#", 1.0f),
+            KeyModel('d'.code, "d", "$", 1.0f),
+            KeyModel('f'.code, "f", "%", 1.0f),
+            KeyModel('g'.code, "g", "&", 1.0f),
+            KeyModel('h'.code, "h", "*", 1.0f),
+            KeyModel('j'.code, "j", "-", 1.0f),
+            KeyModel('k'.code, "k", "+", 1.0f),
+            KeyModel('l'.code, "l", "/", 1.0f)
+        )
+
+        val row3 = listOf(
+            KeyModel(-1, "SHIFT", null, 1.3f, KeyType.SHIFT),
+            KeyModel('z'.code, "z", "_", 1.0f),
+            KeyModel('x'.code, "x", "\"", 1.0f),
+            KeyModel('c'.code, "c", "'", 1.0f),
+            KeyModel('v'.code, "v", ":", 1.0f),
+            KeyModel('b'.code, "b", ";", 1.0f),
+            KeyModel('n'.code, "n", "!", 1.0f),
+            KeyModel('m'.code, "m", "?", 1.0f),
+            KeyModel(-2, "DEL", null, 1.3f, KeyType.BACKSPACE)
+        )
+
+        val row4 = listOf(
+            KeyModel(-3, "?123", null, 1.2f, KeyType.SYM),
+            KeyModel(-4, "Ctrl", null, 1.0f, KeyType.CTRL),
+            KeyModel(-5, "Fn", null, 0.9f, KeyType.FN),
+            KeyModel(','.code, ",", "<", 0.9f),
+            KeyModel(32, "SPACE", null, 4.0f, KeyType.SPACE),
+            KeyModel('.'.code, ".", ">", 0.9f),
+            KeyModel(-6, "ENTER", null, 1.4f, KeyType.ACTION)
+        )
+
+        return listOf(row1, row2, row3, row4)
+    }
+
+    fun getSymbolsRows(): List<List<KeyModel>> {
+        val row1 = listOf(
+            KeyModel('1'.code, "1", "~", 1.0f),
+            KeyModel('2'.code, "2", "`", 1.0f),
+            KeyModel('3'.code, "3", "|", 1.0f),
+            KeyModel('4'.code, "4", "•", 1.0f),
+            KeyModel('5'.code, "5", "√", 1.0f),
+            KeyModel('6'.code, "6", "π", 1.0f),
+            KeyModel('7'.code, "7", "÷", 1.0f),
+            KeyModel('8'.code, "8", "×", 1.0f),
+            KeyModel('9'.code, "9", "¶", 1.0f),
+            KeyModel('0'.code, "0", "°", 1.0f)
+        )
+
+        val row2 = listOf(
+            KeyModel('@'.code, "@", null, 1.0f),
+            KeyModel('#'.code, "#", null, 1.0f),
+            KeyModel('$'.code, "$", "€", 1.0f),
+            KeyModel('%'.code, "%", "¥", 1.0f),
+            KeyModel('&'.code, "&", null, 1.0f),
+            KeyModel('-'.code, "-", null, 1.0f),
+            KeyModel('+'.code, "+", "±", 1.0f),
+            KeyModel('('.code, "(", "[", 1.0f),
+            KeyModel(')'.code, ")", "]", 1.0f),
+            KeyModel('/'.code, "/", "\\", 1.0f)
+        )
+
+        val row3 = listOf(
+            KeyModel('='.code, "=", "≠", 1.2f),
+            KeyModel('*'.code, "*", "^", 1.0f),
+            KeyModel('"'.code, "\"", "«", 1.0f),
+            KeyModel('\''.code, "'", "»", 1.0f),
+            KeyModel(':'.code, ":", null, 1.0f),
+            KeyModel(';'.code, ";", null, 1.0f),
+            KeyModel('!'.code, "!", "¡", 1.0f),
+            KeyModel('?'.code, "?", "¿", 1.0f),
+            KeyModel(-2, "DEL", null, 1.4f, KeyType.BACKSPACE)
+        )
+
+        val row4 = listOf(
+            KeyModel(-7, "ABC", null, 1.2f, KeyType.SYM),
+            KeyModel(-4, "Ctrl", null, 1.0f, KeyType.CTRL),
+            KeyModel(-5, "Fn", null, 0.9f, KeyType.FN),
+            KeyModel(','.code, ",", "{", 0.9f),
+            KeyModel(32, "SPACE", null, 4.0f, KeyType.SPACE),
+            KeyModel('.'.code, ".", "}", 0.9f),
+            KeyModel(-6, "ENTER", null, 1.4f, KeyType.ACTION)
+        )
+
+        return listOf(row1, row2, row3, row4)
+    }
+
+    fun getFunctionKeysRow(): List<KeyModel> {
+        return (1..12).map { fIndex ->
+            KeyModel(
+                code = 130 + fIndex, // KeyEvent.KEYCODE_F1 is 131
+                primaryLabel = "F$fIndex",
+                weight = 1.0f,
+                type = KeyType.CHARACTER
+            )
+        }
+    }
+}
