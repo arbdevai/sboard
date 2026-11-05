@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Pure White Monochrome Silhouette for Material You -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M24,34 h60 a8,8 0 0,1 8,8 v24 a8,8 0 0,1 -8,8 h-60 a8,8 0 0,1 -8,-8 v-24 a8,8 0 0,1 8,-8 z M32,43 h7 v6 h-7 z M45,43 h7 v6 h-7 z M58,43 h7 v6 h-7 z M71,43 h7 v6 h-7 z M32,55 h7 v6 h-7 z M44,55 h22 v6 h-22 z M71,55 h7 v6 h-7 z" />
+</vector>

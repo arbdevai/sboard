@@ -9,6 +9,7 @@ import android.os.Vibrator
 import android.text.InputType
 import android.view.KeyEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.Window
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -16,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -80,6 +82,7 @@ class SboardIME : InputMethodService(),
         super.onCreate()
         savedStateRegistryController.performRestore(null)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
 
         preferences = SboardPreferences(this)
         clipboardManager = SboardClipboardManager(this)
@@ -93,26 +96,52 @@ class SboardIME : InputMethodService(),
     override fun onEvaluateFullscreenMode(): Boolean = false
 
     private fun installViewTreeOwners() {
-        window?.window?.decorView?.let { decorView ->
-            decorView.setViewTreeLifecycleOwner(this)
-            decorView.setViewTreeViewModelStoreOwner(this)
-            decorView.setViewTreeSavedStateRegistryOwner(this)
+        val win = window?.window ?: return
+        val decorView = win.decorView
+
+        // 1. Set pada DecorView
+        decorView.setViewTreeLifecycleOwner(this)
+        decorView.setViewTreeViewModelStoreOwner(this)
+        decorView.setViewTreeSavedStateRegistryOwner(this)
+
+        // 2. Set eksplisit pada content view
+        decorView.findViewById<View>(android.R.id.content)?.let { content ->
+            content.setViewTreeLifecycleOwner(this)
+            content.setViewTreeViewModelStoreOwner(this)
+            content.setViewTreeSavedStateRegistryOwner(this)
+        }
+
+        // 3. Set pada parentPanel jika sudah ter-inflate
+        val parentPanelId = resources.getIdentifier("parentPanel", "id", "android")
+        if (parentPanelId != 0) {
+            decorView.findViewById<View>(parentPanelId)?.let { panel ->
+                panel.setViewTreeLifecycleOwner(this)
+                panel.setViewTreeViewModelStoreOwner(this)
+                panel.setViewTreeSavedStateRegistryOwner(this)
+            }
+        }
+
+        // 4. Set pada semua child ViewGroup yang ada
+        if (decorView is ViewGroup) {
+            for (i in 0 until decorView.childCount) {
+                val child = decorView.getChildAt(i)
+                child.setViewTreeLifecycleOwner(this)
+                child.setViewTreeViewModelStoreOwner(this)
+                child.setViewTreeSavedStateRegistryOwner(this)
+            }
         }
     }
 
     override fun onConfigureWindow(win: Window, isFullscreen: Boolean, isCandidatesOnly: Boolean) {
         super.onConfigureWindow(win, isFullscreen, isCandidatesOnly)
-        win.decorView.let { decorView ->
-            decorView.setViewTreeLifecycleOwner(this)
-            decorView.setViewTreeViewModelStoreOwner(this)
-            decorView.setViewTreeSavedStateRegistryOwner(this)
-        }
+        installViewTreeOwners()
     }
 
     override fun onCreateInputView(): View {
         installViewTreeOwners()
 
         val composeView = ComposeView(this).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnLifecycleDestroyed(this@SboardIME))
             setViewTreeLifecycleOwner(this@SboardIME)
             setViewTreeViewModelStoreOwner(this@SboardIME)
             setViewTreeSavedStateRegistryOwner(this@SboardIME)

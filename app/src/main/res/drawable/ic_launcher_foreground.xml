@@ -4,25 +4,11 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Keyboard outer frame -->
     <path
-        android:strokeColor="#3B82F6"
-        android:strokeWidth="2.5"
+        android:fillColor="#88C0D0"
+        android:strokeColor="#88C0D0"
+        android:strokeWidth="1.5"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:fillColor="#1E293B"
-        android:pathData="M 32,32 L 76,32 A 6,6 0 0,1 82,38 L 82,70 A 6,6 0 0,1 76,76 L 32,76 A 6,6 0 0,1 26,70 L 26,38 A 6,6 0 0,1 32,32 Z" />
-    <!-- Stylized Modern 'S' glyph -->
-    <path
-        android:strokeColor="#60A5FA"
-        android:strokeWidth="3.2"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="M 62,44 C 58,40 50,40 46,44 C 42,48 42,52 46,54 L 62,56 C 66,58 66,62 62,66 C 58,70 50,70 46,66" />
-    <!-- Subtle bottom spacebar indicator line -->
-    <path
-        android:strokeColor="#94A3B8"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"
-        android:pathData="M 44,72 L 64,72" />
+        android:pathData="M24,34 h60 a8,8 0 0,1 8,8 v24 a8,8 0 0,1 -8,8 h-60 a8,8 0 0,1 -8,-8 v-24 a8,8 0 0,1 8,-8 z M32,43 h7 v6 h-7 z M45,43 h7 v6 h-7 z M58,43 h7 v6 h-7 z M71,43 h7 v6 h-7 z M32,55 h7 v6 h-7 z M44,55 h22 v6 h-22 z M71,55 h7 v6 h-7 z" />
 </vector>
