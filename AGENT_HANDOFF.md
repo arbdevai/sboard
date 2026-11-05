@@ -1,56 +1,92 @@
-# 🤝 AGENT HANDOFF: Perbaikan Error ViewTreeLifecycleOwner pada SboardIME
+# 🤝 AGENT HANDOFF: Analisis & Solusi Bug Sboard v1.0.5
 
-Dokumen ini ditulis untuk menginformasikan agent sesi sebelah mengenai akar masalah dan patch perbaikan yang telah diterapkan pada `SboardIME.kt`.
+Dokumen ini adalah panduan arsitektur dan investigasi teknis untuk **Agent Sesi Eksekusi** agar perbaikan bug presisi 100% dan tidak merusak cetak biru `SPEC.md`.
 
 ---
 
-## 1. Akar Masalah (Root Cause)
-
-Error yang terjadi pada crash log:
+## 1. Crash Log Fatal: `BadTokenException`
 ```text
-java.lang.IllegalStateException: ViewTreeLifecycleOwner not found from android.widget.LinearLayout{... #1020437 android:id/parentPanel}
-    at android.inputmethodservice.InputMethodService.setInputView(InputMethodService.java:2517)
+android.view.WindowManager$BadTokenException: Unable to add window -- token null is not valid; is your activity running?
+    at android.view.ViewRootImpl.setView(ViewRootImpl.java:1551)
+    at android.view.WindowManagerImpl.addView(WindowManagerImpl.java:158)
+    at android.app.Dialog.show(Dialog.java:352)
+    at androidx.compose.ui.window.AndroidDialog_androidKt$Dialog$1$1.invokeSuspend(AndroidDialog.android.kt:217)
 ```
 
-### Mengapa Ini Terjadi?
-1. Pada `InputMethodService` Android, jendela IME bukan `Activity`, melainkan dialog sistem khusus (`mWindow`).
-2. Framework Android di `InputMethodService.java` meng-inflate container internal `mRootView` dan menetapkan ID internal:
-   `mRootView.setId(com.android.internal.R.id.parentPanel);`
-3. Saat `onCreateInputView()` mengembalikan `ComposeView`, method `setInputView()` menempelkan `ComposeView` ke dalam `mInputFrame` yang berada di dalam `parentPanel`.
-4. `ComposeView` yang terpasang memanggil `onAttachedToWindow()`, yang kemudian mencari `WindowRecomposer`. Karena Recomposer default bersifat `LifecycleAware`, ia merayap ke view teratas (`rootView` = `parentPanel`) untuk mengambil `ViewTreeLifecycleOwner.get(parentPanel)`.
-5. Karena sebelumnya `setViewTreeLifecycleOwner` hanya dipasang pada `decorView` sebelum `parentPanel` selesai di-inflate/dikaitkan, `parentPanel` tidak memiliki tag `LifecycleOwner`, sehingga melempar crash fatal `IllegalStateException`.
+### Penyebab (Root Cause):
+* Pada `ClipboardScreen.kt`, terdapat pemanggilan `AlertDialog` saat kartu klip ditekan lama (long-press).
+* **Aturan Mutlak Android IME:** `SboardIME` adalah turunan `InputMethodService` (**Service**), BUKAN `Activity`. Komponen Compose `AlertDialog` / `Dialog` di balik layar selalu mencoba membuat Window OS baru yang mewajibkan Token Activity (`token null is not valid`). Akibatnya, aplikasi crash seketika!
+* **Solusi Wajib:**
+  Dilarang keras memakai `AlertDialog` atau `Dialog` di dalam IME! Ganti dengan **Inline Modal Overlay** (menggunakan `Box` lokal dengan latar semi-transparan yang membungkus kartu aksi Pin & Hapus langsung di dalam hierarki ComposeView yang sama).
 
 ---
 
-## 2. Patch yang Sudah Diterapkan (Commit `f634309`)
+## 2. Bug Tombol Hapus (Backspace Tidak Berfungsi)
 
-Perubahan pada file `app/src/main/java/com/sahalos/sboard/service/SboardIME.kt`:
+### Penyebab (Root Cause):
+1. **Konflik Touch Event di Compose:**
+   Di `SboardKeyboardView.kt`, tombol Backspace dibungkus dengan `Box.pointerInput { detectTapGestures(onPress = { ... }) }`, tetapi child di dalamnya ([`KeyView`](file:///home/coder/projects/sahalOS/sboard/app/src/main/java/com/sahalos/sboard/ui/keyboard/KeyView.kt)) memiliki modifier `.clickable(onClick = { /* handled by pointerInput */ })`. Di Compose, `.clickable` pada child **mengonsumsi event sentuhan lebih dulu**, sehingga event `onPress` pada pembungkus luar tidak pernah terpicu!
+2. **Keterbatasan `deleteSurroundingText`:**
+   Pada beberapa aplikasi/kolom input (seperti WebView, terminal, atau kolom pencarian), `ic.deleteSurroundingText(1, 0)` bisa mengembalikan nilai false / tidak bereaksi jika tidak didampingi pengiriman KeyEvent resmi.
 
-1. **Robust Multi-Level `installViewTreeOwners()`:**
-   - Memasang `LifecycleOwner`, `ViewModelStoreOwner`, dan `SavedStateRegistryOwner` pada:
-     - `win.decorView`
-     - `content` (`android.R.id.content`)
-     - `parentPanel` secara spesifik (`resources.getIdentifier("parentPanel", "id", "android")`)
-     - Seluruh child view yang ada di dalam `decorView`.
-2. **Kunci ViewCompositionStrategy pada `ComposeView`:**
+### Solusi Wajib:
+1. Pastikan `KeyView` untuk Backspace **tidak memiliki `.clickable` ganda**. Cukup gunakan satu penanganan sentuhan.
+2. Di `performBackspace()`, tambahkan fallback resmi Android IME:
    ```kotlin
-   composeView.setViewCompositionStrategy(
-       ViewCompositionStrategy.DisposeOnLifecycleDestroyed(this@SboardIME)
-   )
+   val ic = currentInputConnection ?: return
+   val selectedText = ic.getSelectedText(0)
+   if (!selectedText.isNullOrEmpty()) {
+       ic.commitText("", 1)
+   } else {
+       val deleted = ic.deleteSurroundingText(1, 0)
+       if (!deleted) {
+           sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
+       }
+   }
    ```
-   Ini memastikan ComposeView menggunakan lifecycle resmi `SboardIME` dan tidak bergantung pada pelepasan window liar.
-3. **Siklus Lifecycle yang Lengkap:**
-   - Menambahkan event `ON_START` pada `onCreate()`.
-   - Memanggil `installViewTreeOwners()` kembali pada `onConfigureWindow()` dan `onWindowShown()`.
-   - Mengirim event `ON_RESUME` pada `onWindowShown()` dan `ON_PAUSE` pada `onWindowHidden()`.
-4. **Verifikasi Linter:**
-   - Telah diverifikasi dengan `verify_kotlin_syntax.py` dan lolos 100% tanpa warning/error (Exit code 0).
 
 ---
 
-## 3. Langkah untuk Agent di Sesi Sebelah
-Tidak perlu menulis ulang kode lifecycle ini dari awal. Cukup jalankan:
-```bash
-git log -n 1
-```
-Pastikan commit `f634309` sudah ada, lalu lanjutkan proses build APK atau pengujian keyboard di HP!
+## 3. Halaman Clipboard Memanjang 1 Layar Penuh & Teks Panjang Berantakan
+
+### Masalah:
+* Saat beralih ke `KeyboardMode.CLIPBOARD`, tampilan keyboard memanjang menutupi seluruh layar HP dan kartu klip menampilkan teks panjang tanpa batasan yang rapi.
+
+### Penyebab & Solusi Wajib:
+1. **Ketinggian Tetap Sama dengan Keyboard:**
+   `ClipboardScreen` TIDAK BOLEH memakai `Modifier.fillMaxSize()` tanpa batasan tinggi. Ketinggiannya **wajib di-lock sama persis dengan tinggi keyboard saat aktif**:
+   ```kotlin
+   val keyboardHeightDp = ((theme.keyHeightDp * 4) + 40 + bottomPaddingDp) * keyboardHeightRatio
+   Modifier.fillMaxWidth().height(keyboardHeightDp.dp)
+   ```
+2. **Tampilan 2 Kolom (Grid) ala Gboard:**
+   Ganti list 1 kolom vertikal menjadi `LazyVerticalGrid(columns = GridCells.Fixed(2))` dengan padding kompak.
+3. **Truncate Teks Panjang:**
+   Setiap kartu klip wajib membatasi teks:
+   ```kotlin
+   maxLines = 2,
+   overflow = TextOverflow.Ellipsis
+   ```
+4. **Menu Aksi Pin / Hapus Mandiri:**
+   Saat kartu di-long-press, tampilkan dialog aksi **inline overlay** di dalam area keyboard (bukan `AlertDialog`), dengan tombol:
+   * 📌 Sematkan / Lepas Sematan
+   * 🗑️ Hapus Klip Ini
+
+---
+
+## 4. Fitur Resize Melayang / Lari ke Atas Layar
+
+### Penyebab & Solusi Wajib:
+1. `ResizeOverlayView` menggunakan `Modifier.fillMaxSize()`. Pada jendela IME Android, `fillMaxSize()` memaksa container view meregang keluar batas dagu layar hingga ke bagian atas layar (*floating over app*).
+2. **Solusi:**
+   Tinggi `ResizeOverlayView` dan keyboard pembungkusnya harus tetap diikat pada dasar keyboard (`Modifier.fillMaxWidth().height(calculatedHeight)`).
+   Menggeser handle atas hanya mengubah `previewHeightRatio` (antara `0.80f` s/d `1.25f`), dan handle bawah mengubah `previewBottomPaddingDp` (`0` s/d `36.dp`).
+
+---
+
+## 5. Ringkasan Checklist Sebelum Commit:
+- [ ] Hapus import `androidx.compose.material3.AlertDialog` dari `ClipboardScreen.kt`. Ganti dengan inline overlay.
+- [ ] Perbaiki Backspace: hapus `.clickable` kosong pada child `KeyView` dan sertakan fallback `sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)`.
+- [ ] Kunci tinggi `ClipboardScreen` dan `ResizeOverlayView` agar sama persis dengan tinggi keyboard (tidak ada `fillMaxSize` liar).
+- [ ] Ubah kartu clipboard menjadi 2 kolom grid dengan teks terpotong rapi (`maxLines = 2`).
+- [ ] Jalankan verifikasi `verify_kotlin_syntax.py` sebelum push.
