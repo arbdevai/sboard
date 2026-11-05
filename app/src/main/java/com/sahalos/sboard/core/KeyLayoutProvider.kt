@@ -47,11 +47,12 @@ object KeyLayoutProvider {
 
         val row4 = listOf(
             KeyModel(-3, "?123", null, 1.2f, KeyType.SYM),
-            KeyModel(-4, "Ctrl", null, 1.0f, KeyType.CTRL),
-            KeyModel(-5, "Fn", null, 0.9f, KeyType.FN),
-            KeyModel(','.code, ",", "<", 0.9f),
-            KeyModel(32, "SPACE", null, 4.0f, KeyType.SPACE),
-            KeyModel('.'.code, ".", ">", 0.9f),
+            KeyModel(-20, "EMOJI", null, 0.9f, KeyType.EMOJI),
+            KeyModel(-4, "Ctrl", null, 0.9f, KeyType.CTRL),
+            KeyModel(-5, "Fn", null, 0.8f, KeyType.FN),
+            KeyModel(','.code, ",", "<", 0.8f),
+            KeyModel(32, "SPACE", null, 3.2f, KeyType.SPACE),
+            KeyModel('.'.code, ".", ">", 0.8f),
             KeyModel(-6, "ENTER", null, 1.4f, KeyType.ACTION)
         )
 
@@ -86,7 +87,7 @@ object KeyLayoutProvider {
         )
 
         val row3 = listOf(
-            KeyModel('='.code, "=", "≠", 1.2f),
+            KeyModel(-8, "=\\<", null, 1.3f, KeyType.SYM_PAGE_2),
             KeyModel('*'.code, "*", "^", 1.0f),
             KeyModel('"'.code, "\"", "«", 1.0f),
             KeyModel('\''.code, "'", "»", 1.0f),
@@ -94,16 +95,69 @@ object KeyLayoutProvider {
             KeyModel(';'.code, ";", null, 1.0f),
             KeyModel('!'.code, "!", "¡", 1.0f),
             KeyModel('?'.code, "?", "¿", 1.0f),
-            KeyModel(-2, "DEL", null, 1.4f, KeyType.BACKSPACE)
+            KeyModel(-2, "DEL", null, 1.7f, KeyType.BACKSPACE)
         )
 
         val row4 = listOf(
             KeyModel(-7, "ABC", null, 1.2f, KeyType.SYM),
-            KeyModel(-4, "Ctrl", null, 1.0f, KeyType.CTRL),
-            KeyModel(-5, "Fn", null, 0.9f, KeyType.FN),
-            KeyModel(','.code, ",", "{", 0.9f),
+            KeyModel(-20, "EMOJI", null, 0.9f, KeyType.EMOJI),
+            KeyModel('_'.code, "_", null, 0.9f),
+            KeyModel(','.code, ",", "{", 0.8f),
             KeyModel(32, "SPACE", null, 4.0f, KeyType.SPACE),
-            KeyModel('.'.code, ".", "}", 0.9f),
+            KeyModel('.'.code, ".", "}", 0.8f),
+            KeyModel(-6, "ENTER", null, 1.4f, KeyType.ACTION)
+        )
+
+        return listOf(row1, row2, row3, row4)
+    }
+
+    fun getSymbolsPage2Rows(): List<List<KeyModel>> {
+        val row1 = listOf(
+            KeyModel('~'.code, "~", null, 1.0f),
+            KeyModel('\\'.code, "\\", null, 1.0f),
+            KeyModel('|'.code, "|", null, 1.0f),
+            KeyModel('<'.code, "<", null, 1.0f),
+            KeyModel('>'.code, ">", null, 1.0f),
+            KeyModel('{'.code, "{", null, 1.0f),
+            KeyModel('}'.code, "}", null, 1.0f),
+            KeyModel('['.code, "[", null, 1.0f),
+            KeyModel(']'.code, "]", null, 1.0f),
+            KeyModel('^'.code, "^", null, 1.0f)
+        )
+
+        val row2 = listOf(
+            KeyModel('°'.code, "°", null, 1.0f),
+            KeyModel('•'.code, "•", null, 1.0f),
+            KeyModel('§'.code, "§", null, 1.0f),
+            KeyModel('€'.code, "€", null, 1.0f),
+            KeyModel('£'.code, "£", null, 1.0f),
+            KeyModel('¥'.code, "¥", null, 1.0f),
+            KeyModel('¢'.code, "¢", null, 1.0f),
+            KeyModel('₹'.code, "₹", null, 1.0f),
+            KeyModel('±'.code, "±", null, 1.0f),
+            KeyModel('≠'.code, "≠", null, 1.0f)
+        )
+
+        val row3 = listOf(
+            KeyModel(-3, "?123", null, 1.3f, KeyType.SYM_PAGE_2),
+            KeyModel('÷'.code, "÷", null, 0.875f),
+            KeyModel('×'.code, "×", null, 0.875f),
+            KeyModel('¶'.code, "¶", null, 0.875f),
+            KeyModel('©'.code, "©", null, 0.875f),
+            KeyModel('®'.code, "®", null, 0.875f),
+            KeyModel('™'.code, "™", null, 0.875f),
+            KeyModel('¿'.code, "¿", null, 0.875f),
+            KeyModel('¡'.code, "¡", null, 0.875f),
+            KeyModel(-2, "DEL", null, 1.7f, KeyType.BACKSPACE)
+        )
+
+        val row4 = listOf(
+            KeyModel(-7, "ABC", null, 1.2f, KeyType.SYM),
+            KeyModel(-20, "EMOJI", null, 0.9f, KeyType.EMOJI),
+            KeyModel('`'.code, "`", null, 0.9f),
+            KeyModel('='.code, "=", null, 0.8f),
+            KeyModel(32, "SPACE", null, 4.0f, KeyType.SPACE),
+            KeyModel('.'.code, ".", null, 0.8f),
             KeyModel(-6, "ENTER", null, 1.4f, KeyType.ACTION)
         )
 

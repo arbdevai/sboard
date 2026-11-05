@@ -45,6 +45,7 @@ fun KeyView(
     actionImeLabel: String? = null,
     actionIconRes: Int = R.drawable.ic_enter,
     enableKeyPopup: Boolean = true,
+    isTopRow: Boolean = false,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null
@@ -168,6 +169,14 @@ fun KeyView(
                         fontWeight = FontWeight.Medium
                     )
                 }
+                KeyType.EMOJI -> {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_emoji),
+                        contentDescription = "Emoji",
+                        tint = textColor,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
                 else -> {
                     val displayText = if (modifierState.isShifted || modifierState.isCapsLock) {
                         key.primaryLabel.uppercase()
@@ -184,19 +193,25 @@ fun KeyView(
             }
         }
 
-        // Floating Key Magnifier Popup (Active on touch down)
+        // Floating Key Magnifier Popup (Active on touch down, with adaptive top-row offset)
         if (isPressed && enableKeyPopup && key.type == KeyType.CHARACTER) {
             val popupChar = if (modifierState.isShifted || modifierState.isCapsLock) {
                 key.primaryLabel.uppercase()
             } else {
                 key.primaryLabel
             }
+            val popupOffsetY = if (isTopRow) (-36).dp else (-46).dp
+            val bubbleHeight = if (isTopRow) 44.dp else 48.dp
+            val fontSize = if (isTopRow) 21.sp else 24.sp
+
             FloatingKeyBubble(
                 label = popupChar,
                 secondaryLabel = key.secondaryLabel,
                 theme = theme,
+                bubbleHeight = bubbleHeight,
+                fontSize = fontSize,
                 modifier = Modifier
-                    .offset(y = (-52).dp)
+                    .offset(y = popupOffsetY)
                     .zIndex(100f)
             )
         }
@@ -208,6 +223,8 @@ private fun FloatingKeyBubble(
     label: String,
     secondaryLabel: String?,
     theme: SboardTheme,
+    bubbleHeight: androidx.compose.ui.unit.Dp,
+    fontSize: androidx.compose.ui.unit.TextUnit,
     modifier: Modifier = Modifier
 ) {
     val bubbleShape = RoundedCornerShape(10.dp)
@@ -217,8 +234,8 @@ private fun FloatingKeyBubble(
 
     Box(
         modifier = modifier
-            .size(width = 48.dp, height = 54.dp)
-            .shadow(8.dp, shape = bubbleShape)
+            .size(width = 44.dp, height = bubbleHeight)
+            .shadow(6.dp, shape = bubbleShape)
             .clip(bubbleShape)
             .background(bubbleBg)
             .border(1.dp, accentColor.copy(alpha = 0.35f), bubbleShape),
@@ -231,12 +248,12 @@ private fun FloatingKeyBubble(
                 color = textColor.copy(alpha = 0.65f),
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(top = 2.dp, end = 5.dp)
+                    .padding(top = 2.dp, end = 4.dp)
             )
         }
         Text(
             text = label,
-            fontSize = 26.sp,
+            fontSize = fontSize,
             fontWeight = FontWeight.Bold,
             color = textColor
         )

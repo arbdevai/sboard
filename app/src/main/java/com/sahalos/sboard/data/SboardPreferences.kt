@@ -26,6 +26,7 @@ class SboardPreferences(private val context: Context) {
         val KEY_KEY_POPUP_PREVIEW = booleanPreferencesKey("enable_key_popup_preview")
         val KEY_SPACEBAR_CURSOR_GLIDE = booleanPreferencesKey("enable_spacebar_cursor_glide")
         val KEY_CLIPBOARD_HISTORY = booleanPreferencesKey("enable_clipboard_history")
+        val KEY_RECENT_EMOJIS = stringPreferencesKey("recent_emojis")
     }
 
     val bottomPaddingDp: Flow<Int> = context.dataStore.data.map { prefs ->
@@ -68,6 +69,11 @@ class SboardPreferences(private val context: Context) {
         prefs[KEY_CLIPBOARD_HISTORY] ?: true
     }
 
+    val recentEmojis: Flow<List<String>> = context.dataStore.data.map { prefs ->
+        val raw = prefs[KEY_RECENT_EMOJIS] ?: ""
+        if (raw.isEmpty()) emptyList() else raw.split("\u0001")
+    }
+
     suspend fun setBottomPaddingDp(dp: Int) {
         context.dataStore.edit { it[KEY_BOTTOM_PADDING] = dp }
     }
@@ -106,5 +112,16 @@ class SboardPreferences(private val context: Context) {
 
     suspend fun setEnableClipboardHistory(enabled: Boolean) {
         context.dataStore.edit { it[KEY_CLIPBOARD_HISTORY] = enabled }
+    }
+
+    suspend fun addRecentEmoji(emoji: String) {
+        context.dataStore.edit { prefs ->
+            val current = (prefs[KEY_RECENT_EMOJIS] ?: "")
+                .split("\u0001")
+                .filter { it.isNotEmpty() && it != emoji }
+                .toMutableList()
+            current.add(0, emoji)
+            prefs[KEY_RECENT_EMOJIS] = current.take(36).joinToString("\u0001")
+        }
     }
 }

@@ -54,6 +54,7 @@ fun SboardKeyboardView(
     onCursorMove: (Int) -> Unit,
     onShowImePicker: () -> Unit,
     onSuggestionClick: (String) -> Unit,
+    onEmojiClick: () -> Unit,
     onClipboardClick: () -> Unit,
     onResizeClick: () -> Unit,
     onSettingsClick: () -> Unit,
@@ -64,10 +65,10 @@ fun SboardKeyboardView(
     val density = LocalDensity.current
     val glideThresholdPx = with(density) { 12.dp.toPx() }
 
-    val rows = if (modifierState.isSymActive) {
-        KeyLayoutProvider.getSymbolsRows()
-    } else {
-        KeyLayoutProvider.getQwertyRows()
+    val rows = when {
+        modifierState.isSymPage2Active -> KeyLayoutProvider.getSymbolsPage2Rows()
+        modifierState.isSymActive -> KeyLayoutProvider.getSymbolsRows()
+        else -> KeyLayoutProvider.getQwertyRows()
     }
 
     Column(
@@ -75,11 +76,12 @@ fun SboardKeyboardView(
             .fillMaxWidth()
             .background(Color(theme.backgroundColor))
     ) {
-        // Suggestions & Quick Action Strip (Clipboard, Resize, Settings)
+        // Suggestions & Quick Action Strip (Emoji, Clipboard, Resize, Settings)
         SuggestionsBar(
             suggestions = suggestions,
             theme = theme,
             onSuggestionClick = onSuggestionClick,
+            onEmojiClick = onEmojiClick,
             onClipboardClick = onClipboardClick,
             onResizeClick = onResizeClick,
             onSettingsClick = onSettingsClick
@@ -100,7 +102,7 @@ fun SboardKeyboardView(
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp, vertical = 2.dp)
         ) {
-            rows.forEach { rowKeys ->
+            rows.forEachIndexed { rowIndex, rowKeys ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -242,6 +244,7 @@ fun SboardKeyboardView(
                                     actionImeLabel = actionImeLabel,
                                     actionIconRes = actionIconRes,
                                     enableKeyPopup = enableKeyPopup,
+                                    isTopRow = (rowIndex == 0),
                                     modifier = Modifier
                                         .weight(keyWeight)
                                         .fillMaxHeight(),

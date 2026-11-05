@@ -35,6 +35,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
@@ -53,6 +54,7 @@ import com.sahalos.sboard.model.KeyboardMode
 import com.sahalos.sboard.model.ModifierState
 import com.sahalos.sboard.model.SboardTheme
 import com.sahalos.sboard.ui.keyboard.ClipboardScreen
+import com.sahalos.sboard.ui.keyboard.EmojiScreen
 import com.sahalos.sboard.ui.keyboard.ResizeOverlayView
 import com.sahalos.sboard.ui.keyboard.SboardKeyboardView
 import kotlinx.coroutines.CoroutineScope
@@ -166,6 +168,7 @@ class SboardIME : InputMethodService(),
                 val enableKeyPopup by preferences.enableKeyPopupPreview.collectAsStateWithLifecycle(initialValue = true)
                 val themeId by preferences.themeId.collectAsStateWithLifecycle(initialValue = "nord_dark")
                 val clips by clipboardManager.clips.collectAsStateWithLifecycle()
+                val recentEmojis by preferences.recentEmojis.collectAsStateWithLifecycle(initialValue = emptyList())
 
                 val activeTheme = SboardTheme.AvailableThemes.find { it.id == themeId } ?: SboardTheme.NordDark
 
@@ -202,6 +205,7 @@ class SboardIME : InputMethodService(),
                                 onCursorMove = { offset -> moveCursor(offset) },
                                 onShowImePicker = { showImePicker() },
                                 onSuggestionClick = { word -> commitSuggestion(word) },
+                                onEmojiClick = { keyboardMode = KeyboardMode.EMOJI },
                                 onClipboardClick = { keyboardMode = KeyboardMode.CLIPBOARD },
                                 onResizeClick = {
                                     previewHeightRatio = heightRatio
@@ -224,6 +228,21 @@ class SboardIME : InputMethodService(),
                                 onTogglePin = { clipId -> clipboardManager.togglePin(clipId) },
                                 onDeleteClip = { clipId -> clipboardManager.removeClip(clipId) },
                                 onClearAll = { clipboardManager.clearAllUnpinned() },
+                                onBackToKeyboard = { keyboardMode = KeyboardMode.KEYBOARD }
+                            )
+                        }
+                        KeyboardMode.EMOJI -> {
+                            EmojiScreen(
+                                theme = activeTheme,
+                                recentEmojis = recentEmojis,
+                                totalKeyboardHeight = totalKeyboardHeightDp,
+                                onEmojiClick = { emoji ->
+                                    commitTextDirectly(emoji)
+                                    lifecycleScope.launch {
+                                        preferences.addRecentEmoji(emoji)
+                                    }
+                                },
+                                onBackspaceClick = { performBackspace() },
                                 onBackToKeyboard = { keyboardMode = KeyboardMode.KEYBOARD }
                             )
                         }
@@ -250,6 +269,7 @@ class SboardIME : InputMethodService(),
                                     onCursorMove = {},
                                     onShowImePicker = {},
                                     onSuggestionClick = {},
+                                    onEmojiClick = {},
                                     onClipboardClick = {},
                                     onResizeClick = {},
                                     onSettingsClick = {},
@@ -428,7 +448,19 @@ class SboardIME : InputMethodService(),
                 modifierState = modifierState.copy(isFnActive = !modifierState.isFnActive)
             }
             KeyType.SYM -> {
-                modifierState = modifierState.copy(isSymActive = !modifierState.isSymActive)
+                val nextSymActive = !modifierState.isSymActive
+                modifierState = modifierState.copy(
+                    isSymActive = nextSymActive,
+                    isSymPage2Active = false
+                )
+            }
+            KeyType.SYM_PAGE_2 -> {
+                modifierState = modifierState.copy(
+                    isSymPage2Active = !modifierState.isSymPage2Active
+                )
+            }
+            KeyType.EMOJI -> {
+                keyboardMode = KeyboardMode.EMOJI
             }
             KeyType.ACTION -> {
                 if (currentActionId != EditorInfo.IME_ACTION_UNSPECIFIED && currentActionId != EditorInfo.IME_ACTION_NONE) {

@@ -33,6 +33,7 @@ fun SuggestionsBar(
     suggestions: List<String>,
     theme: SboardTheme,
     onSuggestionClick: (String) -> Unit,
+    onEmojiClick: () -> Unit,
     onClipboardClick: () -> Unit,
     onResizeClick: () -> Unit,
     onSettingsClick: () -> Unit,
@@ -50,13 +51,30 @@ fun SuggestionsBar(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
+        // Quick tools: Emoji button
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(6.dp))
+                .clickable { onEmojiClick() }
+                .padding(horizontal = 6.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_emoji),
+                contentDescription = "Emoji",
+                tint = textColor.copy(alpha = 0.85f),
+                modifier = Modifier.size(18.dp)
+            )
+        }
+
         // Quick tools: Clipboard button
         Box(
             modifier = Modifier
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(6.dp))
                 .clickable { onClipboardClick() }
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = 6.dp),
             contentAlignment = Alignment.Center
         ) {
             Icon(

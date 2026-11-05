@@ -11,7 +11,9 @@ enum class KeyType {
     ACTION,
     CLIPBOARD,
     SETTINGS,
-    SPACER
+    SPACER,
+    EMOJI,
+    SYM_PAGE_2
 }
 
 data class KeyModel(
@@ -27,5 +29,6 @@ data class ModifierState(
     val isCapsLock: Boolean = false,
     val isCtrlActive: Boolean = false,
     val isFnActive: Boolean = false,
-    val isSymActive: Boolean = false
+    val isSymActive: Boolean = false,
+    val isSymPage2Active: Boolean = false
 )
