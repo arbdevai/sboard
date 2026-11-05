@@ -136,3 +136,21 @@ Handle drag atas pada `ResizeOverlayView.kt` mengupdate `previewHeightRatio` pad
 - [x] **Penyesuaian Offset Popup Huruf Atas (`KeyView.kt`, `SboardKeyboardView.kt`)**:
   - Deteksi baris teratas (QWERTYUIOP) dengan offset pop-up terkalibrasi (-36.dp) agar gelembung huruf tidak mentok di plafon window keyboard.
 
+---
+
+## Ringkasan Eksekusi Rilis v1.0.11:
+- [x] **Styling Flat Konsisten untuk Ctrl & Fn (`SuggestionsBar.kt`)**:
+  - Latar belakang (background) kotak tombol `Ctrl` dan `Fn` di toolbar dihapus total saat tidak aktif.
+  - Tampilan visual sekarang 100% konsisten, flat, dan menyatu rapi dengan ikon Clipboard dan Resize (`tint = textColor.copy(alpha = 0.85f)`).
+  - Saat aktif, hanya warna teks yang berubah menjadi aksen dan tebal tanpa kotak background yang merusak estetika toolbar.
+- [x] **Pemisahan Mode Emoji Bersih & Standar Gboard (`EmojiScreen.kt`)**:
+  - Mengeliminasi penumpukan 5 toolbar sekaligus yang membuat tampilan sempit dan berantakan.
+  - **Mode Browser Emoji (Default):**
+    - Toolbar atas minimalis (40dp): `[←] [🔍 Telusuri emoji...] [⌫]`.
+    - Area grid emoji lega (8 kolom) mengisi 80%+ tinggi keyboard tanpa tumpukan keyboard inline.
+    - Toolbar bawah kategori (38dp): `[ABC]` + deretan ikon emoji kategori bersih tanpa teks panjang (`🕒` `😊` `👋` `🐶` `🍕` `⚽` `🚗` `💡` `🔣` `🏁`) + `[⌫]`.
+  - **Mode Pencarian Emoji:**
+    - Hanya aktif saat pengguna mengetuk kotak pencarian "Telusuri emoji...".
+    - Menampilkan bar kata kunci instan, hasil pencarian real-time di atas, dan keyboard QWERTY untuk mengetik kata kunci.
+
+

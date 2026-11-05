@@ -55,43 +55,41 @@ fun SuggestionsBar(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // Quick tools: Ctrl and Fn Buttons (Moved up from keyboard row to maximize space)
+        // Quick tools: Ctrl and Fn Buttons (Flat, consistent with clipboard and resize icons)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            // Ctrl Pill Button
+            // Ctrl Button (Flat icon style, consistent with clipboard and resize)
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(6.dp))
-                    .background(if (isCtrlActive) accentColor else Color(theme.keyBackgroundColor).copy(alpha = 0.5f))
                     .clickable { onCtrlClick() }
-                    .padding(horizontal = 9.dp),
+                    .padding(horizontal = 6.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "Ctrl",
-                    color = if (isCtrlActive) Color.White else textColor,
-                    fontSize = 11.sp,
+                    color = if (isCtrlActive) accentColor else textColor.copy(alpha = 0.85f),
+                    fontSize = 12.sp,
                     fontWeight = if (isCtrlActive) FontWeight.Bold else FontWeight.Medium
                 )
             }
 
-            // Fn Pill Button
+            // Fn Button (Flat icon style, consistent with clipboard and resize)
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(6.dp))
-                    .background(if (isFnActive) accentColor else Color(theme.keyBackgroundColor).copy(alpha = 0.5f))
                     .clickable { onFnClick() }
-                    .padding(horizontal = 9.dp),
+                    .padding(horizontal = 6.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "Fn",
-                    color = if (isFnActive) Color.White else textColor,
-                    fontSize = 11.sp,
+                    color = if (isFnActive) accentColor else textColor.copy(alpha = 0.85f),
+                    fontSize = 12.sp,
                     fontWeight = if (isFnActive) FontWeight.Bold else FontWeight.Medium
                 )
             }
