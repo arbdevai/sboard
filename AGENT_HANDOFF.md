@@ -84,9 +84,11 @@ android.view.WindowManager$BadTokenException: Unable to add window -- token null
 
 ---
 
-## 5. Ringkasan Checklist Sebelum Commit:
-- [ ] Hapus import `androidx.compose.material3.AlertDialog` dari `ClipboardScreen.kt`. Ganti dengan inline overlay.
-- [ ] Perbaiki Backspace: hapus `.clickable` kosong pada child `KeyView` dan sertakan fallback `sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)`.
-- [ ] Kunci tinggi `ClipboardScreen` dan `ResizeOverlayView` agar sama persis dengan tinggi keyboard (tidak ada `fillMaxSize` liar).
-- [ ] Ubah kartu clipboard menjadi 2 kolom grid dengan teks terpotong rapi (`maxLines = 2`).
-- [ ] Jalankan verifikasi `verify_kotlin_syntax.py` sebelum push.
+## 5. Ringkasan Checklist Rilis v1.0.6:
+- [x] Hapus import `androidx.compose.material3.AlertDialog` dari `ClipboardScreen.kt`. Ganti dengan inline modal overlay di hierarki Compose yang sama untuk mencegah `BadTokenException`.
+- [x] Perbaiki Backspace: `KeyView` dibuat mendukung `onClick = null` agar gesture `detectTapGestures(onPress = ...)` pada wrapper luar tidak dikonsumsi, serta menyertakan fallback resmi `sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)`.
+- [x] Kunci tinggi `ClipboardScreen` dan `ResizeOverlayView` agar sama persis dengan tinggi keyboard (`totalKeyboardHeightDp`) tanpa `Modifier.fillMaxSize()`.
+- [x] Ubah kartu clipboard menjadi 2 kolom grid (`LazyVerticalGrid(GridCells.Fixed(2))`) dengan teks terpotong rapi (`maxLines = 2`, `TextOverflow.Ellipsis`).
+- [x] Tambahkan menu aksi mandiri (Pin/Lepas Sematan & Hapus Klip) per kartu via inline overlay.
+- [x] Jalankan verifikasi `verify_kotlin_syntax.py` dengan 0 kesalahan.
+- [x] Build sukses di GitHub Actions CI (Run ID: 41972465852) dan APK v1.0.6 terbit.
