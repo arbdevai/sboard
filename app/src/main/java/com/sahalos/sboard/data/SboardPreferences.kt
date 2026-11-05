@@ -23,6 +23,9 @@ class SboardPreferences(private val context: Context) {
         val KEY_VIBRATION = booleanPreferencesKey("enable_vibration")
         val KEY_THEME_ID = stringPreferencesKey("theme_id")
         val KEY_PASSIVE_SUGGESTIONS = booleanPreferencesKey("passive_suggestions")
+        val KEY_KEY_POPUP_PREVIEW = booleanPreferencesKey("enable_key_popup_preview")
+        val KEY_SPACEBAR_CURSOR_GLIDE = booleanPreferencesKey("enable_spacebar_cursor_glide")
+        val KEY_CLIPBOARD_HISTORY = booleanPreferencesKey("enable_clipboard_history")
     }
 
     val bottomPaddingDp: Flow<Int> = context.dataStore.data.map { prefs ->
@@ -53,6 +56,18 @@ class SboardPreferences(private val context: Context) {
         prefs[KEY_PASSIVE_SUGGESTIONS] ?: true
     }
 
+    val enableKeyPopupPreview: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[KEY_KEY_POPUP_PREVIEW] ?: true
+    }
+
+    val enableSpacebarCursorGlide: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[KEY_SPACEBAR_CURSOR_GLIDE] ?: true
+    }
+
+    val enableClipboardHistory: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[KEY_CLIPBOARD_HISTORY] ?: true
+    }
+
     suspend fun setBottomPaddingDp(dp: Int) {
         context.dataStore.edit { it[KEY_BOTTOM_PADDING] = dp }
     }
@@ -79,5 +94,17 @@ class SboardPreferences(private val context: Context) {
 
     suspend fun setEnablePassiveSuggestions(enabled: Boolean) {
         context.dataStore.edit { it[KEY_PASSIVE_SUGGESTIONS] = enabled }
+    }
+
+    suspend fun setEnableKeyPopupPreview(enabled: Boolean) {
+        context.dataStore.edit { it[KEY_KEY_POPUP_PREVIEW] = enabled }
+    }
+
+    suspend fun setEnableSpacebarCursorGlide(enabled: Boolean) {
+        context.dataStore.edit { it[KEY_SPACEBAR_CURSOR_GLIDE] = enabled }
+    }
+
+    suspend fun setEnableClipboardHistory(enabled: Boolean) {
+        context.dataStore.edit { it[KEY_CLIPBOARD_HISTORY] = enabled }
     }
 }

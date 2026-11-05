@@ -163,6 +163,7 @@ class SboardIME : InputMethodService(),
                 val bottomPadding by preferences.bottomPaddingDp.collectAsStateWithLifecycle(initialValue = 0)
                 val heightRatio by preferences.keyboardHeightRatio.collectAsStateWithLifecycle(initialValue = 1.0f)
                 val enableLongPressSymbols by preferences.enableLongPressSymbols.collectAsStateWithLifecycle(initialValue = true)
+                val enableKeyPopup by preferences.enableKeyPopupPreview.collectAsStateWithLifecycle(initialValue = true)
                 val themeId by preferences.themeId.collectAsStateWithLifecycle(initialValue = "nord_dark")
                 val clips by clipboardManager.clips.collectAsStateWithLifecycle()
 
@@ -192,6 +193,7 @@ class SboardIME : InputMethodService(),
                                 bottomPaddingDp = bottomPadding,
                                 keyboardHeightRatio = heightRatio,
                                 enableLongPressSymbols = enableLongPressSymbols,
+                                enableKeyPopup = enableKeyPopup,
                                 actionImeLabel = currentActionLabel,
                                 actionIconRes = currentActionIcon,
                                 onKeyClick = { key -> handleKeyClick(key) },
@@ -239,6 +241,7 @@ class SboardIME : InputMethodService(),
                                     bottomPaddingDp = previewBottomPaddingDp,
                                     keyboardHeightRatio = previewHeightRatio,
                                     enableLongPressSymbols = enableLongPressSymbols,
+                                    enableKeyPopup = false,
                                     actionImeLabel = currentActionLabel,
                                     actionIconRes = currentActionIcon,
                                     onKeyClick = {},

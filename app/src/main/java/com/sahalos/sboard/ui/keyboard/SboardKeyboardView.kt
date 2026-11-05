@@ -45,6 +45,7 @@ fun SboardKeyboardView(
     bottomPaddingDp: Int,
     keyboardHeightRatio: Float,
     enableLongPressSymbols: Boolean,
+    enableKeyPopup: Boolean = true,
     actionImeLabel: String?,
     actionIconRes: Int,
     onKeyClick: (KeyModel) -> Unit,
@@ -240,6 +241,7 @@ fun SboardKeyboardView(
                                     theme = theme,
                                     actionImeLabel = actionImeLabel,
                                     actionIconRes = actionIconRes,
+                                    enableKeyPopup = enableKeyPopup,
                                     modifier = Modifier
                                         .weight(keyWeight)
                                         .fillMaxHeight(),
