@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleIncomingIntent(intent: Intent?) {
-        val data: Uri? = intent?.data ?: return
+        val data: Uri = intent?.data ?: return
         if (data.scheme == "sboard" && data.host == "theme") {
             val downloadUrl = data.getQueryParameter("download")
             if (!downloadUrl.isNullOrEmpty()) {
