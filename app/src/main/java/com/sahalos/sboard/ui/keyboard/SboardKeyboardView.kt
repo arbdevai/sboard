@@ -1,6 +1,5 @@
 package com.sahalos.sboard.ui.keyboard
 
-import android.view.KeyEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -27,7 +26,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.sahalos.sboard.R
 import com.sahalos.sboard.core.KeyLayoutProvider
-import com.sahalos.sboard.model.ClipItem
 import com.sahalos.sboard.model.KeyModel
 import com.sahalos.sboard.model.KeyType
 import com.sahalos.sboard.model.ModifierState
@@ -41,8 +39,6 @@ fun SboardKeyboardView(
     modifierState: ModifierState,
     theme: SboardTheme,
     suggestions: List<String>,
-    clips: List<ClipItem>,
-    isClipboardOpen: Boolean,
     bottomPaddingDp: Int,
     keyboardHeightRatio: Float,
     enableLongPressSymbols: Boolean,
@@ -54,9 +50,8 @@ fun SboardKeyboardView(
     onCursorMove: (Int) -> Unit,
     onShowImePicker: () -> Unit,
     onSuggestionClick: (String) -> Unit,
-    onClipboardToggle: () -> Unit,
-    onTogglePin: (String) -> Unit,
-    onClearClips: () -> Unit,
+    onClipboardClick: () -> Unit,
+    onResizeClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onFunctionKeyClick: (Int) -> Unit,
     modifier: Modifier = Modifier
@@ -76,28 +71,15 @@ fun SboardKeyboardView(
             .fillMaxWidth()
             .background(Color(theme.backgroundColor))
     ) {
-        // Suggestions & Toolbar Strip
+        // Suggestions & Quick Action Strip (Clipboard, Resize, Settings)
         SuggestionsBar(
             suggestions = suggestions,
             theme = theme,
-            isClipboardOpen = isClipboardOpen,
             onSuggestionClick = onSuggestionClick,
-            onClipboardToggle = onClipboardToggle,
+            onClipboardClick = onClipboardClick,
+            onResizeClick = onResizeClick,
             onSettingsClick = onSettingsClick
         )
-
-        // Clipboard Drawer (Expandable)
-        if (isClipboardOpen) {
-            ClipboardDrawer(
-                clips = clips,
-                theme = theme,
-                onClipClick = { text ->
-                    onKeyClick(KeyModel(code = 0, primaryLabel = text, type = KeyType.CHARACTER))
-                },
-                onTogglePin = onTogglePin,
-                onClearAll = onClearClips
-            )
-        }
 
         // Optional Fn Row when Fn mode is active
         if (modifierState.isFnActive) {
@@ -131,12 +113,6 @@ fun SboardKeyboardView(
                                         .weight(keyWeight)
                                         .fillMaxHeight()
                                         .pointerInput(Unit) {
-                                            detectTapGestures(
-                                                onTap = { onKeyClick(key) },
-                                                onLongPress = { onShowImePicker() }
-                                            )
-                                        }
-                                        .pointerInput(Unit) {
                                             detectDragGestures(
                                                 onDragStart = { dragAccumulatorPx = 0f },
                                                 onDrag = { _, dragAmount ->
@@ -157,7 +133,8 @@ fun SboardKeyboardView(
                                         modifierState = modifierState,
                                         theme = theme,
                                         modifier = Modifier.fillMaxSize(),
-                                        onClick = { /* handled by pointerInput gestures */ }
+                                        onClick = { onKeyClick(key) },
+                                        onLongClick = { onShowImePicker() }
                                     )
                                 }
                             }
@@ -172,7 +149,7 @@ fun SboardKeyboardView(
                                                 onPress = {
                                                     // Instant tap on ACTION_DOWN
                                                     onKeyClick(key)
-                                                    // Controlled pacing repeat delete: 350ms delay, 45ms repeat
+                                                    // Controlled repeat delete: 350ms initial delay, 45ms repeat
                                                     repeatJob = coroutineScope.launch {
                                                         delay(350L)
                                                         while (true) {
@@ -183,7 +160,6 @@ fun SboardKeyboardView(
                                                     try {
                                                         awaitRelease()
                                                     } finally {
-                                                        // Triple-Cancellation Guard: ACTION_UP, ACTION_CANCEL, bounds exit
                                                         repeatJob?.cancel()
                                                         repeatJob = null
                                                     }
@@ -196,36 +172,25 @@ fun SboardKeyboardView(
                                         modifierState = modifierState,
                                         theme = theme,
                                         modifier = Modifier.fillMaxSize(),
-                                        onClick = { /* handled by pointerInput */ }
+                                        onClick = { /* handled by outer pointerInput */ }
                                     )
                                 }
                             }
                             else -> {
-                                Box(
+                                KeyView(
+                                    key = key,
+                                    modifierState = modifierState,
+                                    theme = theme,
+                                    actionImeLabel = actionImeLabel,
+                                    actionIconRes = actionIconRes,
                                     modifier = Modifier
                                         .weight(keyWeight)
-                                        .fillMaxHeight()
-                                        .pointerInput(key) {
-                                            detectTapGestures(
-                                                onTap = { onKeyClick(key) },
-                                                onLongPress = {
-                                                    if (enableLongPressSymbols && !key.secondaryLabel.isNullOrEmpty()) {
-                                                        onKeyLongClick(key)
-                                                    }
-                                                }
-                                            )
-                                        }
-                                ) {
-                                    KeyView(
-                                        key = key,
-                                        modifierState = modifierState,
-                                        theme = theme,
-                                        actionImeLabel = actionImeLabel,
-                                        actionIconRes = actionIconRes,
-                                        modifier = Modifier.fillMaxSize(),
-                                        onClick = { /* handled by pointerInput */ }
-                                    )
-                                }
+                                        .fillMaxHeight(),
+                                    onClick = { onKeyClick(key) },
+                                    onLongClick = if (enableLongPressSymbols && !key.secondaryLabel.isNullOrEmpty()) {
+                                        { onKeyLongClick(key) }
+                                    } else null
+                                )
                             }
                         }
                     }
@@ -233,7 +198,7 @@ fun SboardKeyboardView(
             }
         }
 
-        // Adjustable Bottom Padding (Ergonomi jempol anti-pegal)
+        // Adjustable Bottom Padding (Ergonomi jempol)
         if (bottomPaddingDp > 0) {
             Spacer(modifier = Modifier.height(bottomPaddingDp.dp))
         }

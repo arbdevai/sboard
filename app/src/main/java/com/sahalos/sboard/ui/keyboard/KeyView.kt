@@ -2,9 +2,9 @@ package com.sahalos.sboard.ui.keyboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -36,7 +37,8 @@ fun KeyView(
     actionImeLabel: String? = null,
     actionIconRes: Int = R.drawable.ic_enter,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val shape = RoundedCornerShape(theme.keyCornerRadiusDp.dp)
@@ -54,17 +56,29 @@ fun KeyView(
         else -> Color(theme.keyTextColor)
     }
 
+    val baseModifier = modifier
+        .padding(horizontal = 2.dp, vertical = 3.dp)
+        .shadow(theme.keyElevationDp.dp, shape = shape)
+        .clip(shape)
+        .background(keyBgColor)
+
+    val interactiveModifier = if (onLongClick != null) {
+        baseModifier.pointerInput(key) {
+            detectTapGestures(
+                onTap = { onClick() },
+                onLongPress = { onLongClick() }
+            )
+        }
+    } else {
+        baseModifier.clickable(
+            interactionSource = interactionSource,
+            indication = ripple(bounded = true, color = textColor.copy(alpha = 0.2f)),
+            onClick = onClick
+        )
+    }
+
     Box(
-        modifier = modifier
-            .padding(horizontal = 2.dp, vertical = 3.dp)
-            .shadow(theme.keyElevationDp.dp, shape = shape)
-            .clip(shape)
-            .background(keyBgColor)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = ripple(bounded = true, color = textColor.copy(alpha = 0.2f)),
-                onClick = onClick
-            ),
+        modifier = interactiveModifier,
         contentAlignment = Alignment.Center
     ) {
         // Secondary label on top-right (e.g. symbols / numbers)

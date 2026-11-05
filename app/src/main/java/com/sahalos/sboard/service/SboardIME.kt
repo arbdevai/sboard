@@ -13,9 +13,19 @@ import android.view.ViewGroup
 import android.view.Window
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.lifecycle.Lifecycle
@@ -37,8 +47,11 @@ import com.sahalos.sboard.core.PassiveSuggestionEngine
 import com.sahalos.sboard.data.SboardPreferences
 import com.sahalos.sboard.model.KeyModel
 import com.sahalos.sboard.model.KeyType
+import com.sahalos.sboard.model.KeyboardMode
 import com.sahalos.sboard.model.ModifierState
 import com.sahalos.sboard.model.SboardTheme
+import com.sahalos.sboard.ui.keyboard.ClipboardScreen
+import com.sahalos.sboard.ui.keyboard.ResizeOverlayView
 import com.sahalos.sboard.ui.keyboard.SboardKeyboardView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -64,11 +77,13 @@ class SboardIME : InputMethodService(),
     private lateinit var clipboardManager: SboardClipboardManager
     private var vibrator: Vibrator? = null
 
+    // Screen mode (Keyboard, Clipboard, Resize)
+    private var keyboardMode by mutableStateOf(KeyboardMode.KEYBOARD)
+
     // Keyboard state
     private var modifierState by mutableStateOf(ModifierState())
     private var currentComposingWord by mutableStateOf("")
     private var currentSuggestions by mutableStateOf<List<String>>(emptyList())
-    private var isClipboardOpen by mutableStateOf(false)
 
     // Dynamic Action Key
     private var currentActionIcon by mutableStateOf(R.drawable.ic_enter)
@@ -99,19 +114,16 @@ class SboardIME : InputMethodService(),
         val win = window?.window ?: return
         val decorView = win.decorView
 
-        // 1. Set pada DecorView
         decorView.setViewTreeLifecycleOwner(this)
         decorView.setViewTreeViewModelStoreOwner(this)
         decorView.setViewTreeSavedStateRegistryOwner(this)
 
-        // 2. Set eksplisit pada content view
         decorView.findViewById<View>(android.R.id.content)?.let { content ->
             content.setViewTreeLifecycleOwner(this)
             content.setViewTreeViewModelStoreOwner(this)
             content.setViewTreeSavedStateRegistryOwner(this)
         }
 
-        // 3. Set pada parentPanel jika sudah ter-inflate
         val parentPanelId = resources.getIdentifier("parentPanel", "id", "android")
         if (parentPanelId != 0) {
             decorView.findViewById<View>(parentPanelId)?.let { panel ->
@@ -121,7 +133,6 @@ class SboardIME : InputMethodService(),
             }
         }
 
-        // 4. Set pada semua child ViewGroup yang ada
         if (decorView is ViewGroup) {
             for (i in 0 until decorView.childCount) {
                 val child = decorView.getChildAt(i)
@@ -155,29 +166,104 @@ class SboardIME : InputMethodService(),
 
                 val activeTheme = SboardTheme.AvailableThemes.find { it.id == themeId } ?: SboardTheme.NordDark
 
-                SboardKeyboardView(
-                    modifierState = modifierState,
-                    theme = activeTheme,
-                    suggestions = if (isPasswordField) emptyList() else currentSuggestions,
-                    clips = clips,
-                    isClipboardOpen = isClipboardOpen,
-                    bottomPaddingDp = bottomPadding,
-                    keyboardHeightRatio = heightRatio,
-                    enableLongPressSymbols = enableLongPressSymbols,
-                    actionImeLabel = currentActionLabel,
-                    actionIconRes = currentActionIcon,
-                    onKeyClick = { key -> handleKeyClick(key) },
-                    onKeyLongClick = { key -> handleKeyLongClick(key) },
-                    onBackspaceRepeat = { performBackspace() },
-                    onCursorMove = { offset -> moveCursor(offset) },
-                    onShowImePicker = { showImePicker() },
-                    onSuggestionClick = { word -> commitSuggestion(word) },
-                    onClipboardToggle = { isClipboardOpen = !isClipboardOpen },
-                    onTogglePin = { clipId -> clipboardManager.togglePin(clipId) },
-                    onClearClips = { clipboardManager.clearAllUnpinned() },
-                    onSettingsClick = { openSettings() },
-                    onFunctionKeyClick = { keyCode -> sendFunctionKey(keyCode) }
-                )
+                // Local states for live resize preview
+                var previewHeightRatio by androidx.compose.runtime.remember(heightRatio) { mutableFloatStateOf(heightRatio) }
+                var previewBottomPaddingDp by androidx.compose.runtime.remember(bottomPadding) { mutableIntStateOf(bottomPadding) }
+
+                AnimatedContent(
+                    targetState = keyboardMode,
+                    transitionSpec = { fadeIn() togetherWith fadeOut() },
+                    label = "KeyboardModeTransition"
+                ) { mode ->
+                    when (mode) {
+                        KeyboardMode.KEYBOARD -> {
+                            SboardKeyboardView(
+                                modifierState = modifierState,
+                                theme = activeTheme,
+                                suggestions = if (isPasswordField) emptyList() else currentSuggestions,
+                                bottomPaddingDp = bottomPadding,
+                                keyboardHeightRatio = heightRatio,
+                                enableLongPressSymbols = enableLongPressSymbols,
+                                actionImeLabel = currentActionLabel,
+                                actionIconRes = currentActionIcon,
+                                onKeyClick = { key -> handleKeyClick(key) },
+                                onKeyLongClick = { key -> handleKeyLongClick(key) },
+                                onBackspaceRepeat = { performBackspace() },
+                                onCursorMove = { offset -> moveCursor(offset) },
+                                onShowImePicker = { showImePicker() },
+                                onSuggestionClick = { word -> commitSuggestion(word) },
+                                onClipboardClick = { keyboardMode = KeyboardMode.CLIPBOARD },
+                                onResizeClick = {
+                                    previewHeightRatio = heightRatio
+                                    previewBottomPaddingDp = bottomPadding
+                                    keyboardMode = KeyboardMode.RESIZE
+                                },
+                                onSettingsClick = { openSettings() },
+                                onFunctionKeyClick = { keyCode -> sendFunctionKey(keyCode) }
+                            )
+                        }
+                        KeyboardMode.CLIPBOARD -> {
+                            ClipboardScreen(
+                                clips = clips,
+                                theme = activeTheme,
+                                onClipClick = { text ->
+                                    commitTextDirectly(text)
+                                    keyboardMode = KeyboardMode.KEYBOARD
+                                },
+                                onTogglePin = { clipId -> clipboardManager.togglePin(clipId) },
+                                onDeleteClip = { clipId -> clipboardManager.removeClip(clipId) },
+                                onClearAll = { clipboardManager.clearAllUnpinned() },
+                                onBackToKeyboard = { keyboardMode = KeyboardMode.KEYBOARD }
+                            )
+                        }
+                        KeyboardMode.RESIZE -> {
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                // Keyboard rendered underneath with preview dimensions
+                                SboardKeyboardView(
+                                    modifierState = modifierState,
+                                    theme = activeTheme,
+                                    suggestions = emptyList(),
+                                    bottomPaddingDp = previewBottomPaddingDp,
+                                    keyboardHeightRatio = previewHeightRatio,
+                                    enableLongPressSymbols = enableLongPressSymbols,
+                                    actionImeLabel = currentActionLabel,
+                                    actionIconRes = currentActionIcon,
+                                    onKeyClick = {},
+                                    onKeyLongClick = {},
+                                    onBackspaceRepeat = {},
+                                    onCursorMove = {},
+                                    onShowImePicker = {},
+                                    onSuggestionClick = {},
+                                    onClipboardClick = {},
+                                    onResizeClick = {},
+                                    onSettingsClick = {},
+                                    onFunctionKeyClick = {}
+                                )
+
+                                // Interactive Gboard-style Resize Overlay
+                                ResizeOverlayView(
+                                    currentHeightRatio = previewHeightRatio,
+                                    currentBottomPaddingDp = previewBottomPaddingDp,
+                                    theme = activeTheme,
+                                    onHeightRatioChange = { previewHeightRatio = it },
+                                    onBottomPaddingChange = { previewBottomPaddingDp = it },
+                                    onReset = {
+                                        previewHeightRatio = 1.0f
+                                        previewBottomPaddingDp = 0
+                                    },
+                                    onCancel = { keyboardMode = KeyboardMode.KEYBOARD },
+                                    onSave = {
+                                        serviceScope.launch {
+                                            preferences.setKeyboardHeightRatio(previewHeightRatio)
+                                            preferences.setBottomPaddingDp(previewBottomPaddingDp)
+                                        }
+                                        keyboardMode = KeyboardMode.KEYBOARD
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
         return composeView
@@ -190,7 +276,7 @@ class SboardIME : InputMethodService(),
 
         currentComposingWord = ""
         currentSuggestions = emptyList()
-        isClipboardOpen = false
+        keyboardMode = KeyboardMode.KEYBOARD
 
         // Check if password field
         val variation = (info?.inputType ?: 0) and InputType.TYPE_MASK_VARIATION
@@ -211,7 +297,7 @@ class SboardIME : InputMethodService(),
     override fun onWindowHidden() {
         super.onWindowHidden()
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-        isClipboardOpen = false
+        keyboardMode = KeyboardMode.KEYBOARD
     }
 
     override fun onFinishInputView(finishingInput: Boolean) {
@@ -260,8 +346,17 @@ class SboardIME : InputMethodService(),
         }
     }
 
+    private fun commitTextDirectly(text: String) {
+        triggerHaptic()
+        val ic = currentInputConnection ?: return
+        ic.commitText(text, 1)
+        currentComposingWord = ""
+        currentSuggestions = emptyList()
+    }
+
     private fun handleKeyClick(key: KeyModel) {
         triggerHaptic()
+        val ic = currentInputConnection ?: return
 
         when (key.type) {
             KeyType.CHARACTER -> {
@@ -277,7 +372,7 @@ class SboardIME : InputMethodService(),
                     key.primaryLabel
                 }
 
-                currentInputConnection?.commitText(charToCommit, 1)
+                ic.commitText(charToCommit, 1)
 
                 // Update composing word for passive suggestions
                 if (!isPasswordField && charToCommit.length == 1 && charToCommit[0].isLetter()) {
@@ -294,7 +389,7 @@ class SboardIME : InputMethodService(),
                 }
             }
             KeyType.SPACE -> {
-                currentInputConnection?.commitText(" ", 1)
+                ic.commitText(" ", 1)
                 currentComposingWord = ""
                 currentSuggestions = emptyList()
             }
@@ -321,7 +416,7 @@ class SboardIME : InputMethodService(),
             }
             KeyType.ACTION -> {
                 if (currentActionId != EditorInfo.IME_ACTION_UNSPECIFIED && currentActionId != EditorInfo.IME_ACTION_NONE) {
-                    currentInputConnection?.performEditorAction(currentActionId)
+                    ic.performEditorAction(currentActionId)
                 } else {
                     sendKeyChar('\n')
                 }
@@ -333,27 +428,28 @@ class SboardIME : InputMethodService(),
     private fun handleKeyLongClick(key: KeyModel) {
         triggerHaptic()
         val symbol = key.secondaryLabel ?: return
-        currentInputConnection?.commitText(symbol, 1)
+        val ic = currentInputConnection ?: return
+        ic.commitText(symbol, 1)
         currentComposingWord = ""
         currentSuggestions = emptyList()
     }
 
     private fun handleCtrlShortcut(letter: String) {
+        val ic = currentInputConnection ?: return
         val lower = letter.lowercase()
         when (lower) {
-            "a" -> currentInputConnection?.performContextMenuAction(android.R.id.selectAll)
-            "c" -> currentInputConnection?.performContextMenuAction(android.R.id.copy)
-            "v" -> currentInputConnection?.performContextMenuAction(android.R.id.paste)
-            "x" -> currentInputConnection?.performContextMenuAction(android.R.id.cut)
-            "z" -> currentInputConnection?.performContextMenuAction(android.R.id.undo)
+            "a" -> ic.performContextMenuAction(android.R.id.selectAll)
+            "c" -> ic.performContextMenuAction(android.R.id.copy)
+            "v" -> ic.performContextMenuAction(android.R.id.paste)
+            "x" -> ic.performContextMenuAction(android.R.id.cut)
+            "z" -> ic.performContextMenuAction(android.R.id.undo)
             else -> {
-                // Send standard KeyEvent with META_CTRL_ON
                 val keyCode = KeyEvent.keyCodeFromString("KEYCODE_${letter.uppercase()}")
                 if (keyCode != KeyEvent.KEYCODE_UNKNOWN) {
                     val eventDown = KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, keyCode, 0, KeyEvent.META_CTRL_ON)
                     val eventUp = KeyEvent(0L, 0L, KeyEvent.ACTION_UP, keyCode, 0, KeyEvent.META_CTRL_ON)
-                    currentInputConnection?.sendKeyEvent(eventDown)
-                    currentInputConnection?.sendKeyEvent(eventUp)
+                    ic.sendKeyEvent(eventDown)
+                    ic.sendKeyEvent(eventUp)
                 }
             }
         }
@@ -361,11 +457,12 @@ class SboardIME : InputMethodService(),
 
     private fun performBackspace() {
         triggerHaptic()
-        val selectedText = currentInputConnection?.getSelectedText(0)
+        val ic = currentInputConnection ?: return
+        val selectedText = ic.getSelectedText(0)
         if (!selectedText.isNullOrEmpty()) {
-            currentInputConnection?.commitText("", 1)
+            ic.commitText("", 1)
         } else {
-            currentInputConnection?.deleteSurroundingText(1, 0)
+            ic.deleteSurroundingText(1, 0)
         }
         if (currentComposingWord.isNotEmpty()) {
             currentComposingWord = currentComposingWord.dropLast(1)
@@ -393,10 +490,11 @@ class SboardIME : InputMethodService(),
 
     private fun sendFunctionKey(keyCode: Int) {
         triggerHaptic()
+        val ic = currentInputConnection ?: return
         val eventDown = KeyEvent(KeyEvent.ACTION_DOWN, keyCode)
         val eventUp = KeyEvent(KeyEvent.ACTION_UP, keyCode)
-        currentInputConnection?.sendKeyEvent(eventDown)
-        currentInputConnection?.sendKeyEvent(eventUp)
+        ic.sendKeyEvent(eventDown)
+        ic.sendKeyEvent(eventUp)
     }
 
     private fun showImePicker() {

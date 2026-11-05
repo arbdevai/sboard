@@ -5,11 +5,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -30,15 +32,14 @@ import com.sahalos.sboard.model.SboardTheme
 fun SuggestionsBar(
     suggestions: List<String>,
     theme: SboardTheme,
-    isClipboardOpen: Boolean,
     onSuggestionClick: (String) -> Unit,
-    onClipboardToggle: () -> Unit,
+    onClipboardClick: () -> Unit,
+    onResizeClick: () -> Unit,
     onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val barBgColor = Color(theme.surfaceColor)
     val textColor = Color(theme.keyTextColor)
-    val accentColor = Color(theme.accentColor)
 
     Row(
         modifier = modifier
@@ -54,15 +55,31 @@ fun SuggestionsBar(
             modifier = Modifier
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(6.dp))
-                .background(if (isClipboardOpen) accentColor.copy(alpha = 0.25f) else Color.Transparent)
-                .clickable { onClipboardToggle() }
+                .clickable { onClipboardClick() }
                 .padding(horizontal = 8.dp),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_clipboard),
-                contentDescription = "Clipboard",
-                tint = if (isClipboardOpen) accentColor else textColor.copy(alpha = 0.8f),
+                contentDescription = "Papan Klip",
+                tint = textColor.copy(alpha = 0.85f),
+                modifier = Modifier.size(18.dp)
+            )
+        }
+
+        // Quick tools: Resize button (Gboard style directly in toolbar)
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(6.dp))
+                .clickable { onResizeClick() }
+                .padding(horizontal = 8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_resize),
+                contentDescription = "Ubah Ukuran Keyboard",
+                tint = textColor.copy(alpha = 0.85f),
                 modifier = Modifier.size(18.dp)
             )
         }
@@ -90,7 +107,7 @@ fun SuggestionsBar(
                             .fillMaxHeight()
                             .clip(RoundedCornerShape(6.dp))
                             .clickable { onSuggestionClick(word) }
-                            .padding(horizontal = 10.dp),
+                            .padding(horizontal = 8.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -118,7 +135,7 @@ fun SuggestionsBar(
             Icon(
                 painter = painterResource(id = R.drawable.ic_settings),
                 contentDescription = "Pengaturan",
-                tint = textColor.copy(alpha = 0.8f),
+                tint = textColor.copy(alpha = 0.85f),
                 modifier = Modifier.size(18.dp)
             )
         }
