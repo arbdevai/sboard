@@ -26,6 +26,7 @@ androidx-datastore = { module = "androidx.datastore:datastore-preferences", vers
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 androidx-emoji2 = { module = "androidx.emoji2:emoji2", version.ref = "emoji2" }
 androidx-emoji2-views = { module = "androidx.emoji2:emoji2-views", version.ref = "emoji2" }
+junit = { module = "junit:junit", version.ref = "junit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
