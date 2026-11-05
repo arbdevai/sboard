@@ -303,7 +303,7 @@ class SboardIME : InputMethodService(),
                                     modifierState = modifierState,
                                     theme = activeTheme,
                                     suggestions = emptyList(),
-                                    bottomPaddingDp = bottomPaddingDp,
+                                    bottomPaddingDp = bottomPadding,
                                     keyboardHeightRatio = heightRatio,
                                     enableLongPressSymbols = enableLongPressSymbols,
                                     enableKeyPopup = enableKeyPopup,
@@ -353,7 +353,7 @@ class SboardIME : InputMethodService(),
                                     onClipboardClick = { keyboardMode = KeyboardMode.CLIPBOARD },
                                     onResizeClick = {
                                         previewHeightRatio = heightRatio
-                                        previewBottomPaddingDp = bottomPaddingDp
+                                        previewBottomPaddingDp = bottomPadding
                                         keyboardMode = KeyboardMode.RESIZE
                                     },
                                     onSettingsClick = { openSettings() },
