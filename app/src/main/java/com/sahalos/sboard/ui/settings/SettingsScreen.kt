@@ -5,6 +5,7 @@ import android.content.Intent
 import android.provider.Settings
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -42,6 +43,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +59,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sahalos.sboard.BuildConfig
 import com.sahalos.sboard.R
@@ -88,11 +93,30 @@ fun SettingsScreen(
     val enableSpacebarCursorGlide by preferences.enableSpacebarCursorGlide.collectAsStateWithLifecycle(initialValue = true)
     val enableClipboardHistory by preferences.enableClipboardHistory.collectAsStateWithLifecycle(initialValue = true)
 
-    // IME Status
-    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-    val isImeEnabled = imm?.enabledInputMethodList?.any { it.packageName == context.packageName } == true
-    val currentIme = Settings.Secure.getString(context.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD) ?: ""
-    val isImeDefault = currentIme.contains(context.packageName)
+    // IME Dynamic Status on Lifecycle ON_RESUME
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var isImeEnabled by remember { mutableStateOf(false) }
+    var isImeDefault by remember { mutableStateOf(false) }
+
+    fun refreshImeStatus() {
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        isImeEnabled = imm?.enabledInputMethodList?.any { it.packageName == context.packageName } == true
+        val currentIme = Settings.Secure.getString(context.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD) ?: ""
+        isImeDefault = currentIme.contains(context.packageName)
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                refreshImeStatus()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        refreshImeStatus()
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     // Update Manager State
     val updateManager = remember { UpdateManager(context) }
@@ -132,82 +156,136 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // 1. HERO HEADER: Status Aktivasi IME
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = when {
-                        isImeEnabled && isImeDefault -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)
-                        isImeEnabled -> MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
-                        else -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.45f)
-                    }
-                )
-            ) {
-                Column(modifier = Modifier.padding(18.dp)) {
+            if (isImeEnabled && isImeDefault) {
+                // When completely configured, show clean compact success card (alert is gone)
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFF10B981).copy(alpha = 0.12f)
+                    ),
+                    border = BorderStroke(1.dp, Color(0xFF10B981).copy(alpha = 0.4f))
+                ) {
                     Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(10.dp)
-                                .clip(CircleShape)
-                                .background(
-                                    when {
-                                        isImeEnabled && isImeDefault -> Color(0xFF22C55E)
-                                        isImeEnabled -> Color(0xFFEAB308)
-                                        else -> Color(0xFFEF4444)
-                                    }
-                                )
-                        )
-                        Text(
-                            text = when {
-                                isImeEnabled && isImeDefault -> "Sboard Aktif & Keyboard Utama"
-                                isImeEnabled -> "Sboard Aktif (Belum Jadi Keyboard Utama)"
-                                else -> "Sboard Belum Diaktifkan"
-                            },
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Text(
-                        text = when {
-                            isImeEnabled && isImeDefault -> "Keyboard siap digunakan di seluruh aplikasi Android Anda."
-                            isImeEnabled -> "Ketuk tombol 'Pilih Default' untuk menjadikan Sboard sebagai metode input utama."
-                            else -> "Aktifkan Sboard di pengaturan input sistem Android agar dapat digunakan."
-                        },
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    Spacer(modifier = Modifier.height(14.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Button(
-                            onClick = {
-                                val intent = Intent(Settings.ACTION_INPUT_METHOD_SETTINGS).apply {
-                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                }
-                                context.startActivity(intent)
-                            },
+                        Row(
                             modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(10.dp)
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Text("1. Aktifkan", fontSize = 13.sp)
+                            Box(
+                                modifier = Modifier
+                                    .size(10.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF22C55E))
+                            )
+                            Column {
+                                Text(
+                                    text = "Sboard Aktif sebagai Keyboard Utama",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    text = "Keyboard siap digunakan di seluruh aplikasi.",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
 
                         OutlinedButton(
                             onClick = {
+                                val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
                                 imm?.showInputMethodPicker()
                             },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(10.dp)
+                            shape = RoundedCornerShape(8.dp)
                         ) {
-                            Text("2. Pilih Default", fontSize = 13.sp)
+                            Text("Ganti", fontSize = 12.sp)
+                        }
+                    }
+                }
+            } else {
+                // Setup Alert Card when not active or not default
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (isImeEnabled) {
+                            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+                        } else {
+                            MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.45f)
+                        }
+                    )
+                ) {
+                    Column(modifier = Modifier.padding(18.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(10.dp)
+                                    .clip(CircleShape)
+                                    .background(if (isImeEnabled) Color(0xFFEAB308) else Color(0xFFEF4444))
+                            )
+                            Text(
+                                text = if (isImeEnabled) {
+                                    "Sboard Aktif (Belum Jadi Keyboard Utama)"
+                                } else {
+                                    "Sboard Belum Diaktifkan"
+                                },
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = if (isImeEnabled) {
+                                "Ketuk tombol 'Pilih Default' untuk menjadikan Sboard sebagai metode input utama."
+                            } else {
+                                "Aktifkan Sboard di pengaturan input sistem Android agar dapat digunakan."
+                            },
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        Spacer(modifier = Modifier.height(14.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            if (!isImeEnabled) {
+                                Button(
+                                    onClick = {
+                                        val intent = Intent(Settings.ACTION_INPUT_METHOD_SETTINGS).apply {
+                                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                        }
+                                        context.startActivity(intent)
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(10.dp)
+                                ) {
+                                    Text("1. Aktifkan", fontSize = 13.sp)
+                                }
+                            }
+
+                            Button(
+                                onClick = {
+                                    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                                    imm?.showInputMethodPicker()
+                                },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(10.dp)
+                            ) {
+                                Text("Pilih Default", fontSize = 13.sp)
+                            }
                         }
                     }
                 }
@@ -578,14 +656,21 @@ fun SettingsScreen(
                                         onClick = {
                                             coroutineScope.launch {
                                                 updateState = UpdateUiState.Downloading(0f)
-                                                val result = updateManager.downloadAndInstallApk(
+                                                val result = updateManager.downloadApk(
                                                     downloadUrl = state.info.downloadUrl,
                                                     onProgress = { progress ->
                                                         downloadProgress = progress
                                                         updateState = UpdateUiState.Downloading(progress)
                                                     }
                                                 )
-                                                if (result.isFailure) {
+                                                if (result.isSuccess) {
+                                                    val apkFile = result.getOrThrow()
+                                                    updateState = UpdateUiState.Downloaded(apkFile, state.info)
+                                                    val installRes = updateManager.launchApkInstaller(apkFile)
+                                                    if (installRes.isFailure) {
+                                                        Toast.makeText(context, installRes.exceptionOrNull()?.message ?: "Buka izin pasang APK.", Toast.LENGTH_LONG).show()
+                                                    }
+                                                } else {
                                                     updateState = UpdateUiState.Error(result.exceptionOrNull()?.message ?: "Gagal mengunduh APK.")
                                                 }
                                             }
@@ -593,7 +678,7 @@ fun SettingsScreen(
                                         modifier = Modifier.fillMaxWidth(),
                                         shape = RoundedCornerShape(8.dp)
                                     ) {
-                                        Text("Unduh & Pasang Sekarang", fontSize = 13.sp)
+                                        Text("Unduh Pembaruan", fontSize = 13.sp)
                                     }
                                 }
                             }
@@ -611,6 +696,63 @@ fun SettingsScreen(
                                     progress = { state.progress },
                                     modifier = Modifier.fillMaxWidth()
                                 )
+                            }
+                        }
+                        is UpdateUiState.Downloaded -> {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = Color(0xFF10B981).copy(alpha = 0.15f)
+                                ),
+                                border = BorderStroke(1.dp, Color(0xFF10B981).copy(alpha = 0.5f))
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(14.dp),
+                                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(10.dp)
+                                                .clip(CircleShape)
+                                                .background(Color(0xFF22C55E))
+                                        )
+                                        Text(
+                                            text = "Paket Rilis Siap Dipasang (${state.info?.tagName ?: "v${BuildConfig.VERSION_NAME}"})",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 14.sp
+                                        )
+                                    }
+                                    Text(
+                                        text = "File APK pembaruan berhasil diunduh. Ketuk tombol pasang di bawah untuk memperbarui keyboard tanpa menghapus data.",
+                                        fontSize = 12.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Button(
+                                        onClick = {
+                                            val res = updateManager.launchApkInstaller(state.apkFile)
+                                            if (res.isFailure) {
+                                                Toast.makeText(context, res.exceptionOrNull()?.message ?: "Gagal membuka installer.", Toast.LENGTH_LONG).show()
+                                            }
+                                        },
+                                        modifier = Modifier.fillMaxWidth(),
+                                        shape = RoundedCornerShape(8.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color(0xFF15803D),
+                                            contentColor = Color.White
+                                        )
+                                    ) {
+                                        Text(
+                                            text = "PASANG SEKARANG (INSTALL)",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 13.sp
+                                        )
+                                    }
+                                }
                             }
                         }
                     }

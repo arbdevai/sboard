@@ -213,6 +213,14 @@ class SboardIME : InputMethodService(),
                                     keyboardMode = KeyboardMode.RESIZE
                                 },
                                 onSettingsClick = { openSettings() },
+                                onCtrlToggle = {
+                                    triggerHaptic()
+                                    modifierState = modifierState.copy(isCtrlActive = !modifierState.isCtrlActive)
+                                },
+                                onFnToggle = {
+                                    triggerHaptic()
+                                    modifierState = modifierState.copy(isFnActive = !modifierState.isFnActive)
+                                },
                                 onFunctionKeyClick = { keyCode -> sendFunctionKey(keyCode) }
                             )
                         }
@@ -273,6 +281,8 @@ class SboardIME : InputMethodService(),
                                     onClipboardClick = {},
                                     onResizeClick = {},
                                     onSettingsClick = {},
+                                    onCtrlToggle = {},
+                                    onFnToggle = {},
                                     onFunctionKeyClick = {}
                                 )
 

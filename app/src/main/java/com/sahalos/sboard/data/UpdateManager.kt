@@ -2,6 +2,9 @@ package com.sahalos.sboard.data
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import androidx.core.content.FileProvider
 import com.sahalos.sboard.BuildConfig
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +29,7 @@ sealed class UpdateUiState {
     data class UpdateAvailable(val info: ReleaseInfo) : UpdateUiState()
     data class UpToDate(val currentVersion: String) : UpdateUiState()
     data class Downloading(val progress: Float) : UpdateUiState()
+    data class Downloaded(val apkFile: File, val info: ReleaseInfo?) : UpdateUiState()
     data class Error(val message: String) : UpdateUiState()
 }
 
@@ -94,10 +98,10 @@ class UpdateManager(private val context: Context) {
         }
     }
 
-    suspend fun downloadAndInstallApk(
+    suspend fun downloadApk(
         downloadUrl: String,
         onProgress: (Float) -> Unit
-    ): Result<Unit> = withContext(Dispatchers.IO) {
+    ): Result<File> = withContext(Dispatchers.IO) {
         var connection: HttpURLConnection? = null
         try {
             val updateDir = File(context.cacheDir, "updates")
@@ -153,9 +157,7 @@ class UpdateManager(private val context: Context) {
                 }
             }
 
-            // Launch package installer
-            launchApkInstaller(apkFile)
-            Result.success(Unit)
+            Result.success(apkFile)
         } catch (e: Exception) {
             Result.failure(e)
         } finally {
@@ -163,15 +165,46 @@ class UpdateManager(private val context: Context) {
         }
     }
 
-    private fun launchApkInstaller(apkFile: File) {
-        val authority = "${context.packageName}.fileprovider"
-        val contentUri = FileProvider.getUriForFile(context, authority, apkFile)
-        val installIntent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(contentUri, "application/vnd.android.package-archive")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    suspend fun downloadAndInstallApk(
+        downloadUrl: String,
+        onProgress: (Float) -> Unit
+    ): Result<File> {
+        val result = downloadApk(downloadUrl, onProgress)
+        if (result.isSuccess) {
+            val file = result.getOrThrow()
+            launchApkInstaller(file)
+            return Result.success(file)
         }
-        context.startActivity(installIntent)
+        return result
+    }
+
+    fun launchApkInstaller(apkFile: File): Result<Unit> {
+        return try {
+            if (!apkFile.exists()) {
+                return Result.failure(IllegalStateException("File APK tidak ditemukan."))
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (!context.packageManager.canRequestPackageInstalls()) {
+                    val permissionIntent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+                        data = Uri.parse("package:${context.packageName}")
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    context.startActivity(permissionIntent)
+                    return Result.failure(IllegalStateException("Beri izin instalasi 'Sumber tidak dikenal' untuk Sboard lalu ketuk tombol Pasang kembali."))
+                }
+            }
+            val authority = "${context.packageName}.fileprovider"
+            val contentUri = FileProvider.getUriForFile(context, authority, apkFile)
+            val installIntent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(contentUri, "application/vnd.android.package-archive")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(installIntent)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     private fun isNewerVersion(remote: String, current: String): Boolean {

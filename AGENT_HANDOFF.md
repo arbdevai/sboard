@@ -111,3 +111,28 @@ Handle drag atas pada `ResizeOverlayView.kt` mengupdate `previewHeightRatio` pad
   - Izin `INTERNET` dan `REQUEST_INSTALL_PACKAGES` terisolasi ketat di `MainActivity`; `SboardIME` tetap 100% offline dan zero telemetry.
 - [x] Verifikasi sintaks via `verify_kotlin_syntax.py` (0 error, 0 warning).
 - [x] Build sukses di GitHub Actions CI (Run ID: `41978513723`) dan APK `Sboard-v1.0.8.apk` siap di `/home/coder/storage/downloads/`.
+
+---
+
+## Ringkasan Eksekusi Rilis v1.0.10:
+- [x] **Pindahkan Ctrl & Fn ke Toolbar Atas (`SuggestionsBar.kt`, `KeyLayoutProvider.kt`)**:
+  - Tombol modifier `Ctrl` dan `Fn` dipindahkan dari baris bawah keyboard ke toolbar atas bersebelahan dengan clipboard & resize.
+  - Membuka ruang lega pada spasi (weight 4.3f) dan tanda baca bawah persis standar Gboard tanpa sempit.
+  - Hapus icon emoji redundan dari toolbar atas karena tombol emoji dedikasi ada di baris bawah.
+- [x] **Inline Emoji Search & Quick Chips (`EmojiScreen.kt`)**:
+  - Mengatasi limitasi Android `InputMethodService` (`FLAG_NOT_FOCUSABLE`) dengan menghadirkan `InlineEmojiSearchKeyboard` (3 baris QWERTY) langsung di dalam layar emoji.
+  - Filter cepat 1-ketukan berbasis chip kata kunci (`senyum, hati, api, ketawa, jempol, kucing, kopi, makan, sedih, pesta, bintang, doa, mobil`).
+  - Fitur tab Emoji Terakhir Digunakan (Recent Emojis) tersinkronisasi otomatis dan persisten.
+- [x] **Persistensi Pengaturan Anti-Reset saat Pembaruan (`SboardPreferences.kt`, `AndroidManifest.xml`)**:
+  - Ditambahkan `android:hasFragileUserData="true"` dan `android:restoreAnyVersion="true"` pada manifest.
+  - Dual-layer storage: Sinkronisasi instan ke `SharedPreferences` (`sboard_prefs_backup`) sebagai fail-safe DataStore saat update aplikasi.
+- [x] **Tombol Install Eksplisit pada In-App Updater (`UpdateManager.kt`, `SettingsScreen.kt`)**:
+  - Transisi state ke `UpdateUiState.Downloaded(apkFile)` setelah pengunduhan tuntas.
+  - Tombol hijau tegas "PASANG SEKARANG (INSTALL)" disediakan agar pengguna bisa meluncurkan installer paket kapan saja.
+  - Pengecekan izin instalasi aplikasi tidak dikenal (`canRequestPackageInstalls()`) untuk Android 8.0+.
+- [x] **Status Alert Default IME Dinamis (`SettingsScreen.kt`)**:
+  - Pemantauan status `ON_RESUME` via `LifecycleEventObserver` pada Compose.
+  - Banner peringatan langsung hilang dan berganti badge hijau sukses ("✓ Sboard Aktif sebagai Keyboard Utama") seketika pengguna kembali dari pemilih keyboard sistem.
+- [x] **Penyesuaian Offset Popup Huruf Atas (`KeyView.kt`, `SboardKeyboardView.kt`)**:
+  - Deteksi baris teratas (QWERTYUIOP) dengan offset pop-up terkalibrasi (-36.dp) agar gelembung huruf tidak mentok di plafon window keyboard.
+

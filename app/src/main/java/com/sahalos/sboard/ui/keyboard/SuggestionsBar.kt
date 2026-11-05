@@ -32,8 +32,11 @@ import com.sahalos.sboard.model.SboardTheme
 fun SuggestionsBar(
     suggestions: List<String>,
     theme: SboardTheme,
+    isCtrlActive: Boolean,
+    isFnActive: Boolean,
+    onCtrlClick: () -> Unit,
+    onFnClick: () -> Unit,
     onSuggestionClick: (String) -> Unit,
-    onEmojiClick: () -> Unit,
     onClipboardClick: () -> Unit,
     onResizeClick: () -> Unit,
     onSettingsClick: () -> Unit,
@@ -41,91 +44,117 @@ fun SuggestionsBar(
 ) {
     val barBgColor = Color(theme.surfaceColor)
     val textColor = Color(theme.keyTextColor)
+    val accentColor = Color(theme.accentColor)
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(42.dp)
             .background(barBgColor)
-            .padding(horizontal = 6.dp, vertical = 4.dp),
+            .padding(horizontal = 4.dp, vertical = 3.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // Quick tools: Emoji button
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .clip(RoundedCornerShape(6.dp))
-                .clickable { onEmojiClick() }
-                .padding(horizontal = 6.dp),
-            contentAlignment = Alignment.Center
+        // Quick tools: Ctrl and Fn Buttons (Moved up from keyboard row to maximize space)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_emoji),
-                contentDescription = "Emoji",
-                tint = textColor.copy(alpha = 0.85f),
-                modifier = Modifier.size(18.dp)
-            )
+            // Ctrl Pill Button
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(if (isCtrlActive) accentColor else Color(theme.keyBackgroundColor).copy(alpha = 0.5f))
+                    .clickable { onCtrlClick() }
+                    .padding(horizontal = 9.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Ctrl",
+                    color = if (isCtrlActive) Color.White else textColor,
+                    fontSize = 11.sp,
+                    fontWeight = if (isCtrlActive) FontWeight.Bold else FontWeight.Medium
+                )
+            }
+
+            // Fn Pill Button
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(if (isFnActive) accentColor else Color(theme.keyBackgroundColor).copy(alpha = 0.5f))
+                    .clickable { onFnClick() }
+                    .padding(horizontal = 9.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Fn",
+                    color = if (isFnActive) Color.White else textColor,
+                    fontSize = 11.sp,
+                    fontWeight = if (isFnActive) FontWeight.Bold else FontWeight.Medium
+                )
+            }
+
+            // Clipboard button
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(6.dp))
+                    .clickable { onClipboardClick() }
+                    .padding(horizontal = 6.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_clipboard),
+                    contentDescription = "Papan Klip",
+                    tint = textColor.copy(alpha = 0.85f),
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+
+            // Resize button
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(6.dp))
+                    .clickable { onResizeClick() }
+                    .padding(horizontal = 6.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_resize),
+                    contentDescription = "Atur Ukuran",
+                    tint = textColor.copy(alpha = 0.85f),
+                    modifier = Modifier.size(18.dp)
+                )
+            }
         }
 
-        // Quick tools: Clipboard button
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .clip(RoundedCornerShape(6.dp))
-                .clickable { onClipboardClick() }
-                .padding(horizontal = 6.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_clipboard),
-                contentDescription = "Papan Klip",
-                tint = textColor.copy(alpha = 0.85f),
-                modifier = Modifier.size(18.dp)
-            )
-        }
-
-        // Quick tools: Resize button (Gboard style directly in toolbar)
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .clip(RoundedCornerShape(6.dp))
-                .clickable { onResizeClick() }
-                .padding(horizontal = 8.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_resize),
-                contentDescription = "Ubah Ukuran Keyboard",
-                tint = textColor.copy(alpha = 0.85f),
-                modifier = Modifier.size(18.dp)
-            )
-        }
-
-        // Suggestions Area
+        // Center: Passive Suggestions or Space indicator
         Row(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
                 .padding(horizontal = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.Center
         ) {
             if (suggestions.isEmpty()) {
                 Text(
                     text = "Sboard",
-                    color = textColor.copy(alpha = 0.35f),
-                    fontSize = 12.sp,
+                    color = textColor.copy(alpha = 0.25f),
+                    fontSize = 11.sp,
                     fontWeight = FontWeight.Medium
                 )
             } else {
-                suggestions.forEach { word ->
+                suggestions.take(3).forEach { word ->
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
                             .clip(RoundedCornerShape(6.dp))
                             .clickable { onSuggestionClick(word) }
-                            .padding(horizontal = 8.dp),
+                            .padding(horizontal = 6.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -147,7 +176,7 @@ fun SuggestionsBar(
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(6.dp))
                 .clickable { onSettingsClick() }
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = 6.dp),
             contentAlignment = Alignment.Center
         ) {
             Icon(

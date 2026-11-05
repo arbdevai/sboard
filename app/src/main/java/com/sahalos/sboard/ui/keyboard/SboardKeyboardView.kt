@@ -58,6 +58,8 @@ fun SboardKeyboardView(
     onClipboardClick: () -> Unit,
     onResizeClick: () -> Unit,
     onSettingsClick: () -> Unit,
+    onCtrlToggle: () -> Unit,
+    onFnToggle: () -> Unit,
     onFunctionKeyClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -76,12 +78,15 @@ fun SboardKeyboardView(
             .fillMaxWidth()
             .background(Color(theme.backgroundColor))
     ) {
-        // Suggestions & Quick Action Strip (Emoji, Clipboard, Resize, Settings)
+        // Suggestions & Quick Action Strip (Ctrl, Fn, Clipboard, Resize, Settings)
         SuggestionsBar(
             suggestions = suggestions,
             theme = theme,
+            isCtrlActive = modifierState.isCtrlActive,
+            isFnActive = modifierState.isFnActive,
+            onCtrlClick = onCtrlToggle,
+            onFnClick = onFnToggle,
             onSuggestionClick = onSuggestionClick,
-            onEmojiClick = onEmojiClick,
             onClipboardClick = onClipboardClick,
             onResizeClick = onResizeClick,
             onSettingsClick = onSettingsClick
