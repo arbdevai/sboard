@@ -1,94 +1,100 @@
-# 🤝 AGENT HANDOFF: Analisis & Solusi Bug Sboard v1.0.5
+# 🤝 AGENT HANDOFF: Panduan Arsitektur Sboard v1.0.6
 
-Dokumen ini adalah panduan arsitektur dan investigasi teknis untuk **Agent Sesi Eksekusi** agar perbaikan bug presisi 100% dan tidak merusak cetak biru `SPEC.md`.
-
----
-
-## 1. Crash Log Fatal: `BadTokenException`
-```text
-android.view.WindowManager$BadTokenException: Unable to add window -- token null is not valid; is your activity running?
-    at android.view.ViewRootImpl.setView(ViewRootImpl.java:1551)
-    at android.view.WindowManagerImpl.addView(WindowManagerImpl.java:158)
-    at android.app.Dialog.show(Dialog.java:352)
-    at androidx.compose.ui.window.AndroidDialog_androidKt$Dialog$1$1.invokeSuspend(AndroidDialog.android.kt:217)
-```
-
-### Penyebab (Root Cause):
-* Pada `ClipboardScreen.kt`, terdapat pemanggilan `AlertDialog` saat kartu klip ditekan lama (long-press).
-* **Aturan Mutlak Android IME:** `SboardIME` adalah turunan `InputMethodService` (**Service**), BUKAN `Activity`. Komponen Compose `AlertDialog` / `Dialog` di balik layar selalu mencoba membuat Window OS baru yang mewajibkan Token Activity (`token null is not valid`). Akibatnya, aplikasi crash seketika!
-* **Solusi Wajib:**
-  Dilarang keras memakai `AlertDialog` atau `Dialog` di dalam IME! Ganti dengan **Inline Modal Overlay** (menggunakan `Box` lokal dengan latar semi-transparan yang membungkus kartu aksi Pin & Hapus langsung di dalam hierarki ComposeView yang sama).
+Dokumen ini memuat panduan perbaikan bug dan spesifikasi fitur baru yang telah diaudit dan diselaraskan dengan cetak biru `SPEC.md`.
 
 ---
 
-## 2. Bug Tombol Hapus (Backspace Tidak Berfungsi)
+## 1. Perbaikan Prioritas: Bug Kritis & UX Keyboard (Wajib Selesai Dulu)
+1. **Perbaiki Crash `BadTokenException`:**
+   - Hapus pemanggilan `AlertDialog` di `ClipboardScreen.kt`.
+   - Ganti dialog pop-up dengan **Inline Modal Overlay** di dalam hierarki ComposeView keyboard (misal: `Box` dengan latar semi-transparan `Color.Black.copy(0.45f)` yang memunculkan kartu aksi Pin & Hapus di dalam area keyboard).
+2. **Tombol Hapus (Backspace):**
+   - Hapus `.clickable` kosong di child `KeyView` yang memakan touch event pembungkus luar.
+   - Tambahkan fallback resmi `sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)` di method `performBackspace()`.
+3. **Ketinggian ClipboardScreen:**
+   - Kunci tinggi `ClipboardScreen` sama persis dengan tinggi keyboard (`Modifier.fillMaxWidth().height(keyboardHeightDp)`).
+   - Ubah tampilan menjadi **2 Kolom (Grid)** menggunakan `LazyVerticalGrid(columns = GridCells.Fixed(2))` dengan `maxLines = 2` dan `TextOverflow.Ellipsis`.
+4. **Ketinggian ResizeOverlayView:**
+   - Kunci tinggi `ResizeOverlayView` setinggi keyboard (jangan gunakan `fillMaxSize()` yang membuat jendela IME melayang ke atas layar).
 
-### Penyebab (Root Cause):
-1. **Konflik Touch Event di Compose:**
-   Di `SboardKeyboardView.kt`, tombol Backspace dibungkus dengan `Box.pointerInput { detectTapGestures(onPress = { ... }) }`, tetapi child di dalamnya ([`KeyView`](file:///home/coder/projects/sahalOS/sboard/app/src/main/java/com/sahalos/sboard/ui/keyboard/KeyView.kt)) memiliki modifier `.clickable(onClick = { /* handled by pointerInput */ })`. Di Compose, `.clickable` pada child **mengonsumsi event sentuhan lebih dulu**, sehingga event `onPress` pada pembungkus luar tidak pernah terpicu!
-2. **Keterbatasan `deleteSurroundingText`:**
-   Pada beberapa aplikasi/kolom input (seperti WebView, terminal, atau kolom pencarian), `ic.deleteSurroundingText(1, 0)` bisa mengembalikan nilai false / tidak bereaksi jika tidak didampingi pengiriman KeyEvent resmi.
+---
 
-### Solusi Wajib:
-1. Pastikan `KeyView` untuk Backspace **tidak memiliki `.clickable` ganda**. Cukup gunakan satu penanganan sentuhan.
-2. Di `performBackspace()`, tambahkan fallback resmi Android IME:
-   ```kotlin
-   val ic = currentInputConnection ?: return
-   val selectedText = ic.getSelectedText(0)
-   if (!selectedText.isNullOrEmpty()) {
-       ic.commitText("", 1)
-   } else {
-       val deleted = ic.deleteSurroundingText(1, 0)
-       if (!deleted) {
-           sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
+## 2. Fitur Baru 1: Floating Key Preview (Pratinjau Huruf Melayang saat Mengetik)
+* **Kebutuhan:** Saat pengguna menekan tombol huruf/angka (touch down), muncul gelembung pratinjau (*key popup magnifier*) melayang di atas tombol tersebut setinggi `-50.dp` dengan huruf besar (26sp, bold). Gelembung hilang seketika saat jari diangkat (touch up).
+* **Implementasi:**
+  - Simpan state tombol yang sedang ditekan: `activePressedKey: KeyModel?`.
+  - Pada [`SboardKeyboardView.kt`](file:///home/coder/projects/sahalOS/sboard/app/src/main/java/com/sahalos/sboard/ui/keyboard/SboardKeyboardView.kt), jika `activePressedKey != null`, render `Box` gelembung pratinjau melayang di posisi koordinat tombol dengan bayangan halus (`shadow(4.dp, shape = RoundedCornerShape(8.dp))`), warna latar tema sedikit lebih terang, dan huruf kontras.
+  - Sediakan master toggle `enableKeyPopupPreview` (default: `true`) di `SboardPreferences.kt`.
+
+---
+
+## 3. Fitur Baru 2: Redesain Halaman Pengaturan Profesional (`SettingsScreen.kt`)
+Strukturkan halaman pengaturan menjadi kartu-kartu Material 3 yang rapi, elegan, dan terkelompok:
+1. **Hero Header (Status Aktivasi IME):**
+   - Kartu status: Menampilkan apakah Sboard sudah aktif dan dipilih sebagai keyboard utama atau belum, disertai tombol cepat: *"Aktifkan di Pengaturan"* dan *"Pilih Keyboard Utama"*.
+2. **Seksi Tampilan & Tema:**
+   - Pemilih tema horizontal (Nord Dark, Cyberpunk, AMOLED Black, Dracula, Monokai) dengan swatch warna riil.
+   - Slider Ketinggian Keyboard (75% s/d 135%) dengan indikator persentase real-time.
+   - Slider Jarak Dagu Bawah (0 s/d 36 dp) untuk ergonomi jempol.
+   - Switch: *"Pratinjau Huruf Melayang (Key Popup)"*.
+3. **Seksi Pengetikan & Gestur:**
+   - Switch: *"Saran Kata Pasif (Non-agresif)"*.
+   - Switch: *"Getaran Saat Mengetik (Haptic)"*.
+   - Switch: *"Tekan Lama Simbol"* + Slider durasi (150 ms - 450 ms).
+   - Switch: *"Navigasi Kursor Spasi (Cursor Glide)"*.
+4. **Seksi Papan Klip (Clipboard):**
+   - Switch: *"Papan Klip Aktif (FIFO 30 klip)"*.
+   - Tombol outline: *"Bersihkan Riwayat Klip Tidak Disematkan"*.
+5. **Seksi Pembaruan Aplikasi (In-App Updater):**
+   - Kartu terdedikasi: Menampilkan versi aplikasi terpasang (`v1.0.x`), status update, dan tombol *"Periksa Pembaruan"*.
+
+---
+
+## 4. Fitur Baru 3: In-App Updater via GitHub Releases (Non-Play Store Distribution)
+Karena Sboard didistribusikan mandiri tanpa Google Play Store, aplikasi memerlukan kemampuan update langsung dari GitHub Releases:
+
+1. **Manifest & Izin Jaringan:**
+   - Di `AndroidManifest.xml`, tambahkan izin:
+     ```xml
+     <uses-permission android:name="android.permission.INTERNET" />
+     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+     ```
+   - Tambahkan `FileProvider`:
+     ```xml
+     <provider
+         android:name="androidx.core.content.FileProvider"
+         android:authorities="${applicationId}.fileprovider"
+         android:exported="false"
+         android:grantUriPermissions="true">
+         <meta-data
+             android:name="android.support.FILE_PROVIDER_PATHS"
+             android:resource="@xml/file_paths" />
+     </provider>
+     ```
+   - Buat `app/src/main/res/xml/file_paths.xml`:
+     ```xml
+     <?xml version="1.0" encoding="utf-8"?>
+     <paths>
+         <external-files-path name="apk_downloads" path="Download/" />
+         <cache-path name="apk_cache" path="updates/" />
+     </paths>
+     ```
+2. **UpdateManager (`data/UpdateManager.kt`):**
+   - Panggil GitHub API: `https://api.github.com/repos/arbdevai/sboard/releases/latest`.
+   - Parse respons JSON menggunakan `kotlinx.serialization.json`: ambil `tag_name`, `body` (Changelog Markdown formal tanpa emoji lebay), dan URL file `.apk` dari `assets`.
+   - Bandingkan tag remote (misal `v1.0.6`) dengan `BuildConfig.VERSION_NAME`.
+   - Jika versi baru tersedia:
+     - Tampilkan modal konfirmasi dengan catatan rilis.
+     - Unduh berkas APK ke cache aplikasi atau unduhan via `HttpURLConnection` / `DownloadManager`.
+     - Luncurkan Intent instalasi paket:
+       ```kotlin
+       val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", apkFile)
+       val intent = Intent(Intent.ACTION_VIEW).apply {
+           setDataAndType(uri, "application/vnd.android.package-archive")
+           addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
        }
-   }
-   ```
-
----
-
-## 3. Halaman Clipboard Memanjang 1 Layar Penuh & Teks Panjang Berantakan
-
-### Masalah:
-* Saat beralih ke `KeyboardMode.CLIPBOARD`, tampilan keyboard memanjang menutupi seluruh layar HP dan kartu klip menampilkan teks panjang tanpa batasan yang rapi.
-
-### Penyebab & Solusi Wajib:
-1. **Ketinggian Tetap Sama dengan Keyboard:**
-   `ClipboardScreen` TIDAK BOLEH memakai `Modifier.fillMaxSize()` tanpa batasan tinggi. Ketinggiannya **wajib di-lock sama persis dengan tinggi keyboard saat aktif**:
-   ```kotlin
-   val keyboardHeightDp = ((theme.keyHeightDp * 4) + 40 + bottomPaddingDp) * keyboardHeightRatio
-   Modifier.fillMaxWidth().height(keyboardHeightDp.dp)
-   ```
-2. **Tampilan 2 Kolom (Grid) ala Gboard:**
-   Ganti list 1 kolom vertikal menjadi `LazyVerticalGrid(columns = GridCells.Fixed(2))` dengan padding kompak.
-3. **Truncate Teks Panjang:**
-   Setiap kartu klip wajib membatasi teks:
-   ```kotlin
-   maxLines = 2,
-   overflow = TextOverflow.Ellipsis
-   ```
-4. **Menu Aksi Pin / Hapus Mandiri:**
-   Saat kartu di-long-press, tampilkan dialog aksi **inline overlay** di dalam area keyboard (bukan `AlertDialog`), dengan tombol:
-   * 📌 Sematkan / Lepas Sematan
-   * 🗑️ Hapus Klip Ini
-
----
-
-## 4. Fitur Resize Melayang / Lari ke Atas Layar
-
-### Penyebab & Solusi Wajib:
-1. `ResizeOverlayView` menggunakan `Modifier.fillMaxSize()`. Pada jendela IME Android, `fillMaxSize()` memaksa container view meregang keluar batas dagu layar hingga ke bagian atas layar (*floating over app*).
-2. **Solusi:**
-   Tinggi `ResizeOverlayView` dan keyboard pembungkusnya harus tetap diikat pada dasar keyboard (`Modifier.fillMaxWidth().height(calculatedHeight)`).
-   Menggeser handle atas hanya mengubah `previewHeightRatio` (antara `0.80f` s/d `1.25f`), dan handle bawah mengubah `previewBottomPaddingDp` (`0` s/d `36.dp`).
-
----
-
-## 5. Ringkasan Checklist Rilis v1.0.6:
-- [x] Hapus import `androidx.compose.material3.AlertDialog` dari `ClipboardScreen.kt`. Ganti dengan inline modal overlay di hierarki Compose yang sama untuk mencegah `BadTokenException`.
-- [x] Perbaiki Backspace: `KeyView` dibuat mendukung `onClick = null` agar gesture `detectTapGestures(onPress = ...)` pada wrapper luar tidak dikonsumsi, serta menyertakan fallback resmi `sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)`.
-- [x] Kunci tinggi `ClipboardScreen` dan `ResizeOverlayView` agar sama persis dengan tinggi keyboard (`totalKeyboardHeightDp`) tanpa `Modifier.fillMaxSize()`.
-- [x] Ubah kartu clipboard menjadi 2 kolom grid (`LazyVerticalGrid(GridCells.Fixed(2))`) dengan teks terpotong rapi (`maxLines = 2`, `TextOverflow.Ellipsis`).
-- [x] Tambahkan menu aksi mandiri (Pin/Lepas Sematan & Hapus Klip) per kartu via inline overlay.
-- [x] Jalankan verifikasi `verify_kotlin_syntax.py` dengan 0 kesalahan.
-- [x] Build sukses di GitHub Actions CI (Run ID: 41972465852) dan APK v1.0.6 terbit.
+       context.startActivity(intent)
+       ```
+3. **Komitmen Privasi:**
+   - Izin internet diisolasi ketat **hanya** untuk modul pembaruan di `MainActivity`.
+   - Kelas `SboardIME` **100% offline**, tidak ada telemetri dan data ketikan tidak pernah dikirim ke jaringan.

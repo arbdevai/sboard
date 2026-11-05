@@ -4,8 +4,8 @@
 **Tech Stack:** 
 * **UI & Android IME Lifecycle:** Kotlin + Jetpack Compose
 * **Core Engine (Under-the-Hood):** Rust via JNI / UniFFI (`sboard-core`)
-**Paradigma:** Zero Dead-Code, High Performance, Privacy-First (0 Izin Internet), Anti-AI Slop  
-**Target Platform:** Android 11+ (API Level 30+)
+* **Jaringan & Privasi:** Izin Internet terbatas hanya untuk **In-App Updater** mandiri via GitHub Releases di layar Pengaturan (Non-Play Store Distribution). Layanan keyboard IME (`SboardIME`) **100% Offline & Zero Telemetry** (data ketikan tidak pernah menyentuh internet).
+* **Target Platform:** Android 11+ (API Level 30+)
 
 ---
 
@@ -94,22 +94,25 @@ Menyederhanakan navigasi kursor dan menjamin keamanan penghapusan teks tanpa ris
 * **Mode Pilihan:** `Light` (Selalu Terang), `Dark` (Selalu Gelap), dan `Follow System` (`isSystemInDarkTheme()`).
 * **Dukungan Dual-Palette di `theme.json`:** Satu paket `.sboard-theme` dapat mendefinisikan palet `colorsLight` dan `colorsDark` sekaligus agar otomatis beradaptasi saat HP berganti mode malam.
 
-### B. 3 Alur Distribusi Web
-1. **File Association (Download Browser Biasa):**
-   * Di `AndroidManifest.xml`, Sboard mendaftarkan intent filter untuk ekstensi `.sboard-theme`.
-   * Saat user mendownload tema dari web/browser mana pun dan mengetuk file hasil download, Android otomatis memunculkan pilihan: *"Buka dengan Sboard"*. Tema langsung diekstrak dan dipasang.
-2. **Web Deep Link (One-Click Install):**
-   * Website komunitas dapat memasang tautan protokol khusus:
-     `href="sboard://theme?download=https://example.com/themes/nord.sboard-theme"`
-   * Mengklik tautan ini di browser HP akan langsung membuka Sboard dan mengunduh serta memasang tema secara instan tanpa user repot membuka folder download.
-3. **In-App Community Catalog (Tanpa Server Berbayar):**
-   * Memanfaatkan **GitHub Repository** publik sebagai database tema gratis.
-   * File `index.json` di repo memuat katalog nama tema, pratinjau kartu gambar, dan link file `.sboard-theme`.
-   * Tab *"Explore Online Themes"* di dalam aplikasi membaca file indeks ini dan menampilkan katalog estetik dengan tombol *1-Click Download*.
+### C. In-App Updater via GitHub Releases (Distribusi Non-Play Store)
+* **Latar Belakang:** Karena Sboard didistribusikan secara mandiri tanpa Google Play Store, aplikasi dilengkapi modul pembaruan in-app langsung dari GitHub Releases (`https://api.github.com/repos/arbdevai/sboard/releases/latest`).
+* **Mekanisme Kerja:**
+  1. Pengguna mengetuk tombol *"Periksa Pembaruan"* di layar Pengaturan (atau pemeriksaan pasif berkala saat membuka menu Pengaturan).
+  2. Modul membaca tag rilis terbaru dan catatan rilis (*changelog* teknis standar industri, bebas emoji berlebihan).
+  3. Membandingkan tag remote dengan versi lokal (`BuildConfig.VERSION_NAME`).
+  4. Jika tersedia versi baru, aplikasi mengunduh berkas APK dan meluncurkan instalasi paket via `FileProvider` (`ACTION_VIEW`).
+* **Proteksi Privasi IME:** Izin `android.permission.INTERNET` diisolasi ketat hanya untuk modul pembaruan di `MainActivity`. Kelas `SboardIME` sama sekali tidak memiliki akses ke jaringan atau telemetri.
 
 ---
 
-## 5. Standar Aset Visual: Curated Vector Asset System (Lucide Design)
+## 5. Standar Aset Visual & Floating Key Preview
+
+### A. Floating Key Preview (Pratinjau Huruf Melayang)
+* Saat tombol karakter ditekan (*action down*), gelembung pratinjau (*key preview bubble*) melayang tepat di atas tombol tersebut setinggi `-54 dp` dengan huruf berukuran besar (26sp, bold).
+* Memberikan visual feedback instan sebelum tombol dilepas, menjamin akurasi pengetikan ala Gboard/iOS.
+* Dilengkapi master switch *"Pratinjau Tombol Melayang"* di menu Pengaturan (On/Off).
+
+### B. Curated Vector Asset System (Lucide Design)
 
 12 icon vektor esensial yang diadopsi dari standar modern **[Lucide Icons](https://lucide.dev)** (stroke 2dp, sudut melengkung), disimpan langsung di folder `res/drawable/` tanpa dependensi eksternal (ukuran total < 8 KB):
 `ic_backspace`, `ic_shift`, `ic_caps_lock`, `ic_enter`, `ic_search`, `ic_send`, `ic_next`, `ic_globe`, `ic_clipboard`, `ic_pin`, `ic_arrow_left`, `ic_arrow_right`, `ic_settings`.
