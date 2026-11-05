@@ -17,9 +17,12 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -53,8 +56,11 @@ import com.sahalos.sboard.model.KeyType
 import com.sahalos.sboard.model.KeyboardMode
 import com.sahalos.sboard.model.ModifierState
 import com.sahalos.sboard.model.SboardTheme
+import com.sahalos.sboard.core.EmojiCategory
+import com.sahalos.sboard.core.EmojiProvider
 import com.sahalos.sboard.ui.keyboard.ClipboardScreen
 import com.sahalos.sboard.ui.keyboard.EmojiScreen
+import com.sahalos.sboard.ui.keyboard.EmojiSearchToolbar
 import com.sahalos.sboard.ui.keyboard.ResizeOverlayView
 import com.sahalos.sboard.ui.keyboard.SboardKeyboardView
 import kotlinx.coroutines.CoroutineScope
@@ -81,8 +87,9 @@ class SboardIME : InputMethodService(),
     private lateinit var clipboardManager: SboardClipboardManager
     private var vibrator: Vibrator? = null
 
-    // Screen mode (Keyboard, Clipboard, Resize)
+    // Screen mode (Keyboard, Clipboard, Resize, Emoji, Emoji Search)
     private var keyboardMode by mutableStateOf(KeyboardMode.KEYBOARD)
+    private var emojiSearchQuery by mutableStateOf("")
 
     // Keyboard state
     private var modifierState by mutableStateOf(ModifierState())
@@ -251,8 +258,110 @@ class SboardIME : InputMethodService(),
                                     }
                                 },
                                 onBackspaceClick = { performBackspace() },
-                                onBackToKeyboard = { keyboardMode = KeyboardMode.KEYBOARD }
+                                onBackToKeyboard = { keyboardMode = KeyboardMode.KEYBOARD },
+                                onOpenEmojiSearch = {
+                                    emojiSearchQuery = ""
+                                    keyboardMode = KeyboardMode.EMOJI_SEARCH
+                                }
                             )
+                        }
+                        KeyboardMode.EMOJI_SEARCH -> {
+                            val searchResults = remember(emojiSearchQuery, recentEmojis) {
+                                if (emojiSearchQuery.isBlank()) {
+                                    if (recentEmojis.isNotEmpty()) recentEmojis else EmojiProvider.getEmojisForCategory(this@SboardIME, EmojiCategory.SMILEYS).take(15)
+                                } else {
+                                    EmojiProvider.search(this@SboardIME, emojiSearchQuery)
+                                }
+                            }
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color(activeTheme.backgroundColor))
+                            ) {
+                                EmojiSearchToolbar(
+                                    query = emojiSearchQuery,
+                                    results = searchResults,
+                                    theme = activeTheme,
+                                    onEmojiClick = { emoji ->
+                                        commitTextDirectly(emoji)
+                                        lifecycleScope.launch {
+                                            preferences.addRecentEmoji(emoji)
+                                        }
+                                    },
+                                    onClearQuery = { emojiSearchQuery = "" },
+                                    onCloseSearch = {
+                                        emojiSearchQuery = ""
+                                        keyboardMode = KeyboardMode.KEYBOARD
+                                    },
+                                    onQuickFilterClick = { tag ->
+                                        emojiSearchQuery = tag
+                                    }
+                                )
+
+                                SboardKeyboardView(
+                                    modifierState = modifierState,
+                                    theme = activeTheme,
+                                    suggestions = emptyList(),
+                                    bottomPaddingDp = bottomPaddingDp,
+                                    keyboardHeightRatio = heightRatio,
+                                    enableLongPressSymbols = enableLongPressSymbols,
+                                    enableKeyPopup = enableKeyPopup,
+                                    actionImeLabel = "Selesai",
+                                    actionIconRes = R.drawable.ic_enter,
+                                    onKeyClick = { key ->
+                                        triggerHaptic()
+                                        when (key.type) {
+                                            KeyType.CHARACTER -> {
+                                                emojiSearchQuery += key.primaryLabel
+                                            }
+                                            KeyType.SPACE -> {
+                                                emojiSearchQuery += " "
+                                            }
+                                            KeyType.BACKSPACE -> {
+                                                if (emojiSearchQuery.isNotEmpty()) {
+                                                    emojiSearchQuery = emojiSearchQuery.dropLast(1)
+                                                } else {
+                                                    keyboardMode = KeyboardMode.EMOJI
+                                                }
+                                            }
+                                            KeyType.ACTION -> {
+                                                keyboardMode = KeyboardMode.KEYBOARD
+                                            }
+                                            KeyType.SYM -> {
+                                                modifierState = modifierState.copy(isSymActive = !modifierState.isSymActive, isSymPage2Active = false)
+                                            }
+                                            KeyType.SYM_PAGE_2 -> {
+                                                modifierState = modifierState.copy(isSymPage2Active = !modifierState.isSymPage2Active)
+                                            }
+                                            KeyType.EMOJI -> {
+                                                keyboardMode = KeyboardMode.EMOJI
+                                            }
+                                            else -> {}
+                                        }
+                                    },
+                                    onKeyLongClick = {},
+                                    onBackspaceRepeat = {
+                                        if (emojiSearchQuery.isNotEmpty()) {
+                                            emojiSearchQuery = emojiSearchQuery.dropLast(1)
+                                        }
+                                    },
+                                    onCursorMove = {},
+                                    onShowImePicker = { showImePicker() },
+                                    onSuggestionClick = {},
+                                    onEmojiClick = { keyboardMode = KeyboardMode.EMOJI },
+                                    onClipboardClick = { keyboardMode = KeyboardMode.CLIPBOARD },
+                                    onResizeClick = {
+                                        previewHeightRatio = heightRatio
+                                        previewBottomPaddingDp = bottomPaddingDp
+                                        keyboardMode = KeyboardMode.RESIZE
+                                    },
+                                    onSettingsClick = { openSettings() },
+                                    onCtrlToggle = {},
+                                    onFnToggle = {},
+                                    onFunctionKeyClick = {}
+                                )
+                            }
                         }
                         KeyboardMode.RESIZE -> {
                             Box(

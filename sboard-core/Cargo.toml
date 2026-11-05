@@ -1,0 +1,19 @@
+[package]
+name = "sboard-core"
+version = "0.1.0"
+edition = "2021"
+authors = ["SahalOS Team"]
+description = "High-performance native spatial hitbox and bigram probability engine for Sboard"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+jni = { version = "0.21", default-features = false }
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

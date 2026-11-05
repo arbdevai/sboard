@@ -1,5 +1,9 @@
 package com.sahalos.sboard.ui.keyboard
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -53,6 +58,7 @@ fun KeyView(
     val interactionSource = remember { MutableInteractionSource() }
     val isClickablePressed by interactionSource.collectIsPressedAsState()
     var isGesturePressed by remember { mutableStateOf(false) }
+    var isLongPressed by remember { mutableStateOf(false) }
     val isPressed = isClickablePressed || isGesturePressed
 
     val shape = RoundedCornerShape(theme.keyCornerRadiusDp.dp)
@@ -76,14 +82,19 @@ fun KeyView(
                 detectTapGestures(
                     onPress = {
                         isGesturePressed = true
+                        isLongPressed = false
                         try {
                             awaitRelease()
                         } finally {
                             isGesturePressed = false
+                            isLongPressed = false
                         }
                     },
                     onTap = { onClick() },
-                    onLongPress = { onLongClick() }
+                    onLongPress = {
+                        isLongPressed = true
+                        onLongClick()
+                    }
                 )
             }
         }
@@ -193,7 +204,7 @@ fun KeyView(
             }
         }
 
-        // Floating Key Magnifier Popup (Active on touch down, with adaptive top-row offset)
+        // Floating Key Magnifier Popup with Spring Animation on Long Press
         if (isPressed && enableKeyPopup && key.type == KeyType.CHARACTER) {
             val popupChar = if (modifierState.isShifted || modifierState.isCapsLock) {
                 key.primaryLabel.uppercase()
@@ -207,6 +218,7 @@ fun KeyView(
             FloatingKeyBubble(
                 label = popupChar,
                 secondaryLabel = key.secondaryLabel,
+                isLongPressed = isLongPressed,
                 theme = theme,
                 bubbleHeight = bubbleHeight,
                 fontSize = fontSize,
@@ -222,6 +234,7 @@ fun KeyView(
 private fun FloatingKeyBubble(
     label: String,
     secondaryLabel: String?,
+    isLongPressed: Boolean,
     theme: SboardTheme,
     bubbleHeight: androidx.compose.ui.unit.Dp,
     fontSize: androidx.compose.ui.unit.TextUnit,
@@ -232,30 +245,66 @@ private fun FloatingKeyBubble(
     val textColor = Color(theme.keyTextColor)
     val accentColor = Color(theme.accentColor)
 
+    val bubbleScale by animateFloatAsState(
+        targetValue = if (isLongPressed) 1.15f else 1.0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "bubbleScale"
+    )
+
+    val borderColor by animateColorAsState(
+        targetValue = if (isLongPressed) accentColor else accentColor.copy(alpha = 0.35f),
+        label = "borderColor"
+    )
+
     Box(
         modifier = modifier
+            .graphicsLayer {
+                scaleX = bubbleScale
+                scaleY = bubbleScale
+            }
             .size(width = 44.dp, height = bubbleHeight)
-            .shadow(6.dp, shape = bubbleShape)
+            .shadow(if (isLongPressed) 10.dp else 6.dp, shape = bubbleShape)
             .clip(bubbleShape)
             .background(bubbleBg)
-            .border(1.dp, accentColor.copy(alpha = 0.35f), bubbleShape),
+            .border(if (isLongPressed) 2.dp else 1.dp, borderColor, bubbleShape),
         contentAlignment = Alignment.Center
     ) {
-        if (!secondaryLabel.isNullOrEmpty()) {
+        if (isLongPressed && !secondaryLabel.isNullOrEmpty()) {
+            // Emphasize the secondary symbol when long-pressed
             Text(
                 text = secondaryLabel,
-                fontSize = 10.sp,
-                color = textColor.copy(alpha = 0.65f),
+                fontSize = fontSize,
+                fontWeight = FontWeight.Bold,
+                color = accentColor
+            )
+            Text(
+                text = label,
+                fontSize = 9.sp,
+                color = textColor.copy(alpha = 0.5f),
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 2.dp, end = 4.dp)
+                    .align(Alignment.TopStart)
+                    .padding(top = 2.dp, start = 4.dp)
+            )
+        } else {
+            if (!secondaryLabel.isNullOrEmpty()) {
+                Text(
+                    text = secondaryLabel,
+                    fontSize = 10.sp,
+                    color = textColor.copy(alpha = 0.65f),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 2.dp, end = 4.dp)
+                )
+            }
+            Text(
+                text = label,
+                fontSize = fontSize,
+                fontWeight = FontWeight.Bold,
+                color = textColor
             )
         }
-        Text(
-            text = label,
-            fontSize = fontSize,
-            fontWeight = FontWeight.Bold,
-            color = textColor
-        )
     }
 }

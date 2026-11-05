@@ -1,0 +1,4082 @@
+[
+  {
+    "emoji": "😀",
+    "category": "SMILEYS",
+    "tags": "senyum smile gembira happy"
+  },
+  {
+    "emoji": "😃",
+    "category": "SMILEYS",
+    "tags": "senyum smile lebar happy"
+  },
+  {
+    "emoji": "😄",
+    "category": "SMILEYS",
+    "tags": "senyum mata tertawa laugh happy"
+  },
+  {
+    "emoji": "😁",
+    "category": "SMILEYS",
+    "tags": "senyum gigi grin tooth"
+  },
+  {
+    "emoji": "😆",
+    "category": "SMILEYS",
+    "tags": "tertawa tertutup mata lol haha"
+  },
+  {
+    "emoji": "😅",
+    "category": "SMILEYS",
+    "tags": "keringat lega sweat haha"
+  },
+  {
+    "emoji": "🤣",
+    "category": "SMILEYS",
+    "tags": "terbahak guling rofl ngakak kocak"
+  },
+  {
+    "emoji": "😂",
+    "category": "SMILEYS",
+    "tags": "tertawa air mata nangis lol ngakak joy"
+  },
+  {
+    "emoji": "🙂",
+    "category": "SMILEYS",
+    "tags": "senyum tipis calm smile"
+  },
+  {
+    "emoji": "🙃",
+    "category": "SMILEYS",
+    "tags": "terbalik upside down konyol silly"
+  },
+  {
+    "emoji": "😉",
+    "category": "SMILEYS",
+    "tags": "kedip wink flirty"
+  },
+  {
+    "emoji": "😊",
+    "category": "SMILEYS",
+    "tags": "senyum merona blush manis sweet"
+  },
+  {
+    "emoji": "😇",
+    "category": "SMILEYS",
+    "tags": "malaikat suci angel halo baik"
+  },
+  {
+    "emoji": "🥰",
+    "category": "SMILEYS",
+    "tags": "jatuh cinta love cinta sayang"
+  },
+  {
+    "emoji": "😍",
+    "category": "SMILEYS",
+    "tags": "mata hati love heart suka banget"
+  },
+  {
+    "emoji": "🤩",
+    "category": "SMILEYS",
+    "tags": "mata bintang star excited takjub"
+  },
+  {
+    "emoji": "😘",
+    "category": "SMILEYS",
+    "tags": "cium hembus kiss love sayang"
+  },
+  {
+    "emoji": "😗",
+    "category": "SMILEYS",
+    "tags": "cium kiss bibir"
+  },
+  {
+    "emoji": "😚",
+    "category": "SMILEYS",
+    "tags": "cium mata tertutup kiss love"
+  },
+  {
+    "emoji": "😙",
+    "category": "SMILEYS",
+    "tags": "cium senyum kiss smile"
+  },
+  {
+    "emoji": "😋",
+    "category": "SMILEYS",
+    "tags": "lidah lezat enak yummy lapar hungry"
+  },
+  {
+    "emoji": "😛",
+    "category": "SMILEYS",
+    "tags": "lidah melet tongue silly"
+  },
+  {
+    "emoji": "😜",
+    "category": "SMILEYS",
+    "tags": "lidah kedip wink tongue konyol"
+  },
+  {
+    "emoji": "🤪",
+    "category": "SMILEYS",
+    "tags": "gila heboh crazy wacky silly"
+  },
+  {
+    "emoji": "😝",
+    "category": "SMILEYS",
+    "tags": "lidah tertawa squint tongue"
+  },
+  {
+    "emoji": "🤑",
+    "category": "SMILEYS",
+    "tags": "uang dollar kaya money cash rich"
+  },
+  {
+    "emoji": "🤗",
+    "category": "SMILEYS",
+    "tags": "peluk rangkul hug ramah warmth"
+  },
+  {
+    "emoji": "🤭",
+    "category": "SMILEYS",
+    "tags": "tutup mulut gigle malu oops secret"
+  },
+  {
+    "emoji": "🤫",
+    "category": "SMILEYS",
+    "tags": "diam hening shh secret quiet"
+  },
+  {
+    "emoji": "🤔",
+    "category": "SMILEYS",
+    "tags": "berpikir mikir think hmm curious"
+  },
+  {
+    "emoji": "🤐",
+    "category": "SMILEYS",
+    "tags": "mulut ritsleting zipper silent diam"
+  },
+  {
+    "emoji": "🤨",
+    "category": "SMILEYS",
+    "tags": "angkat alis ragu skeptic suspect curiga"
+  },
+  {
+    "emoji": "😐",
+    "category": "SMILEYS",
+    "tags": "datar neutral polos poker face"
+  },
+  {
+    "emoji": "😑",
+    "category": "SMILEYS",
+    "tags": "tanpa ekspresi datar flat expressionless"
+  },
+  {
+    "emoji": "😶",
+    "category": "SMILEYS",
+    "tags": "tanpa mulut speechless mute silence"
+  },
+  {
+    "emoji": "😏",
+    "category": "SMILEYS",
+    "tags": "senyum licik smirk smug naughty"
+  },
+  {
+    "emoji": "😒",
+    "category": "SMILEYS",
+    "tags": "tidak puas unamused meh bosan"
+  },
+  {
+    "emoji": "🙄",
+    "category": "SMILEYS",
+    "tags": "putar mata roll eyes malas annoying"
+  },
+  {
+    "emoji": "😬",
+    "category": "SMILEYS",
+    "tags": "meringis canggung grimace awkward cringe"
+  },
+  {
+    "emoji": "🤥",
+    "category": "SMILEYS",
+    "tags": "hidung panjang bohong pinocchio liar lie"
+  },
+  {
+    "emoji": "😌",
+    "category": "SMILEYS",
+    "tags": "lega relieved damai calm relax"
+  },
+  {
+    "emoji": "😔",
+    "category": "SMILEYS",
+    "tags": "murung sedih pensif dejected sad"
+  },
+  {
+    "emoji": "😪",
+    "category": "SMILEYS",
+    "tags": "mengantuk sleep ngantuk sleepy tired"
+  },
+  {
+    "emoji": "🤤",
+    "category": "SMILEYS",
+    "tags": "ngiler drool lezat ngiler enak"
+  },
+  {
+    "emoji": "😴",
+    "category": "SMILEYS",
+    "tags": "tidur lelap snoring zzz sleep"
+  },
+  {
+    "emoji": "😷",
+    "category": "SMILEYS",
+    "tags": "masker sakit mask flu illness"
+  },
+  {
+    "emoji": "🤒",
+    "category": "SMILEYS",
+    "tags": "termometer demam fever sick sakit"
+  },
+  {
+    "emoji": "🤕",
+    "category": "SMILEYS",
+    "tags": "perban luka head bandage sakit hurt"
+  },
+  {
+    "emoji": "🤢",
+    "category": "SMILEYS",
+    "tags": "mual jijik nauseated sick puking"
+  },
+  {
+    "emoji": "🤮",
+    "category": "SMILEYS",
+    "tags": "muntah puke vomit jijik gross"
+  },
+  {
+    "emoji": "🤧",
+    "category": "SMILEYS",
+    "tags": "bersin bersin sneeze pilek flu allergy"
+  },
+  {
+    "emoji": "🥵",
+    "category": "SMILEYS",
+    "tags": "kepanasan hot gerah red sweat peluh"
+  },
+  {
+    "emoji": "🥶",
+    "category": "SMILEYS",
+    "tags": "kedinginan cold beku gigil freezing"
+  },
+  {
+    "emoji": "🥴",
+    "category": "SMILEYS",
+    "tags": "mabuk pusing dizzy woozy tipsy"
+  },
+  {
+    "emoji": "😵",
+    "category": "SMILEYS",
+    "tags": "pusing knocked out confused dazed"
+  },
+  {
+    "emoji": "🤯",
+    "category": "SMILEYS",
+    "tags": "otak meledak mind blown kaget wow shock"
+  },
+  {
+    "emoji": "🤠",
+    "category": "SMILEYS",
+    "tags": "topi koboi cowboy sheriff hat"
+  },
+  {
+    "emoji": "🥳",
+    "category": "SMILEYS",
+    "tags": "pesta ulang tahun party celebrate topi hiasan"
+  },
+  {
+    "emoji": "😎",
+    "category": "SMILEYS",
+    "tags": "kacamata keren cool sunglasses gaya hebat"
+  },
+  {
+    "emoji": "🤓",
+    "category": "SMILEYS",
+    "tags": "kacamata kutubuku nerd geek pintar"
+  },
+  {
+    "emoji": "🧐",
+    "category": "SMILEYS",
+    "tags": "kacamata pembesar monokle fancy investigate"
+  },
+  {
+    "emoji": "😕",
+    "category": "SMILEYS",
+    "tags": "bingung ragu confused puzzled"
+  },
+  {
+    "emoji": "😟",
+    "category": "SMILEYS",
+    "tags": "khawatir cemas worried anxious"
+  },
+  {
+    "emoji": "🙁",
+    "category": "SMILEYS",
+    "tags": "agak sedih frown slightly sad"
+  },
+  {
+    "emoji": "☹️",
+    "category": "SMILEYS",
+    "tags": "sedih murung frown sad gloomy"
+  },
+  {
+    "emoji": "😮",
+    "category": "SMILEYS",
+    "tags": "mulut terbuka heran surprise wow open mouth"
+  },
+  {
+    "emoji": "😯",
+    "category": "SMILEYS",
+    "tags": "terkejut hening surprised silent wow"
+  },
+  {
+    "emoji": "😲",
+    "category": "SMILEYS",
+    "tags": "terperangah astonished kaget shock"
+  },
+  {
+    "emoji": "🥺",
+    "category": "SMILEYS",
+    "tags": "memohon mata memelas pleading puppy eyes please"
+  },
+  {
+    "emoji": "😦",
+    "category": "SMILEYS",
+    "tags": "menganga cemas frowning open mouth"
+  },
+  {
+    "emoji": "😧",
+    "category": "SMILEYS",
+    "tags": "cemas terkejut anguished shock scared"
+  },
+  {
+    "emoji": "😨",
+    "category": "SMILEYS",
+    "tags": "takut cemas fearful scared panic"
+  },
+  {
+    "emoji": "😰",
+    "category": "SMILEYS",
+    "tags": "keringat dingin panik anxious sweat cold"
+  },
+  {
+    "emoji": "😥",
+    "category": "SMILEYS",
+    "tags": "kecewa lega sad but relieved"
+  },
+  {
+    "emoji": "😢",
+    "category": "SMILEYS",
+    "tags": "menangis tetes air mata crying tear sedih sad"
+  },
+  {
+    "emoji": "😭",
+    "category": "SMILEYS",
+    "tags": "menangis keras jerit loud crying sob sedih"
+  },
+  {
+    "emoji": "😱",
+    "category": "SMILEYS",
+    "tags": "teriak takut jerit scream horror takut shock"
+  },
+  {
+    "emoji": "😖",
+    "category": "SMILEYS",
+    "tags": "serba salah bingung confounded frustrated"
+  },
+  {
+    "emoji": "😣",
+    "category": "SMILEYS",
+    "tags": "menahan sakit lelah persevering struggle"
+  },
+  {
+    "emoji": "😞",
+    "category": "SMILEYS",
+    "tags": "kecewa patah hati disappointed sad"
+  },
+  {
+    "emoji": "😓",
+    "category": "SMILEYS",
+    "tags": "keringat dingin putus asa downcast sweat"
+  },
+  {
+    "emoji": "😩",
+    "category": "SMILEYS",
+    "tags": "lelah letih weary exhausted complain"
+  },
+  {
+    "emoji": "😫",
+    "category": "SMILEYS",
+    "tags": "sangat lelah capek tired weary"
+  },
+  {
+    "emoji": "🥱",
+    "category": "SMILEYS",
+    "tags": "menguap bosan ngantuk yawn sleepy bored"
+  },
+  {
+    "emoji": "😤",
+    "category": "SMILEYS",
+    "tags": "kesal marah dengus triumph huff puff angry"
+  },
+  {
+    "emoji": "😡",
+    "category": "SMILEYS",
+    "tags": "marah besar merah pouting angry rage mad"
+  },
+  {
+    "emoji": "😠",
+    "category": "SMILEYS",
+    "tags": "marah geram angry mad furious"
+  },
+  {
+    "emoji": "🤬",
+    "category": "SMILEYS",
+    "tags": "marah umpat cursing swearing censored bad words"
+  },
+  {
+    "emoji": "😈",
+    "category": "SMILEYS",
+    "tags": "setan ungu senyum devil evil wicked naughty"
+  },
+  {
+    "emoji": "👿",
+    "category": "SMILEYS",
+    "tags": "setan marah imp devil angry demon"
+  },
+  {
+    "emoji": "💀",
+    "category": "SMILEYS",
+    "tags": "tengkorak mati skull skeleton dead"
+  },
+  {
+    "emoji": "☠️",
+    "category": "SMILEYS",
+    "tags": "tengkorak bajak laut skull and crossbones danger poison"
+  },
+  {
+    "emoji": "💩",
+    "category": "SMILEYS",
+    "tags": "kotoran pup poop poo funny konyol"
+  },
+  {
+    "emoji": "🤡",
+    "category": "SMILEYS",
+    "tags": "badut clown circus konyol silly"
+  },
+  {
+    "emoji": "👹",
+    "category": "SMILEYS",
+    "tags": "monster ogre oni jepang seram red mask"
+  },
+  {
+    "emoji": "👺",
+    "category": "SMILEYS",
+    "tags": "goblin tengu jepang seram mask"
+  },
+  {
+    "emoji": "👻",
+    "category": "SMILEYS",
+    "tags": "hantu putih ghost spooky serem"
+  },
+  {
+    "emoji": "👽",
+    "category": "SMILEYS",
+    "tags": "alien makhluk luar angkasa ufo"
+  },
+  {
+    "emoji": "👾",
+    "category": "SMILEYS",
+    "tags": "alien monster game 8bit space invader"
+  },
+  {
+    "emoji": "🤖",
+    "category": "SMILEYS",
+    "tags": "robot android mecha bot future"
+  },
+  {
+    "emoji": "😺",
+    "category": "SMILEYS",
+    "tags": "kucing senyum cat grinning smile"
+  },
+  {
+    "emoji": "😸",
+    "category": "SMILEYS",
+    "tags": "kucing tertawa cat grin smile haha"
+  },
+  {
+    "emoji": "😹",
+    "category": "SMILEYS",
+    "tags": "kucing tawa air mata cat tears of joy lol"
+  },
+  {
+    "emoji": "😻",
+    "category": "SMILEYS",
+    "tags": "kucing mata cinta cat love heart eyes"
+  },
+  {
+    "emoji": "😼",
+    "category": "SMILEYS",
+    "tags": "kucing senyum licik cat smirk sarcastic"
+  },
+  {
+    "emoji": "😽",
+    "category": "SMILEYS",
+    "tags": "kucing cium cat kissing kiss"
+  },
+  {
+    "emoji": "🙀",
+    "category": "SMILEYS",
+    "tags": "kucing kaget cat surprised scream shock"
+  },
+  {
+    "emoji": "😿",
+    "category": "SMILEYS",
+    "tags": "kucing menangis cat crying sad sedih"
+  },
+  {
+    "emoji": "😾",
+    "category": "SMILEYS",
+    "tags": "kucing cemberut cat pouting angry marah"
+  },
+  {
+    "emoji": "💋",
+    "category": "SMILEYS",
+    "tags": "bekas bibir cium kiss lips makeup"
+  },
+  {
+    "emoji": "💌",
+    "category": "SMILEYS",
+    "tags": "surat cinta love letter mail romance"
+  },
+  {
+    "emoji": "💘",
+    "category": "SMILEYS",
+    "tags": "panah cinta cupid arrow heart love"
+  },
+  {
+    "emoji": "💝",
+    "category": "SMILEYS",
+    "tags": "pita kado cinta heart with ribbon gift"
+  },
+  {
+    "emoji": "💖",
+    "category": "SMILEYS",
+    "tags": "hati berkilau sparkling heart love suka"
+  },
+  {
+    "emoji": "💗",
+    "category": "SMILEYS",
+    "tags": "hati bergetar growing heart love sayang"
+  },
+  {
+    "emoji": "💓",
+    "category": "SMILEYS",
+    "tags": "hati berdetak beating heart pulse cinta"
+  },
+  {
+    "emoji": "💞",
+    "category": "SMILEYS",
+    "tags": "hati berputar revolving hearts love"
+  },
+  {
+    "emoji": "💕",
+    "category": "SMILEYS",
+    "tags": "dua hati two hearts love cinta suka"
+  },
+  {
+    "emoji": "💟",
+    "category": "SMILEYS",
+    "tags": "dekorasi hati heart decoration"
+  },
+  {
+    "emoji": "💔",
+    "category": "SMILEYS",
+    "tags": "patah hati patah broken heart sad sedih galau"
+  },
+  {
+    "emoji": "❤️",
+    "category": "SMILEYS",
+    "tags": "hati merah love cinta sayang red heart"
+  },
+  {
+    "emoji": "🧡",
+    "category": "SMILEYS",
+    "tags": "hati oranye orange heart sahabat persahabatan"
+  },
+  {
+    "emoji": "💛",
+    "category": "SMILEYS",
+    "tags": "hati kuning yellow heart ceria friend"
+  },
+  {
+    "emoji": "💚",
+    "category": "SMILEYS",
+    "tags": "hati hijau green heart alam subur peace"
+  },
+  {
+    "emoji": "💙",
+    "category": "SMILEYS",
+    "tags": "hati biru blue heart tenang damai loyal"
+  },
+  {
+    "emoji": "💜",
+    "category": "SMILEYS",
+    "tags": "hati ungu purple heart mewah bts army"
+  },
+  {
+    "emoji": "🖤",
+    "category": "SMILEYS",
+    "tags": "hati hitam black heart gotik sedih duka"
+  },
+  {
+    "emoji": "🤍",
+    "category": "SMILEYS",
+    "tags": "hati putih white heart tulus suci pure"
+  },
+  {
+    "emoji": "🤎",
+    "category": "SMILEYS",
+    "tags": "hati cokelat brown heart hangat"
+  },
+  {
+    "emoji": "💯",
+    "category": "SMILEYS",
+    "tags": "seratus 100 nilai sempurna perfect score mantap"
+  },
+  {
+    "emoji": "💢",
+    "category": "SMILEYS",
+    "tags": "simbol marah angry vein urat anime"
+  },
+  {
+    "emoji": "💥",
+    "category": "SMILEYS",
+    "tags": "ledakan boom collision tabrakan meledak blast"
+  },
+  {
+    "emoji": "💫",
+    "category": "SMILEYS",
+    "tags": "bintang pusing dizzy star kelap-kelip"
+  },
+  {
+    "emoji": "💦",
+    "category": "SMILEYS",
+    "tags": "percikan keringat air sweat drops splash"
+  },
+  {
+    "emoji": "💨",
+    "category": "SMILEYS",
+    "tags": "hembusan angin lari cepat dashing away wind fast"
+  },
+  {
+    "emoji": "🕳️",
+    "category": "SMILEYS",
+    "tags": "lubang hitam gelap hole dark pit"
+  },
+  {
+    "emoji": "💣",
+    "category": "SMILEYS",
+    "tags": "bom sumbu meledak bomb explosive weapon danger"
+  },
+  {
+    "emoji": "💬",
+    "category": "SMILEYS",
+    "tags": "balon obrolan chat speech bubble pesan message"
+  },
+  {
+    "emoji": "👁️‍🗨️",
+    "category": "SMILEYS",
+    "tags": "mata dalam balon pesan eye in speech bubble witness"
+  },
+  {
+    "emoji": "🗨️",
+    "category": "SMILEYS",
+    "tags": "balon percakapan kiri left speech bubble chat"
+  },
+  {
+    "emoji": "🗯️",
+    "category": "SMILEYS",
+    "tags": "balon marah teriakan right anger bubble scream"
+  },
+  {
+    "emoji": "💭",
+    "category": "SMILEYS",
+    "tags": "balon pikiran thought bubble ide mimpi dream"
+  },
+  {
+    "emoji": "💤",
+    "category": "SMILEYS",
+    "tags": "tidur mendengkur zzz sleep snoring dream"
+  },
+  {
+    "emoji": "👋",
+    "category": "PEOPLE",
+    "tags": "lambaian tangan hello hi halo dada bye selamat tinggal"
+  },
+  {
+    "emoji": "🤚",
+    "category": "PEOPLE",
+    "tags": "punggung tangan stop berhenti raised back of hand"
+  },
+  {
+    "emoji": "🖐️",
+    "category": "PEOPLE",
+    "tags": "lima jari terbuka hand with fingers splayed stop"
+  },
+  {
+    "emoji": "✋",
+    "category": "PEOPLE",
+    "tags": "tangan terbuka angkat stop halo berhenti high five"
+  },
+  {
+    "emoji": "🖖",
+    "category": "PEOPLE",
+    "tags": "salam vulcan live long and prosper spock"
+  },
+  {
+    "emoji": "👌",
+    "category": "PEOPLE",
+    "tags": "oke mantap ok hand pas sempurna perfect good"
+  },
+  {
+    "emoji": "🤏",
+    "category": "PEOPLE",
+    "tags": "sedikit cubit pinching hand small little"
+  },
+  {
+    "emoji": "✌️",
+    "category": "PEOPLE",
+    "tags": "damai dua peace victory v tanda dua jari"
+  },
+  {
+    "emoji": "🤞",
+    "category": "PEOPLE",
+    "tags": "jari silang crossed fingers semoga harapan wish good luck"
+  },
+  {
+    "emoji": "🤟",
+    "category": "PEOPLE",
+    "tags": "tanda cinta i love you sign metal gaul"
+  },
+  {
+    "emoji": "🤘",
+    "category": "PEOPLE",
+    "tags": "salam metal rock on horns music cadas"
+  },
+  {
+    "emoji": "🤙",
+    "category": "PEOPLE",
+    "tags": "telepon panggil call me santai shaka hang loose"
+  },
+  {
+    "emoji": "👈",
+    "category": "PEOPLE",
+    "tags": "tunjuk kiri pointing left back kembali"
+  },
+  {
+    "emoji": "👉",
+    "category": "PEOPLE",
+    "tags": "tunjuk kanan pointing right next lanjut maju"
+  },
+  {
+    "emoji": "👆",
+    "category": "PEOPLE",
+    "tags": "tunjuk atas pointing up atas high top"
+  },
+  {
+    "emoji": "🖕",
+    "category": "PEOPLE",
+    "tags": "jari tengah middle finger insult sensor marah"
+  },
+  {
+    "emoji": "👇",
+    "category": "PEOPLE",
+    "tags": "tunjuk bawah pointing down bawah low scroll"
+  },
+  {
+    "emoji": "☝️",
+    "category": "PEOPLE",
+    "tags": "telunjuk ke atas pointing up satu no one number"
+  },
+  {
+    "emoji": "👍",
+    "category": "PEOPLE",
+    "tags": "jempol atas suka mantap ok like thumbs up keren bagus top"
+  },
+  {
+    "emoji": "👎",
+    "category": "PEOPLE",
+    "tags": "jempol bawah buruk tidak suka dislike thumbs down jelek"
+  },
+  {
+    "emoji": "✊",
+    "category": "PEOPLE",
+    "tags": "tinju kepalan raised fist perlawanan semangat power"
+  },
+  {
+    "emoji": "👊",
+    "category": "PEOPLE",
+    "tags": "tinju depan punch fist bump salam tos perkelahian"
+  },
+  {
+    "emoji": "🤛",
+    "category": "PEOPLE",
+    "tags": "tinju kiri fist pointing left tos bump"
+  },
+  {
+    "emoji": "🤜",
+    "category": "PEOPLE",
+    "tags": "tinju kanan fist pointing right tos bump"
+  },
+  {
+    "emoji": "👏",
+    "category": "PEOPLE",
+    "tags": "tepuk tangan applause clapping selamat bangga hebat"
+  },
+  {
+    "emoji": "🙌",
+    "category": "PEOPLE",
+    "tags": "angkat dua tangan celebrating raising hands hore sukses syukur"
+  },
+  {
+    "emoji": "👐",
+    "category": "PEOPLE",
+    "tags": "kedua tangan terbuka open hands peluk ramah"
+  },
+  {
+    "emoji": "🤲",
+    "category": "PEOPLE",
+    "tags": "tangan menengadah berdoa doa palms up together praying harapan"
+  },
+  {
+    "emoji": "🤝",
+    "category": "PEOPLE",
+    "tags": "jabat tangan sepakat deal handshake setuju kawan"
+  },
+  {
+    "emoji": "🙏",
+    "category": "PEOPLE",
+    "tags": "mohon tolong terimakasih terima kasih doa bersyukur folded hands please thank you amen"
+  },
+  {
+    "emoji": "✍️",
+    "category": "PEOPLE",
+    "tags": "menulis pena pensil writing hand ttd catat tugas"
+  },
+  {
+    "emoji": "💅",
+    "category": "PEOPLE",
+    "tags": "cat kuku kutek nail polish santai dandan aesthetic"
+  },
+  {
+    "emoji": "🤳",
+    "category": "PEOPLE",
+    "tags": "foto selfie kamera hp portrait narsis"
+  },
+  {
+    "emoji": "💪",
+    "category": "PEOPLE",
+    "tags": "otot lengan kuat lentur biceps strong fit gym tenaga"
+  },
+  {
+    "emoji": "🦾",
+    "category": "PEOPLE",
+    "tags": "lengan robot mekanik prostetik bionic mechanical arm cyber"
+  },
+  {
+    "emoji": "🦿",
+    "category": "PEOPLE",
+    "tags": "kaki mekanik robot prostetik bionic leg cybernetic"
+  },
+  {
+    "emoji": "🦵",
+    "category": "PEOPLE",
+    "tags": "kaki paha tendang leg kick lari jalan"
+  },
+  {
+    "emoji": "🦶",
+    "category": "PEOPLE",
+    "tags": "telapak kaki jempol kaki foot tapak injak"
+  },
+  {
+    "emoji": "👂",
+    "category": "PEOPLE",
+    "tags": "telinga dengar ear listen sound suara sound"
+  },
+  {
+    "emoji": "🦻",
+    "category": "PEOPLE",
+    "tags": "telinga dengan alat bantu dengar ear with hearing aid"
+  },
+  {
+    "emoji": "👃",
+    "category": "PEOPLE",
+    "tags": "hidung cium bau napas nose smell aroma"
+  },
+  {
+    "emoji": "🧠",
+    "category": "PEOPLE",
+    "tags": "otak pikiran cerdas brain smart mind think ilmu genius"
+  },
+  {
+    "emoji": "🫀",
+    "category": "PEOPLE",
+    "tags": "jantung organ manusia anatomical heart medis kesehatan"
+  },
+  {
+    "emoji": "🫁",
+    "category": "PEOPLE",
+    "tags": "paru paru napas organ lungs respiration breath"
+  },
+  {
+    "emoji": "🦷",
+    "category": "PEOPLE",
+    "tags": "gigi tooth dentist dokter dental putih senyum"
+  },
+  {
+    "emoji": "🦴",
+    "category": "PEOPLE",
+    "tags": "tulang rangka bone skeleton anjing kalsium"
+  },
+  {
+    "emoji": "👀",
+    "category": "PEOPLE",
+    "tags": "sepasang mata melihat lirik kepo eyes look watch stalk"
+  },
+  {
+    "emoji": "👁️",
+    "category": "PEOPLE",
+    "tags": "mata satu melihat eye look vision pandang watch"
+  },
+  {
+    "emoji": "👅",
+    "category": "PEOPLE",
+    "tags": "lidah rasa menjilat tongue taste lick melet"
+  },
+  {
+    "emoji": "👄",
+    "category": "PEOPLE",
+    "tags": "bibir mulut senyum mouth lips kiss sexy"
+  },
+  {
+    "emoji": "👶",
+    "category": "PEOPLE",
+    "tags": "bayi anak kecil baby newborn balita lucu imut"
+  },
+  {
+    "emoji": "🧒",
+    "category": "PEOPLE",
+    "tags": "anak anak child kid bocah kecil muda"
+  },
+  {
+    "emoji": "👦",
+    "category": "PEOPLE",
+    "tags": "anak laki laki boy ikhwan cowok muda"
+  },
+  {
+    "emoji": "👧",
+    "category": "PEOPLE",
+    "tags": "anak perempuan girl akhwat cewek manis imut"
+  },
+  {
+    "emoji": "🧑",
+    "category": "PEOPLE",
+    "tags": "orang dewasa person adult manusia netral"
+  },
+  {
+    "emoji": "👱",
+    "category": "PEOPLE",
+    "tags": "orang rambut pirang blond hair person"
+  },
+  {
+    "emoji": "👨",
+    "category": "PEOPLE",
+    "tags": "pria laki laki dewasa man bapak mas cowok"
+  },
+  {
+    "emoji": "🧔",
+    "category": "PEOPLE",
+    "tags": "pria berjenggot berjanggut bearded man brewok maskulin"
+  },
+  {
+    "emoji": "👩",
+    "category": "PEOPLE",
+    "tags": "wanita perempuan dewasa woman ibu mbak cewek ibu"
+  },
+  {
+    "emoji": "🧓",
+    "category": "PEOPLE",
+    "tags": "lansia orang tua older adult kakek nenek sepuh"
+  },
+  {
+    "emoji": "👴",
+    "category": "PEOPLE",
+    "tags": "kakek pria tua old man kakek opah sepuh"
+  },
+  {
+    "emoji": "👵",
+    "category": "PEOPLE",
+    "tags": "nenek wanita tua old woman oma nenek sepuh"
+  },
+  {
+    "emoji": "🐶",
+    "category": "ANIMALS",
+    "tags": "anjing puppy dog guguk peliharaan pet setia"
+  },
+  {
+    "emoji": "🐱",
+    "category": "ANIMALS",
+    "tags": "kucing anak kitten cat meong pussy peliharaan pet imut"
+  },
+  {
+    "emoji": "🐭",
+    "category": "ANIMALS",
+    "tags": "tikus mencit mouse rodent jerboa kecil"
+  },
+  {
+    "emoji": "🐹",
+    "category": "ANIMALS",
+    "tags": "hamster marmut pipi tembem rodent cute pet"
+  },
+  {
+    "emoji": "🐰",
+    "category": "ANIMALS",
+    "tags": "kelinci bunny rabbit kuping telinga wortel cute imut"
+  },
+  {
+    "emoji": "🦊",
+    "category": "ANIMALS",
+    "tags": "rubah musang fox cunning cerdik oranye hutan"
+  },
+  {
+    "emoji": "🐻",
+    "category": "ANIMALS",
+    "tags": "beruang bear cokelat madu grizzly hutan buas"
+  },
+  {
+    "emoji": "🐼",
+    "category": "ANIMALS",
+    "tags": "panda beruang tiongkok bambu hitam putih cute lucu gemoy"
+  },
+  {
+    "emoji": "🐨",
+    "category": "ANIMALS",
+    "tags": "koala australia eukaliptus lucu tidur marsupial"
+  },
+  {
+    "emoji": "🐯",
+    "category": "ANIMALS",
+    "tags": "harimau belang tiger predator loreng raja rimba macan"
+  },
+  {
+    "emoji": "🦁",
+    "category": "ANIMALS",
+    "tags": "singa surai lion raja hutan king predator buas"
+  },
+  {
+    "emoji": "🐮",
+    "category": "ANIMALS",
+    "tags": "sapi perah cow susu perah ternak mooo daging kurban"
+  },
+  {
+    "emoji": "🐷",
+    "category": "ANIMALS",
+    "tags": "babi pig pink moncong ternak pink"
+  },
+  {
+    "emoji": "🐸",
+    "category": "ANIMALS",
+    "tags": "katak kodok frog amfibi hijau melompat kolam"
+  },
+  {
+    "emoji": "🐵",
+    "category": "ANIMALS",
+    "tags": "monyet monyet kecil monkey kera pisang lucu primata"
+  },
+  {
+    "emoji": "🐔",
+    "category": "ANIMALS",
+    "tags": "ayam jago betina chicken peternakan telur kukuruyuk"
+  },
+  {
+    "emoji": "🐧",
+    "category": "ANIMALS",
+    "tags": "pinguin kutub es penguin tuxedo burung es antartika"
+  },
+  {
+    "emoji": "🐦",
+    "category": "ANIMALS",
+    "tags": "burung berkicau bird terbang sayap sangkar tweet"
+  },
+  {
+    "emoji": "🐤",
+    "category": "ANIMALS",
+    "tags": "anak ayam kuning baby chick piyik kuthuk kecil"
+  },
+  {
+    "emoji": "🦆",
+    "category": "ANIMALS",
+    "tags": "bebek angsa kwek kwek duck unggas berenang danau"
+  },
+  {
+    "emoji": "🦅",
+    "category": "ANIMALS",
+    "tags": "rajawali elang eagle garuda gagah cakar predator sayap"
+  },
+  {
+    "emoji": "🦉",
+    "category": "ANIMALS",
+    "tags": "burung hantu owl bijak malam predator mata bulat"
+  },
+  {
+    "emoji": "🦇",
+    "category": "ANIMALS",
+    "tags": "kelelawar bat malam gua batman nokturnal sayap"
+  },
+  {
+    "emoji": "🐺",
+    "category": "ANIMALS",
+    "tags": "serigala liar wolf lolongan malam bulan buas taring pack"
+  },
+  {
+    "emoji": "🐗",
+    "category": "ANIMALS",
+    "tags": "babi hutan celeng wild boar taring hutan liar"
+  },
+  {
+    "emoji": "🐴",
+    "category": "ANIMALS",
+    "tags": "kuda jantan horse pacuan lari kencang tegap delman"
+  },
+  {
+    "emoji": "🦄",
+    "category": "ANIMALS",
+    "tags": "kuda poni unicorn sihir tanduk pelangi mitologi impian"
+  },
+  {
+    "emoji": "🐝",
+    "category": "ANIMALS",
+    "tags": "lebah madu bee sengat madu kuning bunga sarang"
+  },
+  {
+    "emoji": "🐛",
+    "category": "ANIMALS",
+    "tags": "ulat ulat bulu bug caterpillar hijau daun serangga"
+  },
+  {
+    "emoji": "🦋",
+    "category": "ANIMALS",
+    "tags": "kupu kupu butterfly cantik sayap warna kepompong indah"
+  },
+  {
+    "emoji": "🐌",
+    "category": "ANIMALS",
+    "tags": "siput bekicot snail lambat cangkang lendir pelan"
+  },
+  {
+    "emoji": "🐞",
+    "category": "ANIMALS",
+    "tags": "kepik kumbang ladybug serangga bintik merah daun"
+  },
+  {
+    "emoji": "🐜",
+    "category": "ANIMALS",
+    "tags": "semut rajin ant koloni gotong royong kecil gigit serangga"
+  },
+  {
+    "emoji": "🦗",
+    "category": "ANIMALS",
+    "tags": "jangkrik belalang cricket serangga malam sawah bunyi"
+  },
+  {
+    "emoji": "🕷️",
+    "category": "ANIMALS",
+    "tags": "laba laba jaring spider arachnid spiderman berkaki delapan"
+  },
+  {
+    "emoji": "🦂",
+    "category": "ANIMALS",
+    "tags": "kalajengking sengat racun scorpion gurun capit berbisa"
+  },
+  {
+    "emoji": "🦟",
+    "category": "ANIMALS",
+    "tags": "nyamuk malaria dengue mosquito hisap darah serangga bentol"
+  },
+  {
+    "emoji": "🐢",
+    "category": "ANIMALS",
+    "tags": "kura kura labi labi turtle tempurung lambat panjang umur laut"
+  },
+  {
+    "emoji": "🐍",
+    "category": "ANIMALS",
+    "tags": "ular kobra berbisa snake reptil mendesis melilit liar piton"
+  },
+  {
+    "emoji": "🦎",
+    "category": "ANIMALS",
+    "tags": "kadal cicak tokek lizard bunglon reptil dinding ekor"
+  },
+  {
+    "emoji": "🦖",
+    "category": "ANIMALS",
+    "tags": "t-rex dinosaurus tyrannosaurus tiran reptil purba buas gigit fosil"
+  },
+  {
+    "emoji": "🦕",
+    "category": "ANIMALS",
+    "tags": "brachiosaurus sauropoda dinosaurus leher panjang herbivora purba raksasa"
+  },
+  {
+    "emoji": "🐙",
+    "category": "ANIMALS",
+    "tags": "gurita tentakel octopus moluska laut tinta delapan lengan seafood"
+  },
+  {
+    "emoji": "🦑",
+    "category": "ANIMALS",
+    "tags": "cumi cumi sotong squid laut asin tentakel seafood bakar"
+  },
+  {
+    "emoji": "🦐",
+    "category": "ANIMALS",
+    "tags": "udang rebon prawn shrimp laut galah seafood goreng renyah"
+  },
+  {
+    "emoji": "🦞",
+    "category": "ANIMALS",
+    "tags": "lobster udang karang laut capit mewah seafood mahal restoran"
+  },
+  {
+    "emoji": "🦀",
+    "category": "ANIMALS",
+    "tags": "kepiting capit crab laut capit capit cangkang seafood asam manis"
+  },
+  {
+    "emoji": "🐡",
+    "category": "ANIMALS",
+    "tags": "ikan buntal kembung pufferfish beracun duri laut fugu"
+  },
+  {
+    "emoji": "🐠",
+    "category": "ANIMALS",
+    "tags": "ikan tropis warna warni tropical fish karang nemo akuarium hias"
+  },
+  {
+    "emoji": "🐟",
+    "category": "ANIMALS",
+    "tags": "ikan air tawar laut fish berenang sisik insang lauk gurih"
+  },
+  {
+    "emoji": "🐬",
+    "category": "ANIMALS",
+    "tags": "lumba lumba dolphin cerdas mamalia laut melompat sirkus ramah"
+  },
+  {
+    "emoji": "🐳",
+    "category": "ANIMALS",
+    "tags": "paus menyembur air whale mamalia laut raksasa samudra biru laut"
+  },
+  {
+    "emoji": "🦈",
+    "category": "ANIMALS",
+    "tags": "hiu buas predator shark gigi tajam taring samudra pemangsa jaws"
+  },
+  {
+    "emoji": "🐊",
+    "category": "ANIMALS",
+    "tags": "buaya muara aligator crocodile rawa sungai reptil ganas taring kulit"
+  },
+  {
+    "emoji": "🍇",
+    "category": "FOOD",
+    "tags": "anggur ungu manis segar grape buah vit c anggur"
+  },
+  {
+    "emoji": "🍈",
+    "category": "FOOD",
+    "tags": "melon hijau manis segar cantaloupe buah jus dingin"
+  },
+  {
+    "emoji": "🍉",
+    "category": "FOOD",
+    "tags": "semangka merah manis segar watermelon buah musim panas biji"
+  },
+  {
+    "emoji": "🍊",
+    "category": "FOOD",
+    "tags": "jeruk mandarin orange kupas asam manis vit c segar peras"
+  },
+  {
+    "emoji": "🍋",
+    "category": "FOOD",
+    "tags": "lemon kuning asam kecut citrus peras teh detoks vit c"
+  },
+  {
+    "emoji": "🍌",
+    "category": "FOOD",
+    "tags": "pisang kuning manis karbohidrat banana kera buah gizi potasium"
+  },
+  {
+    "emoji": "🍍",
+    "category": "FOOD",
+    "tags": "nanas duri manis asam pineapple asam segar rujak selai tart"
+  },
+  {
+    "emoji": "🥭",
+    "category": "FOOD",
+    "tags": "mangga manis harum madu mango buah jus rujak tropis"
+  },
+  {
+    "emoji": "🍎",
+    "category": "FOOD",
+    "tags": "apel merah renyah manis apple buah kesehatan dokter pexel"
+  },
+  {
+    "emoji": "🍏",
+    "category": "FOOD",
+    "tags": "apel hijau segar asam green apple buah diet renyah"
+  },
+  {
+    "emoji": "🍐",
+    "category": "FOOD",
+    "tags": "pir kuning buah segar pear buah berair pir manis"
+  },
+  {
+    "emoji": "🍑",
+    "category": "FOOD",
+    "tags": "persik buah manis peach buah lembut warna persik"
+  },
+  {
+    "emoji": "🍒",
+    "category": "FOOD",
+    "tags": "ceri merah manis sepasang cherry buah kue hiasan tart"
+  },
+  {
+    "emoji": "🍓",
+    "category": "FOOD",
+    "tags": "stroberi asam manis strawberry buah merah bintik jus kue"
+  },
+  {
+    "emoji": "🫐",
+    "category": "FOOD",
+    "tags": "blueberry buah ungu manis berry superfood antioksidan sehat"
+  },
+  {
+    "emoji": "🥝",
+    "category": "FOOD",
+    "tags": "kiwi hijau berbulu kiwi fruit asam manis segar potong salad"
+  },
+  {
+    "emoji": "🍅",
+    "category": "FOOD",
+    "tags": "tomat merah sayur buah tomato sambal sup saus lycopene segar"
+  },
+  {
+    "emoji": "🫒",
+    "category": "FOOD",
+    "tags": "zaitun minyak olive zaitun buah mediterania sehat herbal"
+  },
+  {
+    "emoji": "🥥",
+    "category": "FOOD",
+    "tags": "kelapa batok air kelapa santan coconut pantai tropis segar es kopyor"
+  },
+  {
+    "emoji": "🥑",
+    "category": "FOOD",
+    "tags": "alpukat alpokat hijau mentega avocado lemak sehat jus kocok diet"
+  },
+  {
+    "emoji": "🍆",
+    "category": "FOOD",
+    "tags": "terong ungu sayur eggplant balado sayur lodeh bakar"
+  },
+  {
+    "emoji": "🥔",
+    "category": "FOOD",
+    "tags": "kentang umbi potato karbohidrat goreng rebus stik mashed kentang"
+  },
+  {
+    "emoji": "🥕",
+    "category": "FOOD",
+    "tags": "wortel oranye carrot kelinci sayur vitamin a mata sop sayur"
+  },
+  {
+    "emoji": "🌽",
+    "category": "FOOD",
+    "tags": "jagung bakar rebus corn tongkol mentega manis pipil karbohidrat"
+  },
+  {
+    "emoji": "🌶️",
+    "category": "FOOD",
+    "tags": "cabai cabe merah pedas hot pepper pedas sambal pedas hot lombok"
+  },
+  {
+    "emoji": "🫑",
+    "category": "FOOD",
+    "tags": "paprika paprika manis bell pepper sayur tumis salad renyah"
+  },
+  {
+    "emoji": "🥒",
+    "category": "FOOD",
+    "tags": "mentimun timun lalapan segar cucumber lalap acar dingin segar"
+  },
+  {
+    "emoji": "🥬",
+    "category": "FOOD",
+    "tags": "sayuran hijau sawi selada lettuce sayur hijau serat sehat rebus"
+  },
+  {
+    "emoji": "🥦",
+    "category": "FOOD",
+    "tags": "brokoli sayur hijau broccoli sayur sehat anti kanker kukus sup"
+  },
+  {
+    "emoji": "🧄",
+    "category": "FOOD",
+    "tags": "bawang putih garlic bumbu masak dapur harum rempah gurih antioksidan"
+  },
+  {
+    "emoji": "🧅",
+    "category": "FOOD",
+    "tags": "bawang merah bombay onion bumbu iris dapur tumis pedas"
+  },
+  {
+    "emoji": "🍄",
+    "category": "FOOD",
+    "tags": "jamur kuping kancing mushroom tiram tumis sayur sup fungi"
+  },
+  {
+    "emoji": "🥜",
+    "category": "FOOD",
+    "tags": "kacang tanah kulit peanut cemilan gurih renyah selai bumbu"
+  },
+  {
+    "emoji": "🌰",
+    "category": "FOOD",
+    "tags": "kacang kastanye chestnut gurih panggang musim dingin rebus"
+  },
+  {
+    "emoji": "🍞",
+    "category": "FOOD",
+    "tags": "roti tawar gandum potong bread sarapan selai panggang karbohidrat"
+  },
+  {
+    "emoji": "🥐",
+    "category": "FOOD",
+    "tags": "croissant roti prancis berlapis gurih renyah pastry sarapan mentega"
+  },
+  {
+    "emoji": "🥖",
+    "category": "FOOD",
+    "tags": "baguette roti panjang perancis renyah luar lembut tepung rotilapis"
+  },
+  {
+    "emoji": "🥨",
+    "category": "FOOD",
+    "tags": "pretzel roti simpul garam gurih jerman krispi cemilan"
+  },
+  {
+    "emoji": "🥯",
+    "category": "FOOD",
+    "tags": "bagel roti bundar lubang keju oles sarapan bulat gandum"
+  },
+  {
+    "emoji": "🥞",
+    "category": "FOOD",
+    "tags": "panekuk kue dadar pancake madu mentega sirup sarapan tumpuk"
+  },
+  {
+    "emoji": "🧇",
+    "category": "FOOD",
+    "tags": "wafel kue kotak waffle sirup manis es krim renyah sarapan"
+  },
+  {
+    "emoji": "🧀",
+    "category": "FOOD",
+    "tags": "keju potong cheese kuning cheddar mozarella gurih susu kalsium"
+  },
+  {
+    "emoji": "🍖",
+    "category": "FOOD",
+    "tags": "daging bertulang iga sapi bone meat panggang empuk steak bbq"
+  },
+  {
+    "emoji": "🍗",
+    "category": "FOOD",
+    "tags": "paha ayam goreng fried chicken poultry gurih renyah kfc lauk pauk"
+  },
+  {
+    "emoji": "🥩",
+    "category": "FOOD",
+    "tags": "daging sapi potong steak tenderloin sirloin mentah panggang wagyu"
+  },
+  {
+    "emoji": "🥓",
+    "category": "FOOD",
+    "tags": "bacon strip daging asap gurih garing sarapan asin gurih babi sapi"
+  },
+  {
+    "emoji": "🍔",
+    "category": "FOOD",
+    "tags": "hamburger burger daging roti keju fast food mcd selada enak"
+  },
+  {
+    "emoji": "🍟",
+    "category": "FOOD",
+    "tags": "kentang goreng french fries mcdonalds krispi gurih saus fastfood"
+  },
+  {
+    "emoji": "🍕",
+    "category": "FOOD",
+    "tags": "pizza sepotong keju lumer mozarella pepperoni slice itali gurih"
+  },
+  {
+    "emoji": "🌭",
+    "category": "FOOD",
+    "tags": "hot dog sosis roti saus mustard ketchup fast food panggang"
+  },
+  {
+    "emoji": "🥪",
+    "category": "FOOD",
+    "tags": "sandwich roti isi lapis telur daging keju selada bekal piknik"
+  },
+  {
+    "emoji": "🌮",
+    "category": "FOOD",
+    "tags": "taco meksiko daging cincang renyah kulit pedas salsa tortilla"
+  },
+  {
+    "emoji": "🌯",
+    "category": "FOOD",
+    "tags": "burrito gulung meksiko isi daging nasi kacang saus wrap empuk"
+  },
+  {
+    "emoji": "🫔",
+    "category": "FOOD",
+    "tags": "tamale masakan tradisional meksiko bungkus daun jagung kukus gurih"
+  },
+  {
+    "emoji": "🥙",
+    "category": "FOOD",
+    "tags": "kebab pita falafel daging iris roti arab sayur shawarma gurih"
+  },
+  {
+    "emoji": "🧆",
+    "category": "FOOD",
+    "tags": "falafel bola kacang goreng arab timur tengah vegetarian gurih"
+  },
+  {
+    "emoji": "🥚",
+    "category": "FOOD",
+    "tags": "telur ayam mentah butir egg putih kuning protein sarapan rebus"
+  },
+  {
+    "emoji": "🍳",
+    "category": "FOOD",
+    "tags": "telur mata sapi ceplok wajan goreng sarapan pagi gurih kuning"
+  },
+  {
+    "emoji": "🥘",
+    "category": "FOOD",
+    "tags": "wajan masakan paella tumis sup masakan rumah rempah saus hangat"
+  },
+  {
+    "emoji": "🍲",
+    "category": "FOOD",
+    "tags": "semangkuk sup hangat stew kaldu kuah gurih sayur rebus daging bakso"
+  },
+  {
+    "emoji": "🫕",
+    "category": "FOOD",
+    "tags": "fondue keju cair panci celup hangat jerman perancis gurih leleh"
+  },
+  {
+    "emoji": "🥣",
+    "category": "FOOD",
+    "tags": "mangkuk sendok sereal sup bubur oatmeal sarapan pagi hangat"
+  },
+  {
+    "emoji": "🥗",
+    "category": "FOOD",
+    "tags": "salad hijau sayur buah mangkuk segar sehat diet serat mayo dressing"
+  },
+  {
+    "emoji": "🍿",
+    "category": "FOOD",
+    "tags": "popcorn jagung meletup bioskop nonton mentega asin manis renyah"
+  },
+  {
+    "emoji": "🧈",
+    "category": "FOOD",
+    "tags": "mentega margarin butter kuning lembut oles kue wangi roti lumer"
+  },
+  {
+    "emoji": "🧂",
+    "category": "FOOD",
+    "tags": "garam dapur botol tabur salt asin gurih bumbu masak perasa mineral"
+  },
+  {
+    "emoji": "🥫",
+    "category": "FOOD",
+    "tags": "makanan kaleng kalengan canned food sarden kornet awet siap saji"
+  },
+  {
+    "emoji": "🍱",
+    "category": "FOOD",
+    "tags": "kotak bento nasi jepang komplit lauk sayur bekal makan siang rapi"
+  },
+  {
+    "emoji": "🍘",
+    "category": "FOOD",
+    "tags": "kerupuk beras jepang senbei rice cracker gurih renyah nori asin"
+  },
+  {
+    "emoji": "🍙",
+    "category": "FOOD",
+    "tags": "onigiri nasi kepal jepang segitiga nori rumput laut isi tuna abon bekal"
+  },
+  {
+    "emoji": "🍚",
+    "category": "FOOD",
+    "tags": "nasi putih mangkuk hangat cooked rice pulen karbohidrat pokok kenyang"
+  },
+  {
+    "emoji": "🍛",
+    "category": "FOOD",
+    "tags": "nasi kari jepang kuah kental gurih pedas curry rice lezat daging wortel"
+  },
+  {
+    "emoji": "🍜",
+    "category": "FOOD",
+    "tags": "ramen mie kuah kaldu hangat mangkuk sumpit noodles bakmi pedas telur"
+  },
+  {
+    "emoji": "🍝",
+    "category": "FOOD",
+    "tags": "spageti spaghettie pasta tomat saus daging italia bolognese keju sedap"
+  },
+  {
+    "emoji": "🍠",
+    "category": "FOOD",
+    "tags": "ubi bakar cilembu manis madu roasted sweet potato empuk hangat"
+  },
+  {
+    "emoji": "🍢",
+    "category": "FOOD",
+    "tags": "oden tusuk kuah jepang bakso ikan hangat kaldu gurih tusukan sate"
+  },
+  {
+    "emoji": "🍣",
+    "category": "FOOD",
+    "tags": "sushi salmon jepang nasi cuka ikan segar wasabi nigiri sumpit"
+  },
+  {
+    "emoji": "🍤",
+    "category": "FOOD",
+    "tags": "tempura udang goreng tepung krispi renyah jepang ebi furai gurih"
+  },
+  {
+    "emoji": "🍥",
+    "category": "FOOD",
+    "tags": "narutomaki kue ikan olahan jepang spiral pink ramen topping kamaboko"
+  },
+  {
+    "emoji": "🥮",
+    "category": "FOOD",
+    "tags": "kue bulan tiongkok mooncake festival manis isi kacang merah telur asin"
+  },
+  {
+    "emoji": "🍡",
+    "category": "FOOD",
+    "tags": "dango kue mochi manis tusuk tiga warna kenyal jepang tradisional"
+  },
+  {
+    "emoji": "🥟",
+    "category": "FOOD",
+    "tags": "pangsit siomay kukus gyoza dumpling dimsum kulit lembut daging gurih"
+  },
+  {
+    "emoji": "🥠",
+    "category": "FOOD",
+    "tags": "biskuit keberuntungan fortune cookie ramalan renyah tiongkok manis"
+  },
+  {
+    "emoji": "🥡",
+    "category": "FOOD",
+    "tags": "kotak makan bawa pulang take out takeout box kardus mie oriental"
+  },
+  {
+    "emoji": "🍦",
+    "category": "FOOD",
+    "tags": "es krim lembut cone soft serve vanila manis dingin segar gelato"
+  },
+  {
+    "emoji": "🍧",
+    "category": "FOOD",
+    "tags": "es serut sirup manis shaved ice buah es campur mangkok dingin"
+  },
+  {
+    "emoji": "🍨",
+    "category": "FOOD",
+    "tags": "es krim mangkuk scoop vanila stroberi cokelat manis sundae dingin"
+  },
+  {
+    "emoji": "🍩",
+    "category": "FOOD",
+    "tags": "donat cokelat lubang tengah donut tabur meses manis empuk cemilan"
+  },
+  {
+    "emoji": "🍪",
+    "category": "FOOD",
+    "tags": "kue kering biskuit choco chip cookie renyah manis cokelat mentega oven"
+  },
+  {
+    "emoji": "🎂",
+    "category": "FOOD",
+    "tags": "kue ulang tahun birthday cake tart lilin pesta perayaan manis krim"
+  },
+  {
+    "emoji": "🍰",
+    "category": "FOOD",
+    "tags": "sepotong kue bolu lapis slice cake stroberi manis lembut tart"
+  },
+  {
+    "emoji": "🧁",
+    "category": "FOOD",
+    "tags": "kue mangkuk cupcake krim manis hiasan pesta ulang tahun imut kecil"
+  },
+  {
+    "emoji": "🥧",
+    "category": "FOOD",
+    "tags": "kue pai panggang pie isi buah apel selai renyah pinggir manis hangat"
+  },
+  {
+    "emoji": "🍫",
+    "category": "FOOD",
+    "tags": "cokelat batang coklat chocolate batangan manis legit kakao permen"
+  },
+  {
+    "emoji": "🍬",
+    "category": "FOOD",
+    "tags": "permen bungkus kembang gula candy manis anak anak rasa buah hisap"
+  },
+  {
+    "emoji": "🍭",
+    "category": "FOOD",
+    "tags": "permen lolipop bulat gagang lollipop putar warna warni manis anak"
+  },
+  {
+    "emoji": "🍮",
+    "category": "FOOD",
+    "tags": "puding karamel custard lembut manis telur goyang lezat dessert"
+  },
+  {
+    "emoji": "🍯",
+    "category": "FOOD",
+    "tags": "toples madu lebah asli pot honey manis kental herbal sehat alami"
+  },
+  {
+    "emoji": "🍼",
+    "category": "FOOD",
+    "tags": "botol susu bayi dot baby bottle formula putih hangat minum"
+  },
+  {
+    "emoji": "🥛",
+    "category": "FOOD",
+    "tags": "segelas susu putih segar glass of milk kalsium sarapan sehat sapi"
+  },
+  {
+    "emoji": "☕",
+    "category": "FOOD",
+    "tags": "kopi hitam hangat secangkir teh panas coffee cup kafein pagi santai"
+  },
+  {
+    "emoji": "🫖",
+    "category": "FOOD",
+    "tags": "teko teh porselen teapot hangat seduh rempah teh melati hijau celup"
+  },
+  {
+    "emoji": "🍵",
+    "category": "FOOD",
+    "tags": "cangkir teh hijau tanpa gagang matcha ocha herbal hangat jepang sedap"
+  },
+  {
+    "emoji": "🍶",
+    "category": "FOOD",
+    "tags": "botol sake cawan arak jepang hangat dingin fermentasi beras tradisional"
+  },
+  {
+    "emoji": "🍾",
+    "category": "FOOD",
+    "tags": "botol sampanye gabus meletup champagne perayaan pesta ulang tahun mewah"
+  },
+  {
+    "emoji": "🍷",
+    "category": "FOOD",
+    "tags": "segelas anggur merah wine glass pesta mewah alkohol pesta romantis"
+  },
+  {
+    "emoji": "🍸",
+    "category": "FOOD",
+    "tags": "koktail gelas segitiga martini cocktail pesta zaitun bar santai"
+  },
+  {
+    "emoji": "🍹",
+    "category": "FOOD",
+    "tags": "minuman tropis sedotan payung tropical drink kelapa jus buah segar pantai"
+  },
+  {
+    "emoji": "🍺",
+    "category": "FOOD",
+    "tags": "segelas bir busa dingin beer mug alkohol bar santai kumpul kuning"
+  },
+  {
+    "emoji": "🍻",
+    "category": "FOOD",
+    "tags": "bersulang gelas bir cheers clinking beer toast pesta kumpul bersama"
+  },
+  {
+    "emoji": "🥂",
+    "category": "FOOD",
+    "tags": "bersulang gelas sampanye toast perayaan romantis mewah pernikahan clink"
+  },
+  {
+    "emoji": "🥃",
+    "category": "FOOD",
+    "tags": "gelas wiski kaca tumbler whiskey on the rocks alkohol tua bourbon"
+  },
+  {
+    "emoji": "🥤",
+    "category": "FOOD",
+    "tags": "gelas plastik sedotan soda cup es teh cola manis dingin cepat saji"
+  },
+  {
+    "emoji": "🧋",
+    "category": "FOOD",
+    "tags": "boba teh susu mutiara bubble tea boba drink manis kenyal kekinian dingin"
+  },
+  {
+    "emoji": "🧃",
+    "category": "FOOD",
+    "tags": "kotak jus buah sedotan juice box jeruk apel apel manis bekal anak"
+  },
+  {
+    "emoji": "🧉",
+    "category": "FOOD",
+    "tags": "minuman mate yerba mate sedotan logam teh herbal amerika selatan"
+  },
+  {
+    "emoji": "🧊",
+    "category": "FOOD",
+    "tags": "es batu balok bening ice cube dingin beku air beku kristal pelepas dahaga"
+  },
+  {
+    "emoji": "⚽",
+    "category": "ACTIVITIES",
+    "tags": "sepak bola bola sepak soccer football lapangan gol tendang piala dunia"
+  },
+  {
+    "emoji": "🏀",
+    "category": "ACTIVITIES",
+    "tags": "bola basket bola basket basketball ring jaring lempar drible slam dunk"
+  },
+  {
+    "emoji": "🏈",
+    "category": "ACTIVITIES",
+    "tags": "american football bola rugby amerika oval lapangan touchdown"
+  },
+  {
+    "emoji": "⚾",
+    "category": "ACTIVITIES",
+    "tags": "baseball bola bisbol pemukul sarung lempar inning homerun pitcher"
+  },
+  {
+    "emoji": "🥎",
+    "category": "ACTIVITIES",
+    "tags": "softball bola lempar kasti perempuan lapangan kuning bola besar"
+  },
+  {
+    "emoji": "🎾",
+    "category": "ACTIVITIES",
+    "tags": "tenis raket bola hijau lapangan tanah liat net wimbledon ace"
+  },
+  {
+    "emoji": "🏐",
+    "category": "ACTIVITIES",
+    "tags": "bola voli volley net pantai smash blok pasir lapangan olimpiade"
+  },
+  {
+    "emoji": "🏉",
+    "category": "ACTIVITIES",
+    "tags": "rugby football bola lonjong lari tabrak tackled scrum piala dunia"
+  },
+  {
+    "emoji": "🥏",
+    "category": "ACTIVITIES",
+    "tags": "frisbee piring terbang lempar tangkap anjing pantai lapangan taman"
+  },
+  {
+    "emoji": "🎱",
+    "category": "ACTIVITIES",
+    "tags": "biliar bola delapan hitam sodok meja laken cue stick pool meja"
+  },
+  {
+    "emoji": "🪀",
+    "category": "ACTIVITIES",
+    "tags": "yoyo mainan tali putar trik anak klasik putaran turun naik kayu plastik"
+  },
+  {
+    "emoji": "🏓",
+    "category": "ACTIVITIES",
+    "tags": "tenis meja ping pong bet bola kecil net meja cepat servis smash"
+  },
+  {
+    "emoji": "🏸",
+    "category": "ACTIVITIES",
+    "tags": "bulu tangkis bulutangkis badminton raket kok shuttlecock smash indonesia juara"
+  },
+  {
+    "emoji": "🏒",
+    "category": "ACTIVITIES",
+    "tags": "hoki es tongkat keping puck ice hockey dingin gelanggang salju"
+  },
+  {
+    "emoji": "🏑",
+    "category": "ACTIVITIES",
+    "tags": "hoki lapangan rumput field hockey tongkat bola rumput gawang"
+  },
+  {
+    "emoji": "🥍",
+    "category": "ACTIVITIES",
+    "tags": "lacrosse jaring tongkat bola jaring lapangan cepat olahraga amerika"
+  },
+  {
+    "emoji": "🏏",
+    "category": "ACTIVITIES",
+    "tags": "kriket tongkat pemukul cricket wicket bola lapangan rumput inggris"
+  },
+  {
+    "emoji": "🏹",
+    "category": "ACTIVITIES",
+    "tags": "busur panah anak panah archery bidik sasaran panahan konsentrasi akurat"
+  },
+  {
+    "emoji": "🎣",
+    "category": "ACTIVITIES",
+    "tags": "pancing kail ikan fishing joran sungai laut danau umpan strike"
+  },
+  {
+    "emoji": "🤿",
+    "category": "ACTIVITIES",
+    "tags": "kacamata selam snorkel diving menyelam karang laut napas renang air"
+  },
+  {
+    "emoji": "🥊",
+    "category": "ACTIVITIES",
+    "tags": "sarung tinju tinju boxing ronde ring samsak pukulan knockout juara"
+  },
+  {
+    "emoji": "🥋",
+    "category": "ACTIVITIES",
+    "tags": "baju silat karate sabuk taekwondo judo martial arts beladiri dojo"
+  },
+  {
+    "emoji": "🎽",
+    "category": "ACTIVITIES",
+    "tags": "baju lari maraton rompi singlet running lari atletik olahraga nomor"
+  },
+  {
+    "emoji": "🛹",
+    "category": "ACTIVITIES",
+    "tags": "papan luncur skateboard roda trik meluncur aspal trotoar skater"
+  },
+  {
+    "emoji": "🛼",
+    "category": "ACTIVITIES",
+    "tags": "sepatu roda empat roller skate meluncur gelanggang retro aspal"
+  },
+  {
+    "emoji": "🛷",
+    "category": "ACTIVITIES",
+    "tags": "kereta luncur salju sled toboggan seluncur es musim dingin tarik"
+  },
+  {
+    "emoji": "⛸️",
+    "category": "ACTIVITIES",
+    "tags": "sepatu luncur es figure skating seluncur gelanggang es tajam meliuk"
+  },
+  {
+    "emoji": "🥌",
+    "category": "ACTIVITIES",
+    "tags": "batu curling es batu sapu sweeping olimpiade musim dingin target"
+  },
+  {
+    "emoji": "🎿",
+    "category": "ACTIVITIES",
+    "tags": "papan ski salju ski tongkat meluncur lereng gunung musim dingin"
+  },
+  {
+    "emoji": "⛷️",
+    "category": "ACTIVITIES",
+    "tags": "orang berski main ski lereng gunung salju meluncur dingin jaket tebal"
+  },
+  {
+    "emoji": "🏂",
+    "category": "ACTIVITIES",
+    "tags": "pemain snowboard papan seluncur salju melompat gaya ekstrim"
+  },
+  {
+    "emoji": "🪂",
+    "category": "ACTIVITIES",
+    "tags": "parasut terjun payung parachute melayang udara langit terjun payung terjun"
+  },
+  {
+    "emoji": "🏋️",
+    "category": "ACTIVITIES",
+    "tags": "angkat besi beban weightlifting barbel gym otot kuat angkat tenaga"
+  },
+  {
+    "emoji": "🤼",
+    "category": "ACTIVITIES",
+    "tags": "pegulat gulat wrestling bantingan kuncian matras ring atlet beladiri"
+  },
+  {
+    "emoji": "🤸",
+    "category": "ACTIVITIES",
+    "tags": "pesenam salto akrobat cartwheel senam lantai lentur atlet olahraga"
+  },
+  {
+    "emoji": "⛹️",
+    "category": "ACTIVITIES",
+    "tags": "orang main basket dribble basketball pemain bola atlet lapangan"
+  },
+  {
+    "emoji": "🤺",
+    "category": "ACTIVITIES",
+    "tags": "anggar pedang fencer pedang tusuk topeng olahraga pedang tangkas"
+  },
+  {
+    "emoji": "🤾",
+    "category": "ACTIVITIES",
+    "tags": "bola tangan handball gawang lempar atletik lapangan net cepat"
+  },
+  {
+    "emoji": "🏌️",
+    "category": "ACTIVITIES",
+    "tags": "orang main golf stik golf lapangan rumput hijau hole in one pukulan"
+  },
+  {
+    "emoji": "🏇",
+    "category": "ACTIVITIES",
+    "tags": "pacuan kuda joki lomba kuda kencang balap taruhan lintasan rumput"
+  },
+  {
+    "emoji": "🧘",
+    "category": "ACTIVITIES",
+    "tags": "yoga meditasi bersila santai lotus pose pikiran damai sehat tenang"
+  },
+  {
+    "emoji": "🏄",
+    "category": "ACTIVITIES",
+    "tags": "berselancar surfing ombak pantai laut papan selancar surfing pantai"
+  },
+  {
+    "emoji": "🏊",
+    "category": "ACTIVITIES",
+    "tags": "berenang perenang swimming kolam renang gaya dada bebas atletik air"
+  },
+  {
+    "emoji": "🤽",
+    "category": "ACTIVITIES",
+    "tags": "polo air water polo bola gawang renang air tanding tim"
+  },
+  {
+    "emoji": "🚣",
+    "category": "ACTIVITIES",
+    "tags": "mendayung perahu dayung rowing sampan sungai danau atlet olahraga air"
+  },
+  {
+    "emoji": "🧗",
+    "category": "ACTIVITIES",
+    "tags": "panjat tebing rock climbing tebing batu puncak tali harness pegangan"
+  },
+  {
+    "emoji": "🚵",
+    "category": "ACTIVITIES",
+    "tags": "sepeda gunung mountain bike gowes terjal tanjakan hutan tanah ban"
+  },
+  {
+    "emoji": "🚴",
+    "category": "ACTIVITIES",
+    "tags": "bersepeda balap sepeda cycling gowes kayuh pedal helm jalanan keringat"
+  },
+  {
+    "emoji": "🏆",
+    "category": "ACTIVITIES",
+    "tags": "piala piala juara menang emas piala trophy kemenangan turnamen penghargaan"
+  },
+  {
+    "emoji": "🥇",
+    "category": "ACTIVITIES",
+    "tags": "medali emas peringkat satu gold medal nomor satu pemenang olimpiade juara"
+  },
+  {
+    "emoji": "🥈",
+    "category": "ACTIVITIES",
+    "tags": "medali perak peringkat dua silver medal nomor dua kedua runner up"
+  },
+  {
+    "emoji": "🥉",
+    "category": "ACTIVITIES",
+    "tags": "medali perunggu peringkat tiga bronze medal ketiga juara tiga kompetisi"
+  },
+  {
+    "emoji": "🏅",
+    "category": "ACTIVITIES",
+    "tags": "medali penghargaan kalung prestasi olahraga pita kehormatan tanda jasa"
+  },
+  {
+    "emoji": "🎖️",
+    "category": "ACTIVITIES",
+    "tags": "medali militer pita bintang kehormatan tanda keberanian penghargaan prajurit"
+  },
+  {
+    "emoji": "🎫",
+    "category": "ACTIVITIES",
+    "tags": "tiket masuk bioskop konser karcis voucher wahana masuk bioskop"
+  },
+  {
+    "emoji": "🎟️",
+    "category": "ACTIVITIES",
+    "tags": "tiket masuk karcis kupon undian wahana festival gelanggan masuk"
+  },
+  {
+    "emoji": "🎪",
+    "category": "ACTIVITIES",
+    "tags": "tenda sirkus badut atraksi pertunjukan circus hiburan anak karnaval"
+  },
+  {
+    "emoji": "🤹",
+    "category": "ACTIVITIES",
+    "tags": "sulap melempar bola juggling trik atraksi akrobat sirkus lincah kelereng"
+  },
+  {
+    "emoji": "🎭",
+    "category": "ACTIVITIES",
+    "tags": "topeng drama teater sandiwara seni peran senyum sedih komedi tragedi panggung"
+  },
+  {
+    "emoji": "🎨",
+    "category": "ACTIVITIES",
+    "tags": "palet cat lukis kuas seni rupa melukis warna artistik kreasi gambar desainer"
+  },
+  {
+    "emoji": "🎬",
+    "category": "ACTIVITIES",
+    "tags": "papan clapper film sutradara syuting video action kamera rekaman sinema bioskop"
+  },
+  {
+    "emoji": "🎤",
+    "category": "ACTIVITIES",
+    "tags": "mikrofon nyanyi karaoke sing audio suara musik panggung vokalis"
+  },
+  {
+    "emoji": "🎧",
+    "category": "ACTIVITIES",
+    "tags": "headphone headset dengar lagu musik earphone audio bass gaming santai"
+  },
+  {
+    "emoji": "🎼",
+    "category": "ACTIVITIES",
+    "tags": "garis paranada partitur not balok nada musik lagu komposisi orkestra melodi"
+  },
+  {
+    "emoji": "🎹",
+    "category": "ACTIVITIES",
+    "tags": "keyboard piano tuts hitam putih nada melodi orgen instrumen musik konser"
+  },
+  {
+    "emoji": "🥁",
+    "category": "ACTIVITIES",
+    "tags": "drum perkusi stik tabuh pukul ritme beat rock band instrumen drum"
+  },
+  {
+    "emoji": "🎷",
+    "category": "ACTIVITIES",
+    "tags": "saksofon saxophone tiup logam emas jazz nada merdu instrumen musik"
+  },
+  {
+    "emoji": "🎺",
+    "category": "ACTIVITIES",
+    "tags": "terompet trumpet tiup logam kuningan orkestra fanfar nada tiup instrumen"
+  },
+  {
+    "emoji": "🎸",
+    "category": "ACTIVITIES",
+    "tags": "gitar elektrik akustik senar petik rock musik melody bass konser lagu"
+  },
+  {
+    "emoji": "🪕",
+    "category": "ACTIVITIES",
+    "tags": "banjo petik senar pedesaan folk musik tradisi bundar melodi akustik"
+  },
+  {
+    "emoji": "🎻",
+    "category": "ACTIVITIES",
+    "tags": "biola gesek violin dawai merdu orkestra klasik syahdu melankolis nada"
+  },
+  {
+    "emoji": "🎲",
+    "category": "ACTIVITIES",
+    "tags": "dadu lempar angka enam board game papan mainan kasino peluang judi"
+  },
+  {
+    "emoji": "♟️",
+    "category": "ACTIVITIES",
+    "tags": "pion catur bidak hitam putih strategi papan catur chess taktik permainan"
+  },
+  {
+    "emoji": "🎯",
+    "category": "ACTIVITIES",
+    "tags": "papan target panahan bidik tepat bullseye dartboard sasaran gol fokus"
+  },
+  {
+    "emoji": "🎳",
+    "category": "ACTIVITIES",
+    "tags": "boling pin bola boling strike bowling lempar jalur pin bola lubang"
+  },
+  {
+    "emoji": "🎮",
+    "category": "ACTIVITIES",
+    "tags": "gamepad joystick stick controller video game main konsol playstation xbox"
+  },
+  {
+    "emoji": "🎰",
+    "category": "ACTIVITIES",
+    "tags": "mesin judi kasino putar slot machine jackpot koin peruntungan menang kaya"
+  },
+  {
+    "emoji": "🧩",
+    "category": "ACTIVITIES",
+    "tags": "kepingan puzzle susun gambar teka teki potongan logika mainan pasang solusi"
+  },
+  {
+    "emoji": "🚗",
+    "category": "TRAVEL",
+    "tags": "mobil merah sedan sedan mobil penumpang jalan raya kendaraan transport aspal"
+  },
+  {
+    "emoji": "🚕",
+    "category": "TRAVEL",
+    "tags": "taksi kuning taksi argo taksi penumpang antar jemput car travel airport"
+  },
+  {
+    "emoji": "🚙",
+    "category": "TRAVEL",
+    "tags": "mobil suv jip offroad keluarga rekreasi tangguh jalan jauh petualangan"
+  },
+  {
+    "emoji": "🚌",
+    "category": "TRAVEL",
+    "tags": "bus bis kota angkutan umum penumpang halte antar kota pariwisata rute"
+  },
+  {
+    "emoji": "🚎",
+    "category": "TRAVEL",
+    "tags": "trolleybus bus listrik kabel rel atas kota ramah lingkungan umum kota"
+  },
+  {
+    "emoji": "🏎️",
+    "category": "TRAVEL",
+    "tags": "mobil balap f1 formula one balapan jet darat sirkuit kecepatan pitstop cepat"
+  },
+  {
+    "emoji": "🚓",
+    "category": "TRAVEL",
+    "tags": "mobil polisi sirene patroli sirine darurat patrol car menangkap kejahatan amankan"
+  },
+  {
+    "emoji": "🚑",
+    "category": "TRAVEL",
+    "tags": "mobil ambulans sirene rumah sakit gawat darurat pasien p3k medis dokter cepat"
+  },
+  {
+    "emoji": "🚒",
+    "category": "TRAVEL",
+    "tags": "mobil pemadam kebakaran damkar sirine semprot air darurat api tanggap merah"
+  },
+  {
+    "emoji": "🚐",
+    "category": "TRAVEL",
+    "tags": "minibus van mobil van barang antar paket keluarga elf travel car"
+  },
+  {
+    "emoji": "🛻",
+    "category": "TRAVEL",
+    "tags": "mobil pickup bak terbuka angkut barang truk kecil muatan pasir hasil tani"
+  },
+  {
+    "emoji": "🚚",
+    "category": "TRAVEL",
+    "tags": "truk kargo ekspedisi pengiriman paket muatan logistik kontainer jalan tol antarkota"
+  },
+  {
+    "emoji": "🚛",
+    "category": "TRAVEL",
+    "tags": "truk gandeng tronton kontainer semi trailer logistik besar berat lintas sumatra jawa"
+  },
+  {
+    "emoji": "🚜",
+    "category": "TRAVEL",
+    "tags": "traktor bajak sawah pertanian desa roda besar tanah ladang perkebunan traktor"
+  },
+  {
+    "emoji": "🛵",
+    "category": "TRAVEL",
+    "tags": "motor matic skuter vespa jalan raya roda dua helm ojek santai jalanan"
+  },
+  {
+    "emoji": "🏍️",
+    "category": "TRAVEL",
+    "tags": "sepeda motor balap moge sport roda dua touring kencang knalpot jalan raya"
+  },
+  {
+    "emoji": "🛺",
+    "category": "TRAVEL",
+    "tags": "bajaj bentor tuk tuk kendaraan roda tiga angkutan tradisional kota suara khas"
+  },
+  {
+    "emoji": "🚲",
+    "category": "TRAVEL",
+    "tags": "sepeda kayuh ontel gowes pedal sehat roda dua santai ramah lingkungan taman"
+  },
+  {
+    "emoji": "🛴",
+    "category": "TRAVEL",
+    "tags": "skuter otopet anak dorong kaki listrik scooter roda dua berdiri trotoar"
+  },
+  {
+    "emoji": "🚨",
+    "category": "TRAVEL",
+    "tags": "sirene lampu polisi darurat sirine ambulans damkar warning peringatan waspada putar"
+  },
+  {
+    "emoji": "⛽",
+    "category": "TRAVEL",
+    "tags": "pom bensin spbu bensin spbu pertamina bbm isi bahan bakar solar bensin liter"
+  },
+  {
+    "emoji": "🚂",
+    "category": "TRAVEL",
+    "tags": "lokomotif uap kereta api tua gerbong cerobong asap rel uap bersejarah stasiun"
+  },
+  {
+    "emoji": "🚆",
+    "category": "TRAVEL",
+    "tags": "kereta api listrik krl cepat rel modern stasiun komuter rel gerbong cepat"
+  },
+  {
+    "emoji": "🚅",
+    "category": "TRAVEL",
+    "tags": "kereta cepat peluru shinkansen monorail wusss teknologi rel super kilat modern"
+  },
+  {
+    "emoji": "🚄",
+    "category": "TRAVEL",
+    "tags": "kereta cepat jepang monorel rel kilat kecepatan tinggi canggih antar kota"
+  },
+  {
+    "emoji": "🚈",
+    "category": "TRAVEL",
+    "tags": "kereta lrt rel ringan perkotaan stasiun angkutan massal modern ramah lingkungan"
+  },
+  {
+    "emoji": "🚉",
+    "category": "TRAVEL",
+    "tags": "stasiun kereta peron jalur rel transit tunggu tiket penumpang masinis keberangkatan"
+  },
+  {
+    "emoji": "✈️",
+    "category": "TRAVEL",
+    "tags": "pesawat terbang udara bandara maskapai terbang liburan penerbangan awan aviasi tiket"
+  },
+  {
+    "emoji": "🛫",
+    "category": "TRAVEL",
+    "tags": "pesawat lepas landas take off terbang naik bandara berangkat perjalanan awal udara"
+  },
+  {
+    "emoji": "🛬",
+    "category": "TRAVEL",
+    "tags": "pesawat mendarat landing turun tiba bandara landasan selamat tiba tujuan bandar"
+  },
+  {
+    "emoji": "🛩️",
+    "category": "TRAVEL",
+    "tags": "pesawat baling baling kecil perintis carter latih pilot udara terbang pulau"
+  },
+  {
+    "emoji": "🚀",
+    "category": "TRAVEL",
+    "tags": "roket luar angkasa space rocket astronaut meluncur ke bulan mars antariksa nasa"
+  },
+  {
+    "emoji": "🛸",
+    "category": "TRAVEL",
+    "tags": "ufo piring terbang alien luar angkasa makhluk asing misteri piringan melayang luar"
+  },
+  {
+    "emoji": "🚁",
+    "category": "TRAVEL",
+    "tags": "helikopter baling baling putar evakuasi darurat udara terbang heli militer polri"
+  },
+  {
+    "emoji": "🛶",
+    "category": "TRAVEL",
+    "tags": "kano sampan perahu dayung sungai danau air sempit dayung kayu tradisional rakit"
+  },
+  {
+    "emoji": "⛵",
+    "category": "TRAVEL",
+    "tags": "perahu layar perahu tiup angin ombak laut pelaut nelayan pantai berlayar bahari"
+  },
+  {
+    "emoji": "🚤",
+    "category": "TRAVEL",
+    "tags": "speedboat perahu cepat motor mesin melesat ombak laut danau liburan pantai"
+  },
+  {
+    "emoji": "🛳️",
+    "category": "TRAVEL",
+    "tags": "kapal pesiar kapal mewah penumpang liburan laut samudra wisata cruise ship megah"
+  },
+  {
+    "emoji": "⛴️",
+    "category": "TRAVEL",
+    "tags": "kapal feri penyebrangan fery roro antar pulau penumpang mobil truk pelabuhan laut"
+  },
+  {
+    "emoji": "🚢",
+    "category": "TRAVEL",
+    "tags": "kapal kargo barang kapal besar samudra laut ekspor impor kontainer pelabuhan dermaga"
+  },
+  {
+    "emoji": "⚓",
+    "category": "TRAVEL",
+    "tags": "jangkar besi kapal pelaut laut dermaga pelabuhan tambat kokoh kapal laut lambang"
+  },
+  {
+    "emoji": "🛟",
+    "category": "TRAVEL",
+    "tags": "pelampung ban penolong keselamatan laut air darurat tenggelam oren pantai basah"
+  },
+  {
+    "emoji": "🏖️",
+    "category": "TRAVEL",
+    "tags": "pantai pasir payung santai laut ombak liburan musim panas kelapa berjemur indah"
+  },
+  {
+    "emoji": "🏝️",
+    "category": "TRAVEL",
+    "tags": "pulau terpencil kelapa pasir laut tenang tropis tak berpenghuni surga wisata"
+  },
+  {
+    "emoji": "🏜️",
+    "category": "TRAVEL",
+    "tags": "gurun pasir panas kaktus tandus kering gersang onta bukit pasir matahari terik"
+  },
+  {
+    "emoji": "🌋",
+    "category": "TRAVEL",
+    "tags": "gunung berapi letusan magma lahar erupsi abu vulkanik panas kawah bahaya alam"
+  },
+  {
+    "emoji": "⛰️",
+    "category": "TRAVEL",
+    "tags": "gunung alam bukit sejuk tinggi pendakian hutan hijau puncak pemandangan trekking"
+  },
+  {
+    "emoji": "🏔️",
+    "category": "TRAVEL",
+    "tags": "gunung salju es puncak putih dingin everest abadi puncak tebing tinggi sejuk"
+  },
+  {
+    "emoji": "🏕️",
+    "category": "TRAVEL",
+    "tags": "berkemah kemah tenda camping api unggun hutan alam petualangan malam rimba"
+  },
+  {
+    "emoji": "🏠",
+    "category": "TRAVEL",
+    "tags": "rumah tinggal bangunan tempat tinggal atap genteng pintu jendela keluarga asri"
+  },
+  {
+    "emoji": "🏡",
+    "category": "TRAVEL",
+    "tags": "rumah halaman kebun asri bunga keluarga tinggal sejuk nyaman taman pohon pagar"
+  },
+  {
+    "emoji": "🏢",
+    "category": "TRAVEL",
+    "tags": "gedung kantor bertingkat apartemen perkantoran bertingkat tinggi kota pusat bisnis kerja"
+  },
+  {
+    "emoji": "🏣",
+    "category": "TRAVEL",
+    "tags": "kantor pos jepang surat paket kiriman perangko pos ekspedisi bangunan lambang"
+  },
+  {
+    "emoji": "🏤",
+    "category": "TRAVEL",
+    "tags": "kantor pos eropa pos kilat pos bangunan surat dokumen pengiriman kantor"
+  },
+  {
+    "emoji": "🏥",
+    "category": "TRAVEL",
+    "tags": "rumah sakit palang merah medis dokter pasien rawat inap darurat obat poliklinik"
+  },
+  {
+    "emoji": "🏦",
+    "category": "TRAVEL",
+    "tags": "bank gedung uang simpan pinjam atm finansial pilar emas brankas teller transaksi"
+  },
+  {
+    "emoji": "🏨",
+    "category": "TRAVEL",
+    "tags": "hotel penginapan resort kamar tidur tamu liburan resepsionis lobi bangunan menginap"
+  },
+  {
+    "emoji": "🏩",
+    "category": "TRAVEL",
+    "tags": "love hotel hotel romantis kamar cinta motel pernak pernik hati liburan pasangan"
+  },
+  {
+    "emoji": "🏪",
+    "category": "TRAVEL",
+    "tags": "minimarket toko kelontong swalayan 24 jam belanja cepat cemilan minuman jajan kasir"
+  },
+  {
+    "emoji": "🏫",
+    "category": "TRAVEL",
+    "tags": "sekolah gedung belajar murid siswa guru pelajaran kelas jam lonceng pendidikan gedung"
+  },
+  {
+    "emoji": "🏬",
+    "category": "TRAVEL",
+    "tags": "toserba department store mal perbelanjaan pakaian lantai megah barang butik toko"
+  },
+  {
+    "emoji": "🏭",
+    "category": "TRAVEL",
+    "tags": "pabrik cerobong asap industri manufaktur mesin produksi kawasan gudang polusi pekerja"
+  },
+  {
+    "emoji": "🏯",
+    "category": "TRAVEL",
+    "tags": "kastil jepang istana tradisional atap melengkung samurai benteng kaisar sejarah megah"
+  },
+  {
+    "emoji": "🏰",
+    "category": "TRAVEL",
+    "tags": "istana kerajaan kastil dongeng eropa pangeran putri megah benteng raja ratu menara"
+  },
+  {
+    "emoji": "💒",
+    "category": "TRAVEL",
+    "tags": "gereja kapel pernikahan wedding chapel lonceng janji nikah romantis suci pelaminan"
+  },
+  {
+    "emoji": "🗼",
+    "category": "TRAVEL",
+    "tags": "menara tokyo jepang merah putih menara pemancar eiffel tokyo tower malam landmark"
+  },
+  {
+    "emoji": "🗽",
+    "category": "TRAVEL",
+    "tags": "patung liberty new york amerika serikat obor kebebasan hijau tembaga monumen wisata"
+  },
+  {
+    "emoji": "⛪",
+    "category": "TRAVEL",
+    "tags": "gereja ibadah salib kristen katolik bangunan misa hari minggu doa persembahan umat"
+  },
+  {
+    "emoji": "🕌",
+    "category": "TRAVEL",
+    "tags": "masjid kubah menara tempat ibadah umat islam sholat jumat ramadhan adzan suci"
+  },
+  {
+    "emoji": "🛕",
+    "category": "TRAVEL",
+    "tags": "kuil hindu candi pemujaan dewa arca stupa bangunan suci tradisi budaya spiritual"
+  },
+  {
+    "emoji": "🕍",
+    "category": "TRAVEL",
+    "tags": "sinagoga tempat ibadah yahudi bintang daud torah bangunan suci doa tradisi bait"
+  },
+  {
+    "emoji": "⛩️",
+    "category": "TRAVEL",
+    "tags": "gerbang shinto torii jepang kuil merah kayu keramat spiritual tradisi budaya sakral"
+  },
+  {
+    "emoji": "🕋",
+    "category": "TRAVEL",
+    "tags": "kabah baitullah mekah kiblat ibadah haji umrah suci umat islam tawaf masjidil haram"
+  },
+  {
+    "emoji": "💡",
+    "category": "OBJECTS",
+    "tags": "lampu pijar bohlam ide terang konsep solusi inovasi menyala bohlam kuning pikiran"
+  },
+  {
+    "emoji": "🔦",
+    "category": "OBJECTS",
+    "tags": "senter penerangan darurat baterai cahaya malam gelap gulita patroli senter terang"
+  },
+  {
+    "emoji": "🕯️",
+    "category": "OBJECTS",
+    "tags": "lilin sumbu api menyala romantis mati lampu doa ulang tahun padam lilin hangat"
+  },
+  {
+    "emoji": "🧯",
+    "category": "OBJECTS",
+    "tags": "alat pemadam api apar tabung merah semprot foam darurat kebakaran keselamatan keselamatan"
+  },
+  {
+    "emoji": "💵",
+    "category": "OBJECTS",
+    "tags": "uang kertas dollar uang hijau gaji belanja belanja tunai kaya beli bayar mata uang"
+  },
+  {
+    "emoji": "💴",
+    "category": "OBJECTS",
+    "tags": "uang kertas yen jepang mata uang pembayaran kasir belanja tunai belanja impor yen"
+  },
+  {
+    "emoji": "💶",
+    "category": "OBJECTS",
+    "tags": "uang kertas euro uni eropa mata uang valuta asing kasir pembayaran eropa euro"
+  },
+  {
+    "emoji": "💷",
+    "category": "OBJECTS",
+    "tags": "uang kertas poundsterling inggris pound valas valuta mata uang asing belanja britania"
+  },
+  {
+    "emoji": "💰",
+    "category": "OBJECTS",
+    "tags": "kantong karung uang koin dolar kaya emas miliarder harta karun rezeki modal sukses"
+  },
+  {
+    "emoji": "💳",
+    "category": "OBJECTS",
+    "tags": "kartu kredit debit perbankan atm gesek bayar cashless mastercard visa bank cicilan"
+  },
+  {
+    "emoji": "💎",
+    "category": "OBJECTS",
+    "tags": "berlian batu permata intan kristal perhiasan mulia mahal mewah berkilau abadi cincin"
+  },
+  {
+    "emoji": "⚖️",
+    "category": "OBJECTS",
+    "tags": "timbangan keadilan hukum pengadilan neraca adil seimbang hakim pasal gugatan vonis"
+  },
+  {
+    "emoji": "🪜",
+    "category": "OBJECTS",
+    "tags": "tangga lipat kayu bambu panjat perbaikan naik tingkat tinggi tangga bertingkat kuli"
+  },
+  {
+    "emoji": "🧰",
+    "category": "OBJECTS",
+    "tags": "kotak perkakas alat montir bengkel kunci obeng tang perbaikan tukang servis peralatan"
+  },
+  {
+    "emoji": "🔧",
+    "category": "OBJECTS",
+    "tags": "kunci pas inggris perkakas bengkel baut mur kencangkan montir servis mesin pipa"
+  },
+  {
+    "emoji": "🔨",
+    "category": "OBJECTS",
+    "tags": "palu martil paku ketok hancurkan tukang kayu perkakas gebuk bangun robohkan besi"
+  },
+  {
+    "emoji": "⛏️",
+    "category": "OBJECTS",
+    "tags": "beliung beliung tambang gali batu emas batu bara tanah perkakas tambang keras tajam"
+  },
+  {
+    "emoji": "🔩",
+    "category": "OBJECTS",
+    "tags": "baut dan mur besi ulir kencangkan rakit mesin perkakas teknik mekanik sambungan"
+  },
+  {
+    "emoji": "⚙️",
+    "category": "OBJECTS",
+    "tags": "roda gigi gir mesin setting pengaturan gear transmisi mekanik mesin industri putar"
+  },
+  {
+    "emoji": "🗜️",
+    "category": "OBJECTS",
+    "tags": "penjepit klem ragum besi pres tekan kuat pertukangan kayu las bengkel penjepit kencang"
+  },
+  {
+    "emoji": "🔑",
+    "category": "OBJECTS",
+    "tags": "kunci rumah gembok buka pintu rahasia pengaman akses login kata sandi logam kuningan"
+  },
+  {
+    "emoji": "🗝️",
+    "category": "OBJECTS",
+    "tags": "kunci antik kuno emas peti rahasia misteri klasik kuno harta karun buka pintu gerbang"
+  },
+  {
+    "emoji": "🚪",
+    "category": "OBJECTS",
+    "tags": "pintu kayu engsel kenop buka tutup masuk ruangan rumah kamar keluar batas pintu"
+  },
+  {
+    "emoji": "🪑",
+    "category": "OBJECTS",
+    "tags": "kursi kayu duduk sandaran mebel perabot ruang tamu santai nyaman perabot rumah"
+  },
+  {
+    "emoji": "🛏️",
+    "category": "OBJECTS",
+    "tags": "tempat tidur kasur bantal ranjang kamar tidur istirahat lelap mimpi hotel sprei empuk"
+  },
+  {
+    "emoji": "🛋️",
+    "category": "OBJECTS",
+    "tags": "sofa santai empuk ruang keluarga ruang tamu bantal sandaran nonton tv mebel rileks"
+  },
+  {
+    "emoji": "🚿",
+    "category": "OBJECTS",
+    "tags": "pancuran shower kamar mandi air segar keran mandi bersih sabun segar basah guyur"
+  },
+  {
+    "emoji": "🛁",
+    "category": "OBJECTS",
+    "tags": "bak mandi bathtub berendam busa air hangat sabun kamar mandi rileks wangi spa santai"
+  },
+  {
+    "emoji": "🪤",
+    "category": "OBJECTS",
+    "tags": "perangkap tikus umpan keju pegas jebakan perangkap kayu kawat jebakan tikus pasang jitu"
+  },
+  {
+    "emoji": "🧴",
+    "category": "OBJECTS",
+    "tags": "botol lotion sabun cair sampo pembersih pelembab kulit botol pump kosmetik wangi"
+  },
+  {
+    "emoji": "🧷",
+    "category": "OBJECTS",
+    "tags": "peniti peniti jarum kait pengaman kain jilbab baju logam kecil peniti jepit pengaman"
+  },
+  {
+    "emoji": "🧹",
+    "category": "OBJECTS",
+    "tags": "sapu ijuk jerami lantai bersih debu sapu halaman kotor bersih bersih tukang bersih bersih"
+  },
+  {
+    "emoji": "🧺",
+    "category": "OBJECTS",
+    "tags": "keranjang pakaian cucian kain anyaman baju kotor jemuran piknik wadah cucian rapi"
+  },
+  {
+    "emoji": "🧻",
+    "category": "OBJECTS",
+    "tags": "tisu gulung toilet roll pembersih kertas putih kamar mandi toilet roll higienis serap"
+  },
+  {
+    "emoji": "🪣",
+    "category": "OBJECTS",
+    "tags": "ember air plastik wadah cucian pel pelan air tampung bersih bersih ember cuci sumur"
+  },
+  {
+    "emoji": "🧼",
+    "category": "OBJECTS",
+    "tags": "sabun mandi batang busa wangi pembersih kuman cuci tangan higienis mandi bersih wangi"
+  },
+  {
+    "emoji": "🪥",
+    "category": "OBJECTS",
+    "tags": "sikat gigi pasta gigi odol sikat bersihkan gigi senyum putih busa higienis kesehatan"
+  },
+  {
+    "emoji": "🧽",
+    "category": "OBJECTS",
+    "tags": "spons cuci piring busa berpori kuning pembersih wastafel perabotan dapur serap sabun kotor"
+  },
+  {
+    "emoji": "🔔",
+    "category": "OBJECTS",
+    "tags": "lonceng bel bunyi alarm pengingat lonceng gereja notifikasi alert emas dering nyaring"
+  },
+  {
+    "emoji": "🔕",
+    "category": "OBJECTS",
+    "tags": "lonceng coret silent hening mode senyap nada dering mati mute jangan ganggu hening"
+  },
+  {
+    "emoji": "📦",
+    "category": "OBJECTS",
+    "tags": "kardus paket paket kurir jne jnt kiriman kardus belanja online unboxing lakban barang"
+  },
+  {
+    "emoji": "📫",
+    "category": "OBJECTS",
+    "tags": "kotak surat pos tertutup bendera berdiri kiriman pos surat kabar amplop berita rumah"
+  },
+  {
+    "emoji": "📪",
+    "category": "OBJECTS",
+    "tags": "kotak surat pos tertutup bendera turun kosong kirim pos amplop surat paket antar pos"
+  },
+  {
+    "emoji": "📜",
+    "category": "OBJECTS",
+    "tags": "gulungan perkamen naskah kuno kertas tulisan tangan kerajaan dekrit piagam sertifikat kuno"
+  },
+  {
+    "emoji": "📄",
+    "category": "OBJECTS",
+    "tags": "halaman dokumen kertas lembaran berkas file teks dokumen data print out laporan catatan"
+  },
+  {
+    "emoji": "📑",
+    "category": "OBJECTS",
+    "tags": "penanda halaman buku stiker tab kertas dokumen laporan arsip buku batas halaman catatan"
+  },
+  {
+    "emoji": "📊",
+    "category": "OBJECTS",
+    "tags": "grafik batang diagram batang statistik laporan bisnis data naik turun finansial presentasi performa"
+  },
+  {
+    "emoji": "📈",
+    "category": "OBJECTS",
+    "tags": "grafik naik pertumbuhan cuan untung sukses bisnis grafik saham profit meningkat pasar hijau"
+  },
+  {
+    "emoji": "📉",
+    "category": "OBJECTS",
+    "tags": "grafik turun penurunan rugi rugi anjlok bangkrut inflasi grafik merah pasar ambruk rugi"
+  },
+  {
+    "emoji": "🗂️",
+    "category": "OBJECTS",
+    "tags": "pembatas kartu indeks folder arsip organizer dokumen file arsip kantor teratur rapi sistematis"
+  },
+  {
+    "emoji": "📅",
+    "category": "OBJECTS",
+    "tags": "kalender tanggalan jadwal hari bulan tahun agenda kalender pertemuan janji penting pengingat"
+  },
+  {
+    "emoji": "📆",
+    "category": "OBJECTS",
+    "tags": "kalender sobek harian tanggal hari ini agenda robek kertas jadwal catatan meja dinding"
+  },
+  {
+    "emoji": "📇",
+    "category": "OBJECTS",
+    "tags": "kartu kontak rolodex kartu nama alamat rekan nomor telepon arsip relasi kantor putar"
+  },
+  {
+    "emoji": "📁",
+    "category": "OBJECTS",
+    "tags": "folder berkas arsip dokumen berkas komputer file explorer dokumen kuning simpan arsip"
+  },
+  {
+    "emoji": "📂",
+    "category": "OBJECTS",
+    "tags": "folder terbuka membuka berkas file direktori dokumen isi data komputer periksa berkas"
+  },
+  {
+    "emoji": "🗄️",
+    "category": "OBJECTS",
+    "tags": "lemari arsip berkas laci besi dokumen kantor simpan surat rahasia rak arsip laci susun"
+  },
+  {
+    "emoji": "🗳️",
+    "category": "OBJECTS",
+    "tags": "kotak suara pemilu pilpres coblos kertas suara pemungutan suara demokrasi bilik suara bilik"
+  },
+  {
+    "emoji": "📱",
+    "category": "OBJECTS",
+    "tags": "smartphone hp ponsel handphone pintar layar sentuh gadget komunikasi android iphone telepon"
+  },
+  {
+    "emoji": "📲",
+    "category": "OBJECTS",
+    "tags": "ponsel ada panah masuk panggilan pesan chat notifikasi handphone kirim sms transfer masuk"
+  },
+  {
+    "emoji": "☎️",
+    "category": "OBJECTS",
+    "tags": "telepon rumah kabel gagang telepon telepon kantor panggilan suara dering merah jadul kuno"
+  },
+  {
+    "emoji": "📞",
+    "category": "OBJECTS",
+    "tags": "gagang telepon telepon kantor tombol dering call bicara suara koneksi layanan telp hubungi"
+  },
+  {
+    "emoji": "📟",
+    "category": "OBJECTS",
+    "tags": "pager penyeranta alat pesan jadul teks angka pesan singkat pager komunikasi retro jadul"
+  },
+  {
+    "emoji": "📠",
+    "category": "OBJECTS",
+    "tags": "mesin faks faksimili kirim dokumen scan lewat kabel telepon kantor berkas jadul cetak"
+  },
+  {
+    "emoji": "🔋",
+    "category": "OBJECTS",
+    "tags": "baterai penuh energi hijau baterai gadget daya listrik baterai charge daya tahan baterai"
+  },
+  {
+    "emoji": "🪫",
+    "category": "OBJECTS",
+    "tags": "baterai lemah sekarat merah baterai lowbat habis daya colok charger cas mati gadget"
+  },
+  {
+    "emoji": "🔌",
+    "category": "OBJECTS",
+    "tags": "colokan listrik steker kabel charger colok saklar kabel listrik terminal stop kontak adaptor"
+  },
+  {
+    "emoji": "💻",
+    "category": "OBJECTS",
+    "tags": "laptop komputer jinjing layar keyboard kerja kantor koding browsing internet programmer netbook"
+  },
+  {
+    "emoji": "🖥️",
+    "category": "OBJECTS",
+    "tags": "komputer desktop pc layar monitor cpu meja kerja kantor pc gaming all in one unit"
+  },
+  {
+    "emoji": "🖨️",
+    "category": "OBJECTS",
+    "tags": "printer mesin cetak dokumen kertas tinta laserjet fotokopi kantor mencetak kertas formulir"
+  },
+  {
+    "emoji": "⌨️",
+    "category": "OBJECTS",
+    "tags": "keyboard komputer tuts tombol ketik ngetik qwerty mekanikal ngetik sboard input alat ketik"
+  },
+  {
+    "emoji": "🖱️",
+    "category": "OBJECTS",
+    "tags": "mouse komputer tetikus kabel klik kanan kiri scroll kursor pointer navigasi meja pc"
+  },
+  {
+    "emoji": "💽",
+    "category": "OBJECTS",
+    "tags": "minidisk piringan optik kaset magnetik data komputer jadul penyimpanan data disk jadul retro"
+  },
+  {
+    "emoji": "💾",
+    "category": "OBJECTS",
+    "tags": "disket floppy disk simpan berkas jadul retro data save ikon komputer lawas 3.5 inci"
+  },
+  {
+    "emoji": "💿",
+    "category": "OBJECTS",
+    "tags": "cakram optik cd keping dvd lagu musik film data komputer mengkilap piringan compact disc"
+  },
+  {
+    "emoji": "📀",
+    "category": "OBJECTS",
+    "tags": "dvd cakram film video data kapasitas besar piringan emas player pemutar film bioskop"
+  },
+  {
+    "emoji": "🧮",
+    "category": "OBJECTS",
+    "tags": "sempoa sempoa cina kuno hitung matematika angka biji kayu tradisional aritmatika hitungan"
+  },
+  {
+    "emoji": "🎥",
+    "category": "OBJECTS",
+    "tags": "kamera film rol sinema syuting bioskop pita seluloid sutradara lensa rekaman klasik film"
+  },
+  {
+    "emoji": "🎞️",
+    "category": "OBJECTS",
+    "tags": "rol film strip klip negatif seluloid cuci foto kamera lawas rekaman bingkai bioskop"
+  },
+  {
+    "emoji": "📽️",
+    "category": "OBJECTS",
+    "tags": "proyektor film bioskop sorot layar tancap proyektor gambar optik proyektor kelas presentasi"
+  },
+  {
+    "emoji": "📺",
+    "category": "OBJECTS",
+    "tags": "televisi layar tv tabung jadul antena kotak siaran hiburan acara nonton film kartun"
+  },
+  {
+    "emoji": "📷",
+    "category": "OBJECTS",
+    "tags": "kamera saku jepret foto lensa flash potret fotografi dokumentasi gambar piknik kenangan"
+  },
+  {
+    "emoji": "📸",
+    "category": "OBJECTS",
+    "tags": "kamera lampu kilat flash jepret foto potret terang blitz foto candid momen wartawan"
+  },
+  {
+    "emoji": "📹",
+    "category": "OBJECTS",
+    "tags": "kamera video camcorder rekam video handycam rekaman keluarga dokumenter liputan lensa mic"
+  },
+  {
+    "emoji": "📼",
+    "category": "OBJECTS",
+    "tags": "kaset video vhs pita hitam perekam tonton film vcr player pita magnetik lawas jadul 90an"
+  },
+  {
+    "emoji": "🔍",
+    "category": "OBJECTS",
+    "tags": "kaca pembesar telusuri cari search temukan inspeksi zoom telusuri detail detektif lihat"
+  },
+  {
+    "emoji": "🔎",
+    "category": "OBJECTS",
+    "tags": "kaca pembesar miring kanan telusuri periksa investigasi cari telusur pembesar detail temukan"
+  },
+  {
+    "emoji": "📕",
+    "category": "OBJECTS",
+    "tags": "buku merah tertutup jilid tebal bacaan ilmu perpustakaan novel kamus sampul merah buku"
+  },
+  {
+    "emoji": "📖",
+    "category": "OBJECTS",
+    "tags": "buku terbuka halaman lembaran membaca belajar ilmu pengetahuan cerpen novel sastra bahan"
+  },
+  {
+    "emoji": "📚",
+    "category": "OBJECTS",
+    "tags": "tumpukan buku bertumpuk perpustakaan belajar rajin kuliah skripsi materi ilmu pengetahuan tebal"
+  },
+  {
+    "emoji": "📓",
+    "category": "OBJECTS",
+    "tags": "buku catatan sampul notebook agenda jurnal coretan tugas binder catatan tulis sekolah"
+  },
+  {
+    "emoji": "📒",
+    "category": "OBJECTS",
+    "tags": "buku catatan kuning bergaris binder binder catatan memo keuangan buku kas kasir jurnal"
+  },
+  {
+    "emoji": "📃",
+    "category": "OBJECTS",
+    "tags": "halaman melengkung kertas dokumen memo halaman dokumen surat sertifikat perjanjian arsip"
+  },
+  {
+    "emoji": "📜",
+    "category": "OBJECTS",
+    "tags": "gulungan surat piagam naskah maklumat surat tua berharga dokumen sejarah kerajaan kuno"
+  },
+  {
+    "emoji": "📌",
+    "category": "OBJECTS",
+    "tags": "pin dorong paku payung paku papan pengumuman mading tancap penanda merah catatan kantor"
+  },
+  {
+    "emoji": "📍",
+    "category": "OBJECTS",
+    "tags": "pin peta bulat penanda lokasi tempat gps navigasi titik kumpul tujuan jalan peta alamat"
+  },
+  {
+    "emoji": "📎",
+    "category": "OBJECTS",
+    "tags": "klip kertas penjepit kertas paperclip kawat satukan berkas kantor dokumen lampiran rapi"
+  },
+  {
+    "emoji": "🖇️",
+    "category": "OBJECTS",
+    "tags": "dua klip kertas saling terhubung berkaitan kawat penjepit tautan berkas lampiran kantor rapi"
+  },
+  {
+    "emoji": "📏",
+    "category": "OBJECTS",
+    "tags": "penggaris lurus mistar ukur sentimeter skala gambar teknik alat tulis sekolah presisi"
+  },
+  {
+    "emoji": "📐",
+    "category": "OBJECTS",
+    "tags": "penggaris segitiga siku siku busur ukur sudut matematika geometri gambar teknik mistar"
+  },
+  {
+    "emoji": "✂️",
+    "category": "OBJECTS",
+    "tags": "gunting potong kertas kain rambut pisau gunting pemotong jahit alat prakarya kreasi"
+  },
+  {
+    "emoji": "🗃️",
+    "category": "OBJECTS",
+    "tags": "kotak arsip berkas kartu kotak simpan arsip kartu nama data penting dokumen rapi"
+  },
+  {
+    "emoji": "🗑️",
+    "category": "OBJECTS",
+    "tags": "tempat sampah tong sampah buang kotoran keranjang sampah buang berkas bersihkan hapus"
+  },
+  {
+    "emoji": "🔒",
+    "category": "OBJECTS",
+    "tags": "gembok terkunci aman proteksi rahasia kata sandi privasi keamanan tutup logam kuci rapat"
+  },
+  {
+    "emoji": "🔓",
+    "category": "OBJECTS",
+    "tags": "gembok terbuka buka kunci akses bebas terbuka tidak aman unlock sistem terbuka gembok"
+  },
+  {
+    "emoji": "🔏",
+    "category": "OBJECTS",
+    "tags": "gembok pena privasi tanda tangan aman enkripsi kunci digital keamanan dokumen legal verifikasi"
+  },
+  {
+    "emoji": "🔐",
+    "category": "OBJECTS",
+    "tags": "gembok kunci pengamanan proteksi enkripsi sandi privasi keamanan tinggi akses terkunci"
+  },
+  {
+    "emoji": "❤️",
+    "category": "SYMBOLS",
+    "tags": "hati merah cinta love sayang asmara"
+  },
+  {
+    "emoji": "🧡",
+    "category": "SYMBOLS",
+    "tags": "hati jingga oranye orange sahabat hangat"
+  },
+  {
+    "emoji": "💛",
+    "category": "SYMBOLS",
+    "tags": "hati kuning persahabatan ceria cerah"
+  },
+  {
+    "emoji": "💚",
+    "category": "SYMBOLS",
+    "tags": "hati hijau damai alam hijau kesehatan"
+  },
+  {
+    "emoji": "💙",
+    "category": "SYMBOLS",
+    "tags": "hati biru loyal tenang sejuk damai"
+  },
+  {
+    "emoji": "💜",
+    "category": "SYMBOLS",
+    "tags": "hati ungu romantis mewah pesona"
+  },
+  {
+    "emoji": "🖤",
+    "category": "SYMBOLS",
+    "tags": "hati hitam gelap duka sedih gothic"
+  },
+  {
+    "emoji": "🤍",
+    "category": "SYMBOLS",
+    "tags": "hati putih suci tulus bersih ikhlas"
+  },
+  {
+    "emoji": "🤎",
+    "category": "SYMBOLS",
+    "tags": "hati cokelat hangat bumi klasik kopi"
+  },
+  {
+    "emoji": "💔",
+    "category": "SYMBOLS",
+    "tags": "hati patah patah hati putus cinta sedih kecewa galau"
+  },
+  {
+    "emoji": "❣️",
+    "category": "SYMBOLS",
+    "tags": "tanda seru hati cinta tegas penekanan love"
+  },
+  {
+    "emoji": "💕",
+    "category": "SYMBOLS",
+    "tags": "dua hati melayang cinta suka kasih sayang"
+  },
+  {
+    "emoji": "💞",
+    "category": "SYMBOLS",
+    "tags": "hati berputar putar cinta gelora rindu"
+  },
+  {
+    "emoji": "💓",
+    "category": "SYMBOLS",
+    "tags": "hati berdebar detak jantung deg degan cinta"
+  },
+  {
+    "emoji": "💗",
+    "category": "SYMBOLS",
+    "tags": "hati membesar tumbuh cinta berbunga sayang"
+  },
+  {
+    "emoji": "💖",
+    "category": "SYMBOLS",
+    "tags": "hati berkilau pesona bintang cinta gemerlap"
+  },
+  {
+    "emoji": "💘",
+    "category": "SYMBOLS",
+    "tags": "hati panah asmara tembak panah cupid jodoh"
+  },
+  {
+    "emoji": "💝",
+    "category": "SYMBOLS",
+    "tags": "hati pita hadiah kado cinta kejutan valentine"
+  },
+  {
+    "emoji": "💟",
+    "category": "SYMBOLS",
+    "tags": "dekorasi hati lambang cinta kotak hiasan"
+  },
+  {
+    "emoji": "☮️",
+    "category": "SYMBOLS",
+    "tags": "simbol damai perdamaian anti perang tenang peace"
+  },
+  {
+    "emoji": "✝️",
+    "category": "SYMBOLS",
+    "tags": "salib latin salib kristen agama yesus gereja"
+  },
+  {
+    "emoji": "☪️",
+    "category": "SYMBOLS",
+    "tags": "bintang bulan sabit islam muslim keagamaan ramadhan"
+  },
+  {
+    "emoji": "🕉️",
+    "category": "SYMBOLS",
+    "tags": "om aum hindu sakral spiritual yoga sanskerta"
+  },
+  {
+    "emoji": "☸️",
+    "category": "SYMBOLS",
+    "tags": "roda dharma roda kemudi agama buddha cakra kebenaran"
+  },
+  {
+    "emoji": "✡️",
+    "category": "SYMBOLS",
+    "tags": "bintang daud yahudi david star israel keagamaan"
+  },
+  {
+    "emoji": "🔯",
+    "category": "SYMBOLS",
+    "tags": "bintang enam titik heksagram mistik lambang"
+  },
+  {
+    "emoji": "🕎",
+    "category": "SYMBOLS",
+    "tags": "menorah tempat lilin yahudi hanukkah tradisi lilin"
+  },
+  {
+    "emoji": "☯️",
+    "category": "SYMBOLS",
+    "tags": "yin yang keseimbangan taoisme harmoni lawan seimbang"
+  },
+  {
+    "emoji": "☦️",
+    "category": "SYMBOLS",
+    "tags": "salib ortodoks salib eropa timur kristen gereja"
+  },
+  {
+    "emoji": "🛐",
+    "category": "SYMBOLS",
+    "tags": "tempat ibadah orang sujud sembahyang doa spiritual"
+  },
+  {
+    "emoji": "⛎",
+    "category": "SYMBOLS",
+    "tags": "ophiuchus rasi bintang zodiak ular ke tiga belas"
+  },
+  {
+    "emoji": "♈",
+    "category": "SYMBOLS",
+    "tags": "aries zodiak domba jantan horoskop zodiak"
+  },
+  {
+    "emoji": "♉",
+    "category": "SYMBOLS",
+    "tags": "taurus zodiak banteng horoskop zodiak bintang"
+  },
+  {
+    "emoji": "♊",
+    "category": "SYMBOLS",
+    "tags": "gemini zodiak kembar horoskop bintang ramalan"
+  },
+  {
+    "emoji": "♋",
+    "category": "SYMBOLS",
+    "tags": "cancer zodiak kepiting horoskop rasi bintang"
+  },
+  {
+    "emoji": "♌",
+    "category": "SYMBOLS",
+    "tags": "leo zodiak singa raja horoskop zodiak"
+  },
+  {
+    "emoji": "♍",
+    "category": "SYMBOLS",
+    "tags": "virgo zodiak perawan gadis horoskop rasi"
+  },
+  {
+    "emoji": "♎",
+    "category": "SYMBOLS",
+    "tags": "libra zodiak timbangan seimbang horoskop zodiak"
+  },
+  {
+    "emoji": "♏",
+    "category": "SYMBOLS",
+    "tags": "scorpio zodiak kalajengking racun horoskop bintang"
+  },
+  {
+    "emoji": "♐",
+    "category": "SYMBOLS",
+    "tags": "sagittarius zodiak pemanah panah kuda horoskop"
+  },
+  {
+    "emoji": "♑",
+    "category": "SYMBOLS",
+    "tags": "capricorn zodiak kambing laut horoskop zodiak"
+  },
+  {
+    "emoji": "♒",
+    "category": "SYMBOLS",
+    "tags": "aquarius zodiak pembawa air horoskop ramalan"
+  },
+  {
+    "emoji": "♓",
+    "category": "SYMBOLS",
+    "tags": "pisces zodiak dua ikan horoskop rasi bintang"
+  },
+  {
+    "emoji": "🆔",
+    "category": "SYMBOLS",
+    "tags": "id lambang identitas kartu tanda pengenal"
+  },
+  {
+    "emoji": "⚛️",
+    "category": "SYMBOLS",
+    "tags": "simbol atom fisika sains energi nuklir ilmiah"
+  },
+  {
+    "emoji": "🉑",
+    "category": "SYMBOLS",
+    "tags": "kanji jepang dapat diterima oke setuju boleh"
+  },
+  {
+    "emoji": "☢️",
+    "category": "SYMBOLS",
+    "tags": "radioaktif bahaya radiasi nuklir limbah bahaya"
+  },
+  {
+    "emoji": "☣️",
+    "category": "SYMBOLS",
+    "tags": "biohazard bahaya biologis virus racun bahaya medis"
+  },
+  {
+    "emoji": "📴",
+    "category": "SYMBOLS",
+    "tags": "ponsel mati matikan hp dilarang pakai handphone senyap"
+  },
+  {
+    "emoji": "📳",
+    "category": "SYMBOLS",
+    "tags": "mode getar getaran ponsel sinyal bergetar haptic"
+  },
+  {
+    "emoji": "🈶",
+    "category": "SYMBOLS",
+    "tags": "kanji jepang ada berbayar tersedia fasilitas"
+  },
+  {
+    "emoji": "🈚",
+    "category": "SYMBOLS",
+    "tags": "kanji jepang gratis tanpa biaya kosong cuma cuma"
+  },
+  {
+    "emoji": "🈸",
+    "category": "SYMBOLS",
+    "tags": "kanji jepang formulir aplikasi lamaran daftar"
+  },
+  {
+    "emoji": "🈺",
+    "category": "SYMBOLS",
+    "tags": "kanji jepang buka jam operasi toko berjalan"
+  },
+  {
+    "emoji": "🈷️",
+    "category": "SYMBOLS",
+    "tags": "kanji jepang bulan tagihan bulanan kalender"
+  },
+  {
+    "emoji": "✴️",
+    "category": "SYMBOLS",
+    "tags": "bintang delapan titik oranye kilau cahaya sinar"
+  },
+  {
+    "emoji": "🆚",
+    "category": "SYMBOLS",
+    "tags": "vs versus tanding versus duel lawan pertandingan"
+  },
+  {
+    "emoji": "💮",
+    "category": "SYMBOLS",
+    "tags": "stempel bunga putih jepang penghargaan sangat bagus nilai"
+  },
+  {
+    "emoji": "🉐",
+    "category": "SYMBOLS",
+    "tags": "kanji jepang untung hemat diskon potongan harga"
+  },
+  {
+    "emoji": "㊙️",
+    "category": "SYMBOLS",
+    "tags": "kanji rahasia tanda rahasia privat tertutup"
+  },
+  {
+    "emoji": "㊗️",
+    "category": "SYMBOLS",
+    "tags": "kanji selamat selamat berkah perayaan sukses"
+  },
+  {
+    "emoji": "🈴",
+    "category": "SYMBOLS",
+    "tags": "kanji lulus lulus ujian memenuhi syarat sukses"
+  },
+  {
+    "emoji": "🈵",
+    "category": "SYMBOLS",
+    "tags": "kanji penuh kapasitas maksimal penuh terisi"
+  },
+  {
+    "emoji": "🈹",
+    "category": "SYMBOLS",
+    "tags": "kanji diskon promo potongan harga obral murah"
+  },
+  {
+    "emoji": "🈲",
+    "category": "SYMBOLS",
+    "tags": "kanji terlarang dilarang larangan jangan dilarang"
+  },
+  {
+    "emoji": "🅰️",
+    "category": "SYMBOLS",
+    "tags": "golongan darah a huruf a kotak merah darah a"
+  },
+  {
+    "emoji": "🅱️",
+    "category": "SYMBOLS",
+    "tags": "golongan darah b huruf b kotak merah darah b"
+  },
+  {
+    "emoji": "🆎",
+    "category": "SYMBOLS",
+    "tags": "golongan darah ab huruf ab kotak merah darah ab"
+  },
+  {
+    "emoji": "🆑",
+    "category": "SYMBOLS",
+    "tags": "cl lambang clear hapus bersihkan panggilan"
+  },
+  {
+    "emoji": "🅾️",
+    "category": "SYMBOLS",
+    "tags": "golongan darah o huruf o kotak merah darah o"
+  },
+  {
+    "emoji": "🆘",
+    "category": "SYMBOLS",
+    "tags": "sos sinyal darurat tolong bahaya minta bantuan"
+  },
+  {
+    "emoji": "❌",
+    "category": "SYMBOLS",
+    "tags": "tanda silang salah silang merah cancel batal gagal"
+  },
+  {
+    "emoji": "⭕",
+    "category": "SYMBOLS",
+    "tags": "lingkaran merah bulat benar tepat oke bulat"
+  },
+  {
+    "emoji": "🛑",
+    "category": "SYMBOLS",
+    "tags": "rambu stop berhenti delapan sudut merah berhenti bahaya"
+  },
+  {
+    "emoji": "⛔",
+    "category": "SYMBOLS",
+    "tags": "dilarang masuk larangan satu arah setop batas merah"
+  },
+  {
+    "emoji": "📛",
+    "category": "SYMBOLS",
+    "tags": "lencana nama tanda nama api bentuk nama kartu"
+  },
+  {
+    "emoji": "🚫",
+    "category": "SYMBOLS",
+    "tags": "dilarang garis merah larangan jangan larang stop"
+  },
+  {
+    "emoji": "💯",
+    "category": "SYMBOLS",
+    "tags": "seratus poin nilai seratus sempurna mantap hebat 100"
+  },
+  {
+    "emoji": "💢",
+    "category": "SYMBOLS",
+    "tags": "simbol marah urat kepala anime kejengkelan emosi"
+  },
+  {
+    "emoji": "♨️",
+    "category": "SYMBOLS",
+    "tags": "mata air panas onsen uap hangat pemandian jepang"
+  },
+  {
+    "emoji": "🚷",
+    "category": "SYMBOLS",
+    "tags": "dilarang pejalan kaki dilarang lewat jalan raya khusus"
+  },
+  {
+    "emoji": "🚯",
+    "category": "SYMBOLS",
+    "tags": "dilarang buang sampah dilarang kotor buang sembarangan"
+  },
+  {
+    "emoji": "🚳",
+    "category": "SYMBOLS",
+    "tags": "dilarang sepeda tidak boleh bersepeda jalur khusus"
+  },
+  {
+    "emoji": "🚱",
+    "category": "SYMBOLS",
+    "tags": "air tidak boleh diminum bukan air minum air kotor"
+  },
+  {
+    "emoji": "🔞",
+    "category": "SYMBOLS",
+    "tags": "usia 18 tahun ke atas dewasa batas umur sensor"
+  },
+  {
+    "emoji": "📵",
+    "category": "SYMBOLS",
+    "tags": "dilarang menggunakan ponsel matikan hp jangan telepon"
+  },
+  {
+    "emoji": "🚭",
+    "category": "SYMBOLS",
+    "tags": "dilarang merokok stop rokok asap bahaya dilarang"
+  },
+  {
+    "emoji": "❗",
+    "category": "SYMBOLS",
+    "tags": "tanda seru merah perhatian peringatan waspada penting"
+  },
+  {
+    "emoji": "❕",
+    "category": "SYMBOLS",
+    "tags": "tanda seru putih perhatian peringatan samar pelan"
+  },
+  {
+    "emoji": "❓",
+    "category": "SYMBOLS",
+    "tags": "tanda tanya merah pertanyaan bingung tanya apa heran"
+  },
+  {
+    "emoji": "❔",
+    "category": "SYMBOLS",
+    "tags": "tanda tanya putih pertanyaan bingung tanya heran ragu"
+  },
+  {
+    "emoji": "‼️",
+    "category": "SYMBOLS",
+    "tags": "dua tanda seru bahaya sangat penting perhatikan gawat"
+  },
+  {
+    "emoji": "⁉️",
+    "category": "SYMBOLS",
+    "tags": "tanda seru tanya kaget bingung heran kaget sekali"
+  },
+  {
+    "emoji": "🔅",
+    "category": "SYMBOLS",
+    "tags": "kecerahan redup redup layar cahaya turun rendah"
+  },
+  {
+    "emoji": "🔆",
+    "category": "SYMBOLS",
+    "tags": "kecerahan tinggi terang benderang cahaya layar sinar"
+  },
+  {
+    "emoji": "〽️",
+    "category": "SYMBOLS",
+    "tags": "simbol partitur lagu jepang pergantian bait musik"
+  },
+  {
+    "emoji": "⚠️",
+    "category": "SYMBOLS",
+    "tags": "peringatan tanda bahaya segitiga kuning awas waspada"
+  },
+  {
+    "emoji": "🚸",
+    "category": "SYMBOLS",
+    "tags": "anak sekolah menyeberang hati hati rambu jalan pelan"
+  },
+  {
+    "emoji": "🔱",
+    "category": "SYMBOLS",
+    "tags": "trisula trisula poseidon lambang garpu senjata laut"
+  },
+  {
+    "emoji": "⚜️",
+    "category": "SYMBOLS",
+    "tags": "fleur-de-lis bunga teratai lambang perancis pramuka"
+  },
+  {
+    "emoji": "🔰",
+    "category": "SYMBOLS",
+    "tags": "pemula daun hijau kuning jepang pengendara baru belajar"
+  },
+  {
+    "emoji": "♻️",
+    "category": "SYMBOLS",
+    "tags": "daur ulang ramah lingkungan olah kembali hijau bumi"
+  },
+  {
+    "emoji": "✅",
+    "category": "SYMBOLS",
+    "tags": "tanda centang hijau sukses berhasil checklist selesai benar"
+  },
+  {
+    "emoji": "🈯",
+    "category": "SYMBOLS",
+    "tags": "kanji jepang reservasi dipesan khusus tempat duduk"
+  },
+  {
+    "emoji": "💹",
+    "category": "SYMBOLS",
+    "tags": "grafik yen naik cuan untung finansial sukses pasar"
+  },
+  {
+    "emoji": "❇️",
+    "category": "SYMBOLS",
+    "tags": "bunga api kilau berkilau sinar cahaya bintang"
+  },
+  {
+    "emoji": "✳️",
+    "category": "SYMBOLS",
+    "tags": "bintang delapan cabang tanda asterisk hijau bersinar"
+  },
+  {
+    "emoji": "❎",
+    "category": "SYMBOLS",
+    "tags": "kotak silang hijau salah silang batal tidak benar"
+  },
+  {
+    "emoji": "🌐",
+    "category": "SYMBOLS",
+    "tags": "globe bola dunia garis lintang bujur web internet"
+  },
+  {
+    "emoji": "💠",
+    "category": "SYMBOLS",
+    "tags": "berlian dengan titik di tengah kristal biru permata"
+  },
+  {
+    "emoji": "Ⓜ️",
+    "category": "SYMBOLS",
+    "tags": "lingkaran huruf m metro bawah tanah stasiun kereta"
+  },
+  {
+    "emoji": "🌀",
+    "category": "SYMBOLS",
+    "tags": "angin topan pusaran badai siklon spiral pusaran air"
+  },
+  {
+    "emoji": "💤",
+    "category": "SYMBOLS",
+    "tags": "tidur mendengkur zzz ngantuk lelap mimpi istirahat"
+  },
+  {
+    "emoji": "🏧",
+    "category": "SYMBOLS",
+    "tags": "mesin atm tarik tunai bank setor uang tunai"
+  },
+  {
+    "emoji": "🚾",
+    "category": "SYMBOLS",
+    "tags": "water closet wc toilet kamar mandi buang air"
+  },
+  {
+    "emoji": "♿",
+    "category": "SYMBOLS",
+    "tags": "kursi roda akses difabel penyandang disabilitas prioritas"
+  },
+  {
+    "emoji": "🅿️",
+    "category": "SYMBOLS",
+    "tags": "tempat parkir mobil area parkir kendaraan rambu biru"
+  },
+  {
+    "emoji": "🛗",
+    "category": "SYMBOLS",
+    "tags": "lift elevator naik turun gedung fasilitas lantai vertikal"
+  },
+  {
+    "emoji": "🈳",
+    "category": "SYMBOLS",
+    "tags": "kanji jepang kosong kamar kosong tempat lowong ada"
+  },
+  {
+    "emoji": "🈂️",
+    "category": "SYMBOLS",
+    "tags": "katakana jepang sa biaya layanan tambahan servis"
+  },
+  {
+    "emoji": "🛂",
+    "category": "SYMBOLS",
+    "tags": "pemeriksaan paspor imigrasi bandara perbatasan cap paspor"
+  },
+  {
+    "emoji": "🛃",
+    "category": "SYMBOLS",
+    "tags": "bea cukai bea bea impor bagasi periksa barang"
+  },
+  {
+    "emoji": "🛄",
+    "category": "SYMBOLS",
+    "tags": "pengambilan bagasi koper bandara klaim barang putar"
+  },
+  {
+    "emoji": "🛅",
+    "category": "SYMBOLS",
+    "tags": "penitipan bagasi loker stasiun titip koper tas"
+  },
+  {
+    "emoji": "🚹",
+    "category": "SYMBOLS",
+    "tags": "toilet pria laki laki tanda kamar kecil ikhwan cowok"
+  },
+  {
+    "emoji": "🚺",
+    "category": "SYMBOLS",
+    "tags": "toilet wanita perempuan akhwat cewek kamar mandi tanda"
+  },
+  {
+    "emoji": "🚼",
+    "category": "SYMBOLS",
+    "tags": "ruang ganti popok bayi balita fasilitas ibu anak"
+  },
+  {
+    "emoji": "🚻",
+    "category": "SYMBOLS",
+    "tags": "toilet umum kamar mandi pria wanita fasilitas publik"
+  },
+  {
+    "emoji": "🚮",
+    "category": "SYMBOLS",
+    "tags": "buanglah sampah pada tempatnya keranjang sampah bersih rapi"
+  },
+  {
+    "emoji": "🎦",
+    "category": "SYMBOLS",
+    "tags": "bioskop film layar tancap sinema hiburan teater tontonan"
+  },
+  {
+    "emoji": "📶",
+    "category": "SYMBOLS",
+    "tags": "sinyal seluler penuh bar bar jaringan internet koneksi"
+  },
+  {
+    "emoji": "🈁",
+    "category": "SYMBOLS",
+    "tags": "katakana jepang koko di sini lokasi titik tempat"
+  },
+  {
+    "emoji": "🔣",
+    "category": "SYMBOLS",
+    "tags": "simbol input karakter tanda baca matematika simbol kode"
+  },
+  {
+    "emoji": "ℹ️",
+    "category": "SYMBOLS",
+    "tags": "informasi pusat bantuan info keterangan pemandu detail"
+  },
+  {
+    "emoji": "🔤",
+    "category": "SYMBOLS",
+    "tags": "huruf latin alfabet abc pengetikan kecil input bahasa"
+  },
+  {
+    "emoji": "🔡",
+    "category": "SYMBOLS",
+    "tags": "huruf kecil alfabet abc pengetikan teks latin huruf"
+  },
+  {
+    "emoji": "🔠",
+    "category": "SYMBOLS",
+    "tags": "huruf besar kapital alfabet ABC teks input judul"
+  },
+  {
+    "emoji": "🆖",
+    "category": "SYMBOLS",
+    "tags": "ng tidak bagus no good gagal buruk tolak salah"
+  },
+  {
+    "emoji": "🆗",
+    "category": "SYMBOLS",
+    "tags": "ok oke siap setuju sepakat sepakat beres mantap"
+  },
+  {
+    "emoji": "🆙",
+    "category": "SYMBOLS",
+    "tags": "up naik atas tingkatkan upgrade baru promosi tinggi"
+  },
+  {
+    "emoji": "🆒",
+    "category": "SYMBOLS",
+    "tags": "cool keren mantap santai dingin hebat gaya bergaya"
+  },
+  {
+    "emoji": "🆕",
+    "category": "SYMBOLS",
+    "tags": "new baru rilis baru berita segar teranyar update"
+  },
+  {
+    "emoji": "🆓",
+    "category": "SYMBOLS",
+    "tags": "free gratis bebas cuma cuma tanpa biaya voucher promo"
+  },
+  {
+    "emoji": "0️⃣",
+    "category": "SYMBOLS",
+    "tags": "angka nol digit nomor nol bulat kosong"
+  },
+  {
+    "emoji": "1️⃣",
+    "category": "SYMBOLS",
+    "tags": "angka satu nomor satu peringkat kesatu digit pertama"
+  },
+  {
+    "emoji": "2️⃣",
+    "category": "SYMBOLS",
+    "tags": "angka dua digit nomor dua pasangan berdua"
+  },
+  {
+    "emoji": "3️⃣",
+    "category": "SYMBOLS",
+    "tags": "angka tiga digit nomor tiga tigaan tiga"
+  },
+  {
+    "emoji": "4️⃣",
+    "category": "SYMBOLS",
+    "tags": "angka empat digit nomor empat empat sisi"
+  },
+  {
+    "emoji": "5️⃣",
+    "category": "SYMBOLS",
+    "tags": "angka lima digit nomor lima kelima lima jari"
+  },
+  {
+    "emoji": "6️⃣",
+    "category": "SYMBOLS",
+    "tags": "angka enam digit nomor enam enam sisi dadu"
+  },
+  {
+    "emoji": "7️⃣",
+    "category": "SYMBOLS",
+    "tags": "angka tujuh digit nomor tujuh keberuntungan lucky tujuh"
+  },
+  {
+    "emoji": "8️⃣",
+    "category": "SYMBOLS",
+    "tags": "angka delapan digit nomor delapan tak terhingga bulat"
+  },
+  {
+    "emoji": "9️⃣",
+    "category": "SYMBOLS",
+    "tags": "angka sembilan digit nomor sembilan sembilan angka"
+  },
+  {
+    "emoji": "🔟",
+    "category": "SYMBOLS",
+    "tags": "angka sepuluh sepuluh poin nomor sepuluh lengkap full"
+  },
+  {
+    "emoji": "🇮🇩",
+    "category": "FLAGS",
+    "tags": "indonesia bendera merah putih tanah air nusantara garuda"
+  },
+  {
+    "emoji": "🇲🇾",
+    "category": "FLAGS",
+    "tags": "malaysia bendera jiran jalur gemilang kuala lumpur"
+  },
+  {
+    "emoji": "🇸🇬",
+    "category": "FLAGS",
+    "tags": "singapura bendera merah putih bintang bulan lion city"
+  },
+  {
+    "emoji": "🇧🇳",
+    "category": "FLAGS",
+    "tags": "brunei darussalam bendera kuning bandar seri begawan"
+  },
+  {
+    "emoji": "🇵🇭",
+    "category": "FLAGS",
+    "tags": "filipina bendera manila tagalog asean kepulauan"
+  },
+  {
+    "emoji": "🇹🇭",
+    "category": "FLAGS",
+    "tags": "thailand bendera bangkok gajah putih siam asean"
+  },
+  {
+    "emoji": "🇻🇳",
+    "category": "FLAGS",
+    "tags": "vietnam bendera bintang kuning merah hanoi asean"
+  },
+  {
+    "emoji": "🇯🇵",
+    "category": "FLAGS",
+    "tags": "jepang bendera matahari terbit tokyo nippon sakura"
+  },
+  {
+    "emoji": "🇰🇷",
+    "category": "FLAGS",
+    "tags": "korea selatan bendera seoul taegeuk kpop drakor hangul"
+  },
+  {
+    "emoji": "🇸🇦",
+    "category": "FLAGS",
+    "tags": "arab saudi bendera hijau kalimat tauhid mekah madinah riyadh"
+  },
+  {
+    "emoji": "🇵🇸",
+    "category": "FLAGS",
+    "tags": "palestina bendera gaza al quds yerusalem merdeka perjuangan"
+  },
+  {
+    "emoji": "🇹🇷",
+    "category": "FLAGS",
+    "tags": "turki bendera merah bulan sabit bintang istanbul ankara"
+  },
+  {
+    "emoji": "🇺🇸",
+    "category": "FLAGS",
+    "tags": "amerika serikat bendera usa garis bintang paman sam us"
+  },
+  {
+    "emoji": "🇬🇧",
+    "category": "FLAGS",
+    "tags": "inggris britania raya bendera union jack london uk english"
+  },
+  {
+    "emoji": "🇩🇪",
+    "category": "FLAGS",
+    "tags": "jerman bendera hitam merah kuning berlin eropa bundes"
+  },
+  {
+    "emoji": "🇫🇷",
+    "category": "FLAGS",
+    "tags": "prancis perancis bendera biru putih merah paris menara eiffel"
+  },
+  {
+    "emoji": "🇮🇹",
+    "category": "FLAGS",
+    "tags": "italia bendera hijau putih merah roma pizza spaghetti"
+  },
+  {
+    "emoji": "🇪🇸",
+    "category": "FLAGS",
+    "tags": "spanyol bendera merah kuning madrid barcelona matador"
+  },
+  {
+    "emoji": "🇧🇷",
+    "category": "FLAGS",
+    "tags": "brasil brazil bendera hijau kuning rio de janeiro sepakbola samba"
+  },
+  {
+    "emoji": "🇦🇷",
+    "category": "FLAGS",
+    "tags": "argentina bendera biru putih matahari buenos aires tango messi"
+  },
+  {
+    "emoji": "🇦🇺",
+    "category": "FLAGS",
+    "tags": "australia bendera canberra kanguru koala sydney benua"
+  },
+  {
+    "emoji": "🇨🇳",
+    "category": "FLAGS",
+    "tags": "china tiongkok bendera merah bintang kuning beijing panda"
+  },
+  {
+    "emoji": "🇷🇺",
+    "category": "FLAGS",
+    "tags": "rusia bendera putih biru merah moskwa beruang siberia"
+  },
+  {
+    "emoji": "🏳️",
+    "category": "FLAGS",
+    "tags": "bendera putih menyerah damai netral gencatan senjata tamat"
+  },
+  {
+    "emoji": "🏴",
+    "category": "FLAGS",
+    "tags": "bendera hitam bajak laut gotik simbolik gelap berkibar"
+  },
+  {
+    "emoji": "🏁",
+    "category": "FLAGS",
+    "tags": "bendera kotak hitam putih finis finish garis akhir balap juara f1"
+  },
+  {
+    "emoji": "🚩",
+    "category": "FLAGS",
+    "tags": "bendera segitiga merah tiang pos tanda penanda bahaya red flag"
+  },
+  {
+    "emoji": "🏳️‍🌈",
+    "category": "FLAGS",
+    "tags": "bendera pelangi pelangi warna warni cinta damai"
+  },
+  {
+    "emoji": "🏳️‍⚧️",
+    "category": "FLAGS",
+    "tags": "bendera transgender biru muda pink putih simbol"
+  }
+]

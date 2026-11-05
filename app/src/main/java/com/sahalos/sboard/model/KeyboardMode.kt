@@ -4,5 +4,6 @@ enum class KeyboardMode {
     KEYBOARD,
     CLIPBOARD,
     RESIZE,
-    EMOJI
+    EMOJI,
+    EMOJI_SEARCH
 }

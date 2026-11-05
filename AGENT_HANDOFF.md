@@ -138,7 +138,28 @@ Handle drag atas pada `ResizeOverlayView.kt` mengupdate `previewHeightRatio` pad
 
 ---
 
-## Ringkasan Eksekusi Rilis v1.0.11:
+## Ringkasan Eksekusi Rilis v1.0.12:
+- [x] **Label Huruf Kapital CTRL & FN (`SuggestionsBar.kt`)**:
+  - Tombol diubah menjadi huruf kapital penuh: `CTRL` dan `FN` (All Caps).
+  - Menggunakan `letterSpacing = 0.5.sp`, `fontSize = 11.sp`, dan `FontWeight.SemiBold`.
+  - Geometri tinggi huruf kapital sekarang sejajar rapi secara visual dengan ikon 18x18 dp Clipboard dan Resize di sebelahnya.
+- [x] **Animasi Pop-up Long-Press Simbol (`KeyView.kt`)**:
+  - Ditambahkan animasi `animateFloatAsState` berbasis spring physics (`Spring.DampingRatioMediumBouncy`) saat tombol ditahan.
+  - Gelembung membesar halus (skala 1.0f -> 1.15f), border menyala dengan warna aksen tema, dan simbol alternatif berubah menjadi karakter utama yang disorot jelas.
+- [x] **Pencarian Emoji 100% Standar Gboard (`EmojiSearchToolbar.kt`, `SboardIME.kt`, `EmojiScreen.kt`)**:
+  - Menghentikan penggunaan mini-keyboard darurat di dalam layar emoji.
+  - Saat kotak pencarian diketuk, keyboard beralih ke mode `EMOJI_SEARCH`:
+    - Bagian bawah: Keyboard QWERTY asli ukuran penuh dengan seluruh fitur haptik, ukuran standar, dan key preview.
+    - Bagian atas (`EmojiSearchToolbar`): Bilah pencarian dengan hasil live emoji yang difilter seketika saat pengguna mengetik huruf.
+    - Mengetuk emoji langsung memasukkan karakter ke aplikasi aktif dan menyimpan riwayat terbaru tanpa menutup mode pencarian.
+- [x] **Katalog Emoji Dinamis Berbasis Aset JSON (`emojis_catalog.json`, `EmojiProvider.kt`)**:
+  - Daftar 816 emoji dipindahkan dari hardcode Kotlin ke berkas `app/src/main/assets/emojis_catalog.json`.
+  - Parsed secara terstruktur dan fleksibel untuk pembaharuan jangka panjang tanpa perlu recompile kode Kotlin setiap rilis Unicode baru.
+- [x] **Integrasi Mesin Rust Native (`sboard-core`)**:
+  - Crate Rust `sboard-core` diimplementasikan dengan modul `spatial.rs` (Euclidean distance + Gaussian probability), `bigram.rs` (tabel frekuensi transisi karakter anti-typo), dan `state.rs` (atomic modifier state machine).
+  - Wrapper JNI `NativeCoreBridge.kt` dengan arsitektur fail-safe: otomatis fallback ke mesin Kotlin jika library native tidak tersedia.
+  - Otomasi build Rust multi-ABI (`arm64-v8a` & `x86_64`) via `cargo-ndk` di pipeline GitHub Actions CI.
+
 - [x] **Styling Flat Konsisten untuk Ctrl & Fn (`SuggestionsBar.kt`)**:
   - Latar belakang (background) kotak tombol `Ctrl` dan `Fn` di toolbar dihapus total saat tidak aktif.
   - Tampilan visual sekarang 100% konsisten, flat, dan menyatu rapi dengan ikon Clipboard dan Resize (`tint = textColor.copy(alpha = 0.85f)`).

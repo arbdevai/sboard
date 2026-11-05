@@ -70,10 +70,11 @@ fun SuggestionsBar(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Ctrl",
+                    text = "CTRL",
                     color = if (isCtrlActive) accentColor else textColor.copy(alpha = 0.85f),
-                    fontSize = 12.sp,
-                    fontWeight = if (isCtrlActive) FontWeight.Bold else FontWeight.Medium
+                    fontSize = 11.sp,
+                    fontWeight = if (isCtrlActive) FontWeight.Bold else FontWeight.SemiBold,
+                    letterSpacing = 0.5.sp
                 )
             }
 
@@ -87,10 +88,11 @@ fun SuggestionsBar(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Fn",
+                    text = "FN",
                     color = if (isFnActive) accentColor else textColor.copy(alpha = 0.85f),
-                    fontSize = 12.sp,
-                    fontWeight = if (isFnActive) FontWeight.Bold else FontWeight.Medium
+                    fontSize = 11.sp,
+                    fontWeight = if (isFnActive) FontWeight.Bold else FontWeight.SemiBold,
+                    letterSpacing = 0.5.sp
                 )
             }
 
