@@ -5,13 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -51,58 +49,22 @@ fun SuggestionsBar(
             .fillMaxWidth()
             .height(42.dp)
             .background(barBgColor)
-            .padding(horizontal = 4.dp, vertical = 3.dp),
+            .padding(horizontal = 6.dp, vertical = 3.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // Quick tools: Ctrl and Fn Buttons (Flat, consistent with clipboard and resize icons)
+        // 1. Left side: Tools (Clipboard & Resize) with comfortable spacing
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            // Ctrl Button (Flat icon style, consistent with clipboard and resize)
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .clip(RoundedCornerShape(6.dp))
-                    .clickable { onCtrlClick() }
-                    .padding(horizontal = 6.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "CTRL",
-                    color = if (isCtrlActive) accentColor else textColor.copy(alpha = 0.85f),
-                    fontSize = 11.sp,
-                    fontWeight = if (isCtrlActive) FontWeight.Bold else FontWeight.SemiBold,
-                    letterSpacing = 0.5.sp
-                )
-            }
-
-            // Fn Button (Flat icon style, consistent with clipboard and resize)
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .clip(RoundedCornerShape(6.dp))
-                    .clickable { onFnClick() }
-                    .padding(horizontal = 6.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "FN",
-                    color = if (isFnActive) accentColor else textColor.copy(alpha = 0.85f),
-                    fontSize = 11.sp,
-                    fontWeight = if (isFnActive) FontWeight.Bold else FontWeight.SemiBold,
-                    letterSpacing = 0.5.sp
-                )
-            }
-
             // Clipboard button
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(6.dp))
                     .clickable { onClipboardClick() }
-                    .padding(horizontal = 6.dp),
+                    .padding(horizontal = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -119,7 +81,7 @@ fun SuggestionsBar(
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(6.dp))
                     .clickable { onResizeClick() }
-                    .padding(horizontal = 6.dp),
+                    .padding(horizontal = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -131,12 +93,12 @@ fun SuggestionsBar(
             }
         }
 
-        // Center: Passive Suggestions or Space indicator
+        // 2. Center: Suggestions or Sboard indicator
         Row(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
-                .padding(horizontal = 4.dp),
+                .padding(horizontal = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -170,21 +132,63 @@ fun SuggestionsBar(
             }
         }
 
-        // Settings button
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .clip(RoundedCornerShape(6.dp))
-                .clickable { onSettingsClick() }
-                .padding(horizontal = 6.dp),
-            contentAlignment = Alignment.Center
+        // 3. Right side: Modifiers (CTRL, FN) & Settings
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_settings),
-                contentDescription = "Pengaturan",
-                tint = textColor.copy(alpha = 0.85f),
-                modifier = Modifier.size(18.dp)
-            )
+            // Ctrl Button (Flat icon style, consistent with tools)
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(6.dp))
+                    .clickable { onCtrlClick() }
+                    .padding(horizontal = 6.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "CTRL",
+                    color = if (isCtrlActive) accentColor else textColor.copy(alpha = 0.85f),
+                    fontSize = 11.sp,
+                    fontWeight = if (isCtrlActive) FontWeight.Bold else FontWeight.SemiBold,
+                    letterSpacing = 0.5.sp
+                )
+            }
+
+            // Fn Button (Flat icon style, consistent with tools)
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(6.dp))
+                    .clickable { onFnClick() }
+                    .padding(horizontal = 6.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "FN",
+                    color = if (isFnActive) accentColor else textColor.copy(alpha = 0.85f),
+                    fontSize = 11.sp,
+                    fontWeight = if (isFnActive) FontWeight.Bold else FontWeight.SemiBold,
+                    letterSpacing = 0.5.sp
+                )
+            }
+
+            // Settings button
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(6.dp))
+                    .clickable { onSettingsClick() }
+                    .padding(horizontal = 6.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_settings),
+                    contentDescription = "Pengaturan",
+                    tint = textColor.copy(alpha = 0.85f),
+                    modifier = Modifier.size(18.dp)
+                )
+            }
         }
     }
 }

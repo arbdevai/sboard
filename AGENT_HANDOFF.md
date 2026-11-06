@@ -202,5 +202,16 @@ Handle drag atas pada `ResizeOverlayView.kt` mengupdate `previewHeightRatio` pad
   - User-boost: kata yang dipilih langsung dari saran mendapat tambahan frekuensi (+5).
   - Koreksi typo berbasis jarak Levenshtein 1 dikombinasikan dengan skor bigram native Rust (`libsboard_core.so`).
 
+---
+
+## Ringkasan Eksekusi Rilis v1.0.15:
+- [x] **Redistribusi Ergonomis Toolbar (`SuggestionsBar.kt`)**:
+  - Memisahkan kelompok tombol agar tidak memepet/menumpuk ke kiri:
+    - **Sisi Kiri**: `[Clipboard]` & `[Resize]` (alat kerja dengan padding tepi 8dp dan spacing yang lega).
+    - **Sisi Tengah**: Saran kata yang seimbang dan luas.
+    - **Sisi Kanan**: `[CTRL]`, `[FN]`, `[Settings]` (posisi natural untuk jempol kanan saat mengetik shortcut).
+  - Menghilangkan total masalah salah pencet `CTRL` saat pengguna keluar dari layar Clipboard (`<- Papan Klip`).
+
+
 
 
