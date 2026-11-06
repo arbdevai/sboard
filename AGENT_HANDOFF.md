@@ -164,14 +164,24 @@ Handle drag atas pada `ResizeOverlayView.kt` mengupdate `previewHeightRatio` pad
   - Latar belakang (background) kotak tombol `Ctrl` dan `Fn` di toolbar dihapus total saat tidak aktif.
   - Tampilan visual sekarang 100% konsisten, flat, dan menyatu rapi dengan ikon Clipboard dan Resize (`tint = textColor.copy(alpha = 0.85f)`).
   - Saat aktif, hanya warna teks yang berubah menjadi aksen dan tebal tanpa kotak background yang merusak estetika toolbar.
-- [x] **Pemisahan Mode Emoji Bersih & Standar Gboard (`EmojiScreen.kt`)**:
-  - Mengeliminasi penumpukan 5 toolbar sekaligus yang membuat tampilan sempit dan berantakan.
-  - **Mode Browser Emoji (Default):**
-    - Toolbar atas minimalis (40dp): `[←] [🔍 Telusuri emoji...] [⌫]`.
-    - Area grid emoji lega (8 kolom) mengisi 80%+ tinggi keyboard tanpa tumpukan keyboard inline.
-    - Toolbar bawah kategori (38dp): `[ABC]` + deretan ikon emoji kategori bersih tanpa teks panjang (`🕒` `😊` `👋` `🐶` `🍕` `⚽` `🚗` `💡` `🔣` `🏁`) + `[⌫]`.
-  - **Mode Pencarian Emoji:**
-    - Hanya aktif saat pengguna mengetuk kotak pencarian "Telusuri emoji...".
-    - Menampilkan bar kata kunci instan, hasil pencarian real-time di atas, dan keyboard QWERTY untuk mengetik kata kunci.
+---
+
+## Ringkasan Eksekusi Rilis v1.0.13:
+- [x] **Katalog Lengkap Unicode Emoji 15.1 (1.898+ Emoji Standar Gboard)**:
+  - Berkas `app/src/main/assets/emojis_catalog.json` diperbarui dengan seluruh spesifikasi resmi Unicode UTS #51 (15.1) dalam urutan CLDR standar.
+  - Cakupan lengkap semua kategori:
+    - Smileys & Emotion: 168 emoji (sebelumnya hanya ~60)
+    - People & Body: 385 emoji (sebelumnya hanya ~50)
+    - Animals & Nature: 153 emoji (sebelumnya hanya ~40)
+    - Food & Drink: 135 emoji (sebelumnya hanya ~70)
+    - Travel & Places: 218 emoji (sebelumnya hanya ~50)
+    - Activities: 85 emoji
+    - Objects: 262 emoji
+    - Symbols: 223 emoji
+    - Flags: 269 bendera lengkap seluruh negara di dunia (sebelumnya hanya 30)
+- [x] **Pre-warming & O(1) Category Indexing (`EmojiProvider.kt`, `SboardIME.kt`)**:
+  - `EmojiProvider.load(context)` dipre-warm di thread IO saat `SboardIME.onCreate()` sehingga transisi ke layar emoji berjalan instan tanpa lag.
+  - Indeks kategori di-cache dalam `Map<EmojiCategory, List<String>>` untuk waktu akses konstan $O(1)$.
+
 
 

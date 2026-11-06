@@ -117,6 +117,10 @@ class SboardIME : InputMethodService(),
         serviceScope.launch {
             preferences.enableVibration.collect { enableVibration = it }
         }
+
+        serviceScope.launch(Dispatchers.IO) {
+            EmojiProvider.load(this@SboardIME)
+        }
     }
 
     override fun onEvaluateFullscreenMode(): Boolean = false
