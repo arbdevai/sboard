@@ -8,7 +8,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import java.util.concurrent.ConcurrentHashMap
 
 object PassiveSuggestionEngine {
     private const val TAG = "AdaptiveSuggestionEngine"
@@ -16,8 +15,9 @@ object PassiveSuggestionEngine {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var dbHelper: UserDictionaryDbHelper? = null
 
-    // In-memory hot cache for instant (< 1ms) prefix lookups during fast typing
-    private val memoryWords = ConcurrentHashMap<String, WordRecord>()
+    // Production-grade Trie data structure for O(L) instant prefix and fuzzy queries
+    private val trie = TrieTree()
+
     @Volatile
     private var isInitialized = false
 
@@ -33,12 +33,12 @@ object PassiveSuggestionEngine {
                 try {
                     val words = helper.loadAllActiveWords(limit = 4000)
                     for (w in words) {
-                        memoryWords[w.word] = w
+                        trie.insert(w)
                     }
                     isInitialized = true
-                    Log.i(TAG, "Adaptive suggestion engine initialized with ${memoryWords.size} words in memory")
+                    Log.i(TAG, "Adaptive suggestion engine initialized with ${words.size} words in Trie")
                 } catch (e: Exception) {
-                    Log.e(TAG, "Failed to load words into memory cache: ${e.message}")
+                    Log.e(TAG, "Failed to load words into Trie: ${e.message}")
                 }
             }
         }
@@ -49,13 +49,8 @@ object PassiveSuggestionEngine {
         if (clean.length < 2 || clean.any { !it.isLetter() }) return
 
         val now = System.currentTimeMillis()
-        val existing = memoryWords[clean]
-        val newRecord = if (existing != null) {
-            existing.copy(frequency = existing.frequency + boost, lastUsed = now)
-        } else {
-            WordRecord(word = clean, frequency = boost, lastUsed = now)
-        }
-        memoryWords[clean] = newRecord
+        val record = WordRecord(word = clean, frequency = boost, lastUsed = now)
+        trie.insert(record)
 
         // Persist to SQLite asynchronously in background
         scope.launch {
@@ -74,58 +69,42 @@ object PassiveSuggestionEngine {
         val isFirstCharUpper = trimmed.first().isUpperCase()
         val queryLower = trimmed.lowercase()
 
-        val prefixCandidates = mutableListOf<WordRecord>()
+        // 1. O(L) instant prefix match from Trie
+        val prefixRecords = trie.searchPrefix(queryLower, maxCount)
+        val results = mutableListOf<String>()
 
-        // 1. In-memory fast prefix scan
-        for ((_, record) in memoryWords) {
-            if (record.word.startsWith(queryLower) && record.word != queryLower) {
-                prefixCandidates.add(record)
+        for (cand in prefixRecords) {
+            if (cand.word != queryLower) {
+                results.add(formatWordCase(cand.word, isFirstCharUpper))
             }
         }
 
-        // Rank by frequency descending, then lastUsed descending
-        prefixCandidates.sortWith(
-            compareByDescending<WordRecord> { it.frequency }
-                .thenByDescending { it.lastUsed }
-        )
-
-        val results = mutableListOf<String>()
-        for (cand in prefixCandidates.take(maxCount)) {
-            results.add(formatWordCase(cand.word, isFirstCharUpper))
-        }
-
-        // 2. Typo correction if prefix results are insufficient and query has length >= 3
+        // 2. Branch-pruned Trie fuzzy search if prefix candidates are fewer than maxCount
         if (results.size < maxCount && queryLower.length >= 3) {
-            val typoCandidates = mutableListOf<Pair<WordRecord, Float>>()
+            val needed = maxCount - results.size
+            val fuzzyRecords = trie.searchFuzzy(queryLower, maxCount = needed * 2)
 
-            for ((_, record) in memoryWords) {
-                val candidateWord = record.word
-                if (candidateWord in results.map { it.lowercase() } || candidateWord == queryLower) continue
-
-                if (Math.abs(candidateWord.length - queryLower.length) <= 1 && isEditDistanceOne(queryLower, candidateWord)) {
-                    // Score with Rust Native Core bigram transition if available
-                    val bigramBonus = if (candidateWord.length >= 2 && queryLower.length >= 2) {
-                        NativeCoreBridge.getBigramScore(candidateWord[0], candidateWord[1])
+            val scoredFuzzy = fuzzyRecords.filter { it.word !in results.map { r -> r.lowercase() } && it.word != queryLower }
+                .map { rec ->
+                    val bigramBonus = if (rec.word.length >= 2 && queryLower.length >= 2) {
+                        NativeCoreBridge.getBigramScore(rec.word[0], rec.word[1])
                     } else {
                         0.5f
                     }
-                    val finalScore = (record.frequency * 1.0f) + (bigramBonus * 10f)
-                    typoCandidates.add(Pair(record, finalScore))
+                    val finalScore = (rec.frequency * 1.0f) + (bigramBonus * 10f)
+                    Pair(rec, finalScore)
                 }
-            }
+                .sortedByDescending { it.second }
 
-            typoCandidates.sortByDescending { it.second }
-
-            for (pair in typoCandidates) {
+            for (pair in scoredFuzzy.take(needed)) {
                 val formatted = formatWordCase(pair.first.word, isFirstCharUpper)
                 if (formatted !in results) {
                     results.add(formatted)
-                    if (results.size >= maxCount) break
                 }
             }
         }
 
-        return results
+        return results.take(maxCount)
     }
 
     private fun formatWordCase(word: String, isFirstCharUpper: Boolean): String {
@@ -134,30 +113,5 @@ object PassiveSuggestionEngine {
         } else {
             word
         }
-    }
-
-    private fun isEditDistanceOne(s1: String, s2: String): Boolean {
-        var diff = 0
-        var i = 0
-        var j = 0
-        while (i < s1.length && j < s2.length) {
-            if (s1[i] != s2[j]) {
-                diff++
-                if (diff > 1) return false
-                if (s1.length > s2.length) {
-                    i++
-                    continue
-                } else if (s2.length > s1.length) {
-                    j++
-                    continue
-                }
-            }
-            i++
-            j++
-        }
-        if (i < s1.length || j < s2.length) {
-            diff++
-        }
-        return diff == 1
     }
 }

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -45,8 +46,14 @@ class SboardClipboardManager(private val context: Context) {
     }
 
     init {
-        // 1. Instantly load persistent clips from disk on startup
-        loadFromDisk()
+        // 1. Non-blocking asynchronous load from disk to prevent UI thread strict mode violations
+        ioScope.launch {
+            loadFromDisk()
+            // Inspect initial system clipboard text without overwriting pinned items
+            withContext(Dispatchers.Main) {
+                onPrimaryClipChanged()
+            }
+        }
 
         // 2. Attach listener to observe future copy actions
         try {
@@ -54,9 +61,6 @@ class SboardClipboardManager(private val context: Context) {
         } catch (e: Exception) {
             Log.e(TAG, "Failed to register clipboard listener: ${e.message}")
         }
-
-        // 3. Inspect initial system clipboard text without overwriting pinned items
-        onPrimaryClipChanged()
     }
 
     fun destroy() {
