@@ -6,13 +6,18 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sahalos.sboard.R
@@ -42,29 +48,33 @@ fun EmojiSearchToolbar(
     modifier: Modifier = Modifier
 ) {
     val barBg = Color(theme.surfaceColor)
+    val bgColor = Color(theme.backgroundColor)
     val textColor = Color(theme.keyTextColor)
     val accentColor = Color(theme.accentColor)
 
-    val quickFilters = listOf("senyum", "hati", "api", "ketawa", "jempol", "kucing", "kopi", "makan", "sedih", "pesta", "bintang", "doa")
+    val quickFilters = listOf(
+        "senyum", "ketawa", "hati", "api", "kucing", "anjing",
+        "mobil", "makan", "sedih", "jempol", "doa", "bintang",
+        "kopi", "bunga", "musik", "indonesia"
+    )
 
     Column(
         modifier = modifier
             .fillMaxWidth()
             .background(barBg)
-            .padding(horizontal = 4.dp, vertical = 2.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        // Row 1: Search Header (Back Arrow | Query Display | Clear Button)
+        // 1. Search Header (Back Arrow | Query Display Pill | Clear Button)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(32.dp),
+                .height(40.dp)
+                .padding(horizontal = 6.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Exit Search Mode
+            // Exit Search Mode back to keyboard
             Box(
                 modifier = Modifier
-                    .size(28.dp)
+                    .size(32.dp)
                     .clip(CircleShape)
                     .clickable { onCloseSearch() },
                 contentAlignment = Alignment.Center
@@ -73,20 +83,20 @@ fun EmojiSearchToolbar(
                     painter = painterResource(id = R.drawable.ic_arrow_left),
                     contentDescription = "Kembali ke Keyboard",
                     tint = textColor.copy(alpha = 0.85f),
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(18.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.width(6.dp))
 
             // Query Display Pill
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .height(26.dp)
-                    .clip(RoundedCornerShape(13.dp))
-                    .background(Color(theme.backgroundColor))
-                    .padding(horizontal = 8.dp),
+                    .height(30.dp)
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(bgColor)
+                    .padding(horizontal = 10.dp),
                 contentAlignment = Alignment.CenterStart
             ) {
                 Row(
@@ -97,20 +107,20 @@ fun EmojiSearchToolbar(
                         painter = painterResource(id = R.drawable.ic_search),
                         contentDescription = null,
                         tint = accentColor,
-                        modifier = Modifier.size(12.dp)
+                        modifier = Modifier.size(14.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = if (query.isNotEmpty()) query else "Ketik untuk mencari emoji...",
+                        text = if (query.isNotEmpty()) query else "Cari dari 1.800+ emoji...",
                         color = if (query.isNotEmpty()) textColor else textColor.copy(alpha = 0.45f),
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
                         fontWeight = if (query.isNotEmpty()) FontWeight.SemiBold else FontWeight.Normal,
                         modifier = Modifier.weight(1f)
                     )
                     if (query.isNotEmpty()) {
                         Box(
                             modifier = Modifier
-                                .size(18.dp)
+                                .size(20.dp)
                                 .clip(CircleShape)
                                 .clickable { onClearQuery() },
                             contentAlignment = Alignment.Center
@@ -119,7 +129,7 @@ fun EmojiSearchToolbar(
                                 painter = painterResource(id = R.drawable.ic_close),
                                 contentDescription = "Bersihkan",
                                 tint = textColor.copy(alpha = 0.7f),
-                                modifier = Modifier.size(11.dp)
+                                modifier = Modifier.size(12.dp)
                             )
                         }
                     }
@@ -127,55 +137,86 @@ fun EmojiSearchToolbar(
             }
         }
 
-        // Row 2: Real-time Live Matching Emoji Strip or Quick Keyword Chips
-        Row(
+        // 2. Results Body: Gboard-style Vertical Scrollable Grid (Height = 115.dp)
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(34.dp)
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .height(115.dp)
+                .background(bgColor)
+                .padding(horizontal = 4.dp),
+            contentAlignment = Alignment.Center
         ) {
             if (results.isNotEmpty()) {
-                results.take(30).forEach { emoji ->
-                    Box(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clip(RoundedCornerShape(6.dp))
-                            .clickable { onEmojiClick(emoji) },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = emoji,
-                            fontSize = 20.sp
-                        )
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(8),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    items(results, key = { it }) { emoji ->
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(6.dp))
+                                .clickable { onEmojiClick(emoji) },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = emoji,
+                                fontSize = 21.sp
+                            )
+                        }
                     }
                 }
             } else if (query.isBlank()) {
-                // Show Quick Filter Chips when no query typed yet
-                quickFilters.forEach { tag ->
-                    Box(
+                // When no query is typed, show quick filter chips and helpful hint
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 6.dp, vertical = 6.dp),
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Color(theme.keyBackgroundColor).copy(alpha = 0.6f))
-                            .clickable { onQuickFilterClick(tag) }
-                            .padding(horizontal = 8.dp, vertical = 3.dp),
-                        contentAlignment = Alignment.Center
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = tag.replaceFirstChar { it.uppercase() },
-                            fontSize = 10.sp,
-                            color = textColor,
-                            fontWeight = FontWeight.Medium
-                        )
+                        quickFilters.forEach { tag ->
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(barBg)
+                                    .clickable { onQuickFilterClick(tag) }
+                                    .padding(horizontal = 10.dp, vertical = 5.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = tag.replaceFirstChar { it.uppercase() },
+                                    fontSize = 11.sp,
+                                    color = textColor.copy(alpha = 0.9f),
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
                     }
+
+                    Text(
+                        text = "Ketik kata kunci pada keyboard di bawah untuk mencari emoji",
+                        color = textColor.copy(alpha = 0.45f),
+                        fontSize = 11.sp,
+                        textAlign = TextAlign.Center
+                    )
                 }
             } else {
                 Text(
                     text = "Tidak ada emoji untuk '$query'",
                     color = textColor.copy(alpha = 0.5f),
-                    fontSize = 11.sp,
-                    modifier = Modifier.padding(start = 6.dp)
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center
                 )
             }
         }

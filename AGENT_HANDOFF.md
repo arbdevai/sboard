@@ -183,5 +183,24 @@ Handle drag atas pada `ResizeOverlayView.kt` mengupdate `previewHeightRatio` pad
   - `EmojiProvider.load(context)` dipre-warm di thread IO saat `SboardIME.onCreate()` sehingga transisi ke layar emoji berjalan instan tanpa lag.
   - Indeks kategori di-cache dalam `Map<EmojiCategory, List<String>>` untuk waktu akses konstan $O(1)$.
 
+---
+
+## Ringkasan Eksekusi Rilis v1.0.14:
+- [x] **Basis Data Emoji Unicode CLDR Resmi (ID & EN) + Tokenized Matching**:
+  - 100% dari 1.898 emoji dan 269 bendera di `emojis_catalog.json` diperkaya dengan metadata resmi Unicode CLDR (Bahasa Indonesia & Bahasa Inggris) serta sinonim percakapan sehari-hari (`ketawa`, `ngakak`, `sedih`, `nangis`, `mobil`, `makan`, `uang`, dll.).
+  - Mengganti algoritma `contains` naif dengan tokenized word prefix matching: pencarian "mobil" hanya menampilkan kendaraan transportasi nyata (tanpa false-positive seperti wortel atau bola kristal).
+- [x] **Tampilan Pencarian Emoji Ala Gboard (`EmojiSearchToolbar.kt`, `SboardIME.kt`)**:
+  - Mengubah mode pencarian menjadi **Vertical Scrollable Grid 8-Kolom (tinggi 115dp)** tepat di atas keyboard QWERTY.
+  - Toolbar quick action (`CTRL`, `FN`, dll.) otomatis disembunyikan saat mode pencarian emoji aktif agar layar tetap luas dan fokus.
+  - Dilengkapi chip pencarian cepat (*Quick Filters*) saat kolom pencarian masih kosong.
+- [x] **Inisialisasi `EmojiCompat`**:
+  - `EmojiCompat` diinisialisasi otomatis saat `onCreate()` dengan `DefaultEmojiCompatConfig` untuk memastikan perangkat lama tidak menampilkan kotak silang (*tofu*).
+- [x] **Mesin Saran Adaptif & Database Pengguna (`UserDictionaryDbHelper.kt`, `PassiveSuggestionEngine.kt`)**:
+  - Penyimpanan lokal SQLite `sboard_user_dict.db` dengan tabel `user_words` (`word`, `frequency`, `last_used`).
+  - Pre-seeding 3.000 kata dasar Indonesia frekuensi tinggi dari `id_seed_vocabulary.txt`.
+  - Auto-learning: kata otomatis dipelajari saat pengguna menekan Space atau Enter.
+  - User-boost: kata yang dipilih langsung dari saran mendapat tambahan frekuensi (+5).
+  - Koreksi typo berbasis jarak Levenshtein 1 dikombinasikan dengan skor bigram native Rust (`libsboard_core.so`).
+
 
 

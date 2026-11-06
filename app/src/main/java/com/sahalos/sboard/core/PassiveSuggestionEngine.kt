@@ -1,49 +1,139 @@
 package com.sahalos.sboard.core
 
-object PassiveSuggestionEngine {
+import android.content.Context
+import android.util.Log
+import com.sahalos.sboard.data.UserDictionaryDbHelper
+import com.sahalos.sboard.data.WordRecord
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import java.util.concurrent.ConcurrentHashMap
 
-    private val commonVocabulary = listOf(
-        "the", "be", "to", "of", "and", "a", "in", "that", "have", "i",
-        "it", "for", "not", "on", "with", "he", "as", "you", "do", "at",
-        "this", "but", "his", "by", "from", "they", "we", "say", "her", "she",
-        "or", "an", "will", "my", "one", "all", "would", "there", "their", "what",
-        "so", "up", "out", "if", "about", "who", "get", "which", "go", "me",
-        "when", "make", "can", "like", "time", "no", "just", "him", "know", "take",
-        "people", "into", "year", "your", "good", "some", "could", "them", "see", "other",
-        "than", "then", "now", "look", "only", "come", "its", "over", "think", "also",
-        "back", "after", "use", "two", "how", "our", "work", "first", "well", "way",
-        "even", "new", "want", "because", "any", "these", "give", "day", "most", "us",
-        "android", "kotlin", "compose", "keyboard", "mobile", "sboard", "system", "code",
-        "developer", "function", "screen", "button", "commit", "release", "branch", "project"
-    )
+object PassiveSuggestionEngine {
+    private const val TAG = "AdaptiveSuggestionEngine"
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private var dbHelper: UserDictionaryDbHelper? = null
+
+    // In-memory hot cache for instant (< 1ms) prefix lookups during fast typing
+    private val memoryWords = ConcurrentHashMap<String, WordRecord>()
+    @Volatile
+    private var isInitialized = false
+
+    fun init(context: Context) {
+        if (isInitialized && dbHelper != null) return
+
+        synchronized(this) {
+            if (isInitialized && dbHelper != null) return
+            val helper = UserDictionaryDbHelper(context.applicationContext)
+            dbHelper = helper
+
+            scope.launch {
+                try {
+                    val words = helper.loadAllActiveWords(limit = 4000)
+                    for (w in words) {
+                        memoryWords[w.word] = w
+                    }
+                    isInitialized = true
+                    Log.i(TAG, "Adaptive suggestion engine initialized with ${memoryWords.size} words in memory")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to load words into memory cache: ${e.message}")
+                }
+            }
+        }
+    }
+
+    fun learnWord(word: String, boost: Int = 1) {
+        val clean = word.trim().lowercase()
+        if (clean.length < 2 || clean.any { !it.isLetter() }) return
+
+        val now = System.currentTimeMillis()
+        val existing = memoryWords[clean]
+        val newRecord = if (existing != null) {
+            existing.copy(frequency = existing.frequency + boost, lastUsed = now)
+        } else {
+            WordRecord(word = clean, frequency = boost, lastUsed = now)
+        }
+        memoryWords[clean] = newRecord
+
+        // Persist to SQLite asynchronously in background
+        scope.launch {
+            try {
+                dbHelper?.learnWord(clean, boost)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error persisting learned word '$clean': ${e.message}")
+            }
+        }
+    }
 
     fun getSuggestions(composingWord: String, maxCount: Int = 3): List<String> {
-        val trimmed = composingWord.trim().lowercase()
+        val trimmed = composingWord.trim()
         if (trimmed.isEmpty()) return emptyList()
 
-        val results = mutableListOf<String>()
+        val isFirstCharUpper = trimmed.first().isUpperCase()
+        val queryLower = trimmed.lowercase()
 
-        // 1. Exact match / prefix matches
-        for (word in commonVocabulary) {
-            if (word.startsWith(trimmed) && word != trimmed) {
-                results.add(word)
-                if (results.size >= maxCount) return results
+        val prefixCandidates = mutableListOf<WordRecord>()
+
+        // 1. In-memory fast prefix scan
+        for ((_, record) in memoryWords) {
+            if (record.word.startsWith(queryLower) && record.word != queryLower) {
+                prefixCandidates.add(record)
             }
         }
 
-        // 2. Levenshtein / Edit distance 1 candidates if prefix results are few
-        if (results.size < maxCount && trimmed.length >= 3) {
-            for (word in commonVocabulary) {
-                if (word !in results && Math.abs(word.length - trimmed.length) <= 1) {
-                    if (isEditDistanceOne(trimmed, word)) {
-                        results.add(word)
-                        if (results.size >= maxCount) return results
+        // Rank by frequency descending, then lastUsed descending
+        prefixCandidates.sortWith(
+            compareByDescending<WordRecord> { it.frequency }
+                .thenByDescending { it.lastUsed }
+        )
+
+        val results = mutableListOf<String>()
+        for (cand in prefixCandidates.take(maxCount)) {
+            results.add(formatWordCase(cand.word, isFirstCharUpper))
+        }
+
+        // 2. Typo correction if prefix results are insufficient and query has length >= 3
+        if (results.size < maxCount && queryLower.length >= 3) {
+            val typoCandidates = mutableListOf<Pair<WordRecord, Float>>()
+
+            for ((_, record) in memoryWords) {
+                val candidateWord = record.word
+                if (candidateWord in results.map { it.lowercase() } || candidateWord == queryLower) continue
+
+                if (Math.abs(candidateWord.length - queryLower.length) <= 1 && isEditDistanceOne(queryLower, candidateWord)) {
+                    // Score with Rust Native Core bigram transition if available
+                    val bigramBonus = if (candidateWord.length >= 2 && queryLower.length >= 2) {
+                        NativeCoreBridge.getBigramScore(candidateWord[0], candidateWord[1])
+                    } else {
+                        0.5f
                     }
+                    val finalScore = (record.frequency * 1.0f) + (bigramBonus * 10f)
+                    typoCandidates.add(Pair(record, finalScore))
+                }
+            }
+
+            typoCandidates.sortByDescending { it.second }
+
+            for (pair in typoCandidates) {
+                val formatted = formatWordCase(pair.first.word, isFirstCharUpper)
+                if (formatted !in results) {
+                    results.add(formatted)
+                    if (results.size >= maxCount) break
                 }
             }
         }
 
         return results
+    }
+
+    private fun formatWordCase(word: String, isFirstCharUpper: Boolean): String {
+        return if (isFirstCharUpper) {
+            word.replaceFirstChar { it.uppercase() }
+        } else {
+            word
+        }
     }
 
     private fun isEditDistanceOne(s1: String, s2: String): Boolean {
@@ -65,6 +155,9 @@ object PassiveSuggestionEngine {
             i++
             j++
         }
-        return true
+        if (i < s1.length || j < s2.length) {
+            diff++
+        }
+        return diff == 1
     }
 }

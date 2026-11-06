@@ -7,12 +7,15 @@ import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.text.InputType
+import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.emoji2.text.EmojiCompat
+import androidx.emoji2.text.DefaultEmojiCompatConfig
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -121,6 +124,20 @@ class SboardIME : InputMethodService(),
         serviceScope.launch(Dispatchers.IO) {
             EmojiProvider.load(this@SboardIME)
         }
+
+        // Initialize EmojiCompat for system-wide font fallback and modern glyph support
+        try {
+            val config = DefaultEmojiCompatConfig.create(this)
+            if (config != null) {
+                EmojiCompat.init(config)
+                Log.i("SboardIME", "EmojiCompat initialized successfully")
+            }
+        } catch (e: Throwable) {
+            Log.w("SboardIME", "EmojiCompat init skipped: ${e.message}")
+        }
+
+        // Initialize Adaptive User Dictionary and Suggestion Engine
+        PassiveSuggestionEngine.init(this)
     }
 
     override fun onEvaluateFullscreenMode(): Boolean = false
@@ -270,9 +287,9 @@ class SboardIME : InputMethodService(),
                             )
                         }
                         KeyboardMode.EMOJI_SEARCH -> {
-                            val searchResults = remember(emojiSearchQuery, recentEmojis) {
+                            val searchResults = remember(emojiSearchQuery) {
                                 if (emojiSearchQuery.isBlank()) {
-                                    if (recentEmojis.isNotEmpty()) recentEmojis else EmojiProvider.getEmojisForCategory(this@SboardIME, EmojiCategory.SMILEYS).take(15)
+                                    emptyList()
                                 } else {
                                     EmojiProvider.search(this@SboardIME, emojiSearchQuery)
                                 }
@@ -363,7 +380,8 @@ class SboardIME : InputMethodService(),
                                     onSettingsClick = { openSettings() },
                                     onCtrlToggle = {},
                                     onFnToggle = {},
-                                    onFunctionKeyClick = {}
+                                    onFunctionKeyClick = {},
+                                    showSuggestionsBar = false
                                 )
                             }
                         }
@@ -396,7 +414,8 @@ class SboardIME : InputMethodService(),
                                     onSettingsClick = {},
                                     onCtrlToggle = {},
                                     onFnToggle = {},
-                                    onFunctionKeyClick = {}
+                                    onFunctionKeyClick = {},
+                                    showSuggestionsBar = false
                                 )
 
                                 // Interactive Gboard-style Resize Overlay
@@ -508,6 +527,9 @@ class SboardIME : InputMethodService(),
     private fun commitTextDirectly(text: String) {
         triggerHaptic()
         val ic = currentInputConnection ?: return
+        if (currentComposingWord.isNotEmpty()) {
+            PassiveSuggestionEngine.learnWord(currentComposingWord)
+        }
         ic.commitText(text, 1)
         currentComposingWord = ""
         currentSuggestions = emptyList()
@@ -538,6 +560,9 @@ class SboardIME : InputMethodService(),
                     currentComposingWord += charToCommit
                     currentSuggestions = PassiveSuggestionEngine.getSuggestions(currentComposingWord)
                 } else {
+                    if (currentComposingWord.isNotEmpty()) {
+                        PassiveSuggestionEngine.learnWord(currentComposingWord)
+                    }
                     currentComposingWord = ""
                     currentSuggestions = emptyList()
                 }
@@ -548,6 +573,9 @@ class SboardIME : InputMethodService(),
                 }
             }
             KeyType.SPACE -> {
+                if (currentComposingWord.isNotEmpty()) {
+                    PassiveSuggestionEngine.learnWord(currentComposingWord)
+                }
                 ic.commitText(" ", 1)
                 currentComposingWord = ""
                 currentSuggestions = emptyList()
@@ -586,6 +614,11 @@ class SboardIME : InputMethodService(),
                 keyboardMode = KeyboardMode.EMOJI
             }
             KeyType.ACTION -> {
+                if (currentComposingWord.isNotEmpty()) {
+                    PassiveSuggestionEngine.learnWord(currentComposingWord)
+                }
+                currentComposingWord = ""
+                currentSuggestions = emptyList()
                 if (currentActionId != EditorInfo.IME_ACTION_UNSPECIFIED && currentActionId != EditorInfo.IME_ACTION_NONE) {
                     ic.performEditorAction(currentActionId)
                 } else {
@@ -660,6 +693,7 @@ class SboardIME : InputMethodService(),
             ic.deleteSurroundingText(currentComposingWord.length, 0)
         }
         ic.commitText("$word ", 1)
+        PassiveSuggestionEngine.learnWord(word, boost = 5) // Prioritize user-accepted suggestion
         currentComposingWord = ""
         currentSuggestions = emptyList()
     }

@@ -61,6 +61,7 @@ fun SboardKeyboardView(
     onCtrlToggle: () -> Unit,
     onFnToggle: () -> Unit,
     onFunctionKeyClick: (Int) -> Unit,
+    showSuggestionsBar: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -79,18 +80,20 @@ fun SboardKeyboardView(
             .background(Color(theme.backgroundColor))
     ) {
         // Suggestions & Quick Action Strip (Ctrl, Fn, Clipboard, Resize, Settings)
-        SuggestionsBar(
-            suggestions = suggestions,
-            theme = theme,
-            isCtrlActive = modifierState.isCtrlActive,
-            isFnActive = modifierState.isFnActive,
-            onCtrlClick = onCtrlToggle,
-            onFnClick = onFnToggle,
-            onSuggestionClick = onSuggestionClick,
-            onClipboardClick = onClipboardClick,
-            onResizeClick = onResizeClick,
-            onSettingsClick = onSettingsClick
-        )
+        if (showSuggestionsBar) {
+            SuggestionsBar(
+                suggestions = suggestions,
+                theme = theme,
+                isCtrlActive = modifierState.isCtrlActive,
+                isFnActive = modifierState.isFnActive,
+                onCtrlClick = onCtrlToggle,
+                onFnClick = onFnToggle,
+                onSuggestionClick = onSuggestionClick,
+                onClipboardClick = onClipboardClick,
+                onResizeClick = onResizeClick,
+                onSettingsClick = onSettingsClick
+            )
+        }
 
         // Optional Fn Row when Fn mode is active
         if (modifierState.isFnActive) {

@@ -1,6 +1,7 @@
 package com.sahalos.sboard.core
 
 import android.content.Context
+import android.util.Log
 import org.json.JSONArray
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -21,10 +22,12 @@ enum class EmojiCategory(val label: String, val icon: String) {
 data class EmojiItem(
     val emoji: String,
     val category: EmojiCategory,
-    val tags: String
+    val tokens: List<String>
 )
 
 object EmojiProvider {
+    private const val TAG = "EmojiProvider"
+
     @Volatile
     private var cachedEmojis: List<EmojiItem>? = null
     private val categoryMap = mutableMapOf<EmojiCategory, List<String>>()
@@ -52,15 +55,17 @@ object EmojiProvider {
                         } catch (e: Exception) {
                             EmojiCategory.SMILEYS
                         }
-                        list.add(EmojiItem(emoji, category, tags))
+                        val tokens = tags.split(" ").filter { it.isNotEmpty() }
+                        list.add(EmojiItem(emoji, category, tokens))
                     }
                 }
             } catch (e: Exception) {
-                // Minimal safety fallback seed
-                list.add(EmojiItem("😀", EmojiCategory.SMILEYS, "senyum smile gembira happy"))
-                list.add(EmojiItem("😂", EmojiCategory.SMILEYS, "tertawa lol haha joy"))
-                list.add(EmojiItem("👍", EmojiCategory.PEOPLE, "jempol like ok"))
-                list.add(EmojiItem("❤️", EmojiCategory.SYMBOLS, "hati love heart"))
+                Log.e(TAG, "Error loading emojis_catalog.json: ${e.message}")
+                // Fallback seed
+                list.add(EmojiItem("😀", EmojiCategory.SMILEYS, listOf("senyum", "smile", "gembira", "happy")))
+                list.add(EmojiItem("😂", EmojiCategory.SMILEYS, listOf("tertawa", "lol", "haha", "joy", "ngakak")))
+                list.add(EmojiItem("👍", EmojiCategory.PEOPLE, listOf("jempol", "like", "ok", "bagus")))
+                list.add(EmojiItem("❤️", EmojiCategory.SYMBOLS, listOf("hati", "love", "heart", "cinta")))
             }
 
             for (cat in EmojiCategory.values()) {
@@ -83,8 +88,16 @@ object EmojiProvider {
         val trimmed = query.trim().lowercase()
         if (trimmed.isEmpty()) return emptyList()
 
-        return load(context).filter { item ->
-            item.emoji == trimmed || item.tags.contains(trimmed)
-        }.map { it.emoji }.distinct()
+        val items = load(context)
+        val results = mutableListOf<String>()
+
+        // 1. Exact match / token prefix match (Unicode CLDR tokenized)
+        for (item in items) {
+            if (item.emoji == trimmed || item.tokens.any { it.startsWith(trimmed) }) {
+                results.add(item.emoji)
+            }
+        }
+
+        return results.distinct()
     }
 }
