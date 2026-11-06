@@ -212,6 +212,16 @@ Handle drag atas pada `ResizeOverlayView.kt` mengupdate `previewHeightRatio` pad
     - **Sisi Kanan**: `[CTRL]`, `[FN]`, `[Settings]` (posisi natural untuk jempol kanan saat mengetik shortcut).
   - Menghilangkan total masalah salah pencet `CTRL` saat pengguna keluar dari layar Clipboard (`<- Papan Klip`).
 
+---
+
+## Ringkasan Eksekusi Rilis v1.0.16:
+- [x] **Penyimpanan Permanen Clipboard ke Disk (`SboardClipboardManager.kt`)**:
+  - Menyimpan seluruh riwayat dan klip yang di-PIN secara permanen ke `sboard_clipboard_history.json` di storage internal privat.
+  - Memuat otomatis klip tersimpan saat startup (`init`) sehingga klip yang di-PIN tidak pernah hilang saat HP restart, aplikasi di-update, atau keyboard di-kill oleh sistem Android.
+  - Mencegah duplikasi teks yang sudah berstatus PIN saat disalin ulang oleh pengguna.
+  - Operasi disk I/O dijalankan di thread asinkron (`Dispatchers.IO`) dengan atomic temporary file replacement untuk menjamin integritas data tanpa frame drop.
+
+
 
 
 
