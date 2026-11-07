@@ -261,6 +261,14 @@ Handle drag atas pada `ResizeOverlayView.kt` mengupdate `previewHeightRatio` pad
     - 3 baris tuts (*keycaps*) solid `#ECEFF4` dengan tata letak baris tengah *staggered* dilengkapi garis taktil *home-row* (`F` & `J`), tombol Shift `#94A3B8`, serta tombol Spacebar lebar dan Enter dengan warna aksen solid `#38BDF8`.
   - Menyertakan berkas SVG murni di `app/src/main/assets/sboard_icon.svg` dan siluet monokrom yang selaras di `ic_launcher_monochrome.xml`.
 
+---
+
+## Ringkasan Eksekusi Rilis v1.0.21:
+- [x] **Pembersihan Total Pola AI Slop di Pengaturan & Launcher Icon (`SettingsScreen.kt`, `ic_launcher_*.xml`, `sboard_icon.svg`)**:
+  - **Layar Pengaturan (`SettingsScreen.kt`):** Menghapus seluruh efek kartu hijau/merah transparan sirup (`0xFF10B981 copy alpha 0.12f` dan border transparan). Menggantinya dengan kartu solid Material 3 standar (`MaterialTheme.colorScheme.surfaceVariant`) di mana status hanya ditandai dengan dot lingkaran dan teks bersih tanpa mewarnai kontainer.
+  - **Latar Belakang Ikon (`ic_launcher_background.xml`):** Mengganti warna hitam-kebiruan `#111622` menjadi **True OLED Pitch Black `#000000`** murni tanpa bias warna atau gradasi.
+  - **Bodi & Tuts Ikon (`ic_launcher_foreground.xml`, `sboard_icon.svg`):** Mengganti bodi kebiruan `#1E2638` menjadi abu-abu netral gelap `#1C1C1C`, pelat dasar `#0D0D0D`, serta tuts dan spacebar monokrom solid murni (`#E6E6E6` & `#FFFFFF`).
+
 
 
 

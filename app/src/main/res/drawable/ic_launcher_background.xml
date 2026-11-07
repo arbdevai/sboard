@@ -4,8 +4,8 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Pure Solid Dark Slate Background -->
+    <!-- True Solid OLED Neutral Pitch Black (Zero Color Tint, Zero Blue) -->
     <path
-        android:fillColor="#111622"
+        android:fillColor="#000000"
         android:pathData="M0,0h108v108h-108z" />
 </vector>

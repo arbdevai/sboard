@@ -1,7 +1,7 @@
 # Sboard Project State & Evolution Log
 
-## Current Status (v1.0.20 - Production Grade)
-- **Active Version:** `1.0.20` (`versionCode = 10020`)
+## Current Status (v1.0.21 - Production Grade)
+- **Active Version:** `1.0.21` (`versionCode = 10021`)
 - **Git Branch:** `main`
 - **NDK Architectures:** `arm64-v8a`, `x86_64`
 - **Target Android SDK:** 36 (Min SDK: 30)

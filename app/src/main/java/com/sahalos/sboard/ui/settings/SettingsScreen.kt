@@ -157,14 +157,13 @@ fun SettingsScreen(
         ) {
             // 1. HERO HEADER: Status Aktivasi IME
             if (isImeEnabled && isImeDefault) {
-                // When completely configured, show clean compact success card (alert is gone)
+                // When completely configured, show clean compact success card (Solid Material 3)
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFF10B981).copy(alpha = 0.12f)
-                    ),
-                    border = BorderStroke(1.dp, Color(0xFF10B981).copy(alpha = 0.4f))
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
                 ) {
                     Row(
                         modifier = Modifier
@@ -211,16 +210,12 @@ fun SettingsScreen(
                     }
                 }
             } else {
-                // Setup Alert Card when not active or not default
+                // Setup Alert Card when not active or not default (Solid Material 3)
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (isImeEnabled) {
-                            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
-                        } else {
-                            MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.45f)
-                        }
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 ) {
                     Column(modifier = Modifier.padding(18.dp)) {
@@ -241,7 +236,8 @@ fun SettingsScreen(
                                     "Sboard Belum Diaktifkan"
                                 },
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 15.sp
+                                fontSize = 15.sp,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
 
