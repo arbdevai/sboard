@@ -18,16 +18,16 @@ data class SboardTheme(
     val isDark: Boolean = true
 ) {
     companion object {
-        val NordDark = SboardTheme(
-            id = "nord_dark",
-            name = "Nord Dark",
-            backgroundColor = 0xFF242933,
-            surfaceColor = 0xFF2E3440,
-            keyBackgroundColor = 0xFF3B4252,
-            keyActionColor = 0xFF88C0D0,
-            keyTextColor = 0xFFECEFF4,
-            keySecondaryTextColor = 0xFF81A1C1,
-            accentColor = 0xFF88C0D0,
+        val OledBlack = SboardTheme(
+            id = "oled_black",
+            name = "OLED Black",
+            backgroundColor = 0xFF000000,
+            surfaceColor = 0xFF121212,
+            keyBackgroundColor = 0xFF1E1E1E,
+            keyActionColor = 0xFF3B82F6,
+            keyTextColor = 0xFFFFFFFF,
+            keySecondaryTextColor = 0xFF9CA3AF,
+            accentColor = 0xFF60A5FA,
             keyCornerRadiusDp = 8,
             isDark = true
         )
@@ -46,20 +46,6 @@ data class SboardTheme(
             isDark = false
         )
 
-        val OledBlack = SboardTheme(
-            id = "oled_black",
-            name = "OLED Black",
-            backgroundColor = 0xFF000000,
-            surfaceColor = 0xFF121212,
-            keyBackgroundColor = 0xFF1E1E1E,
-            keyActionColor = 0xFF3B82F6,
-            keyTextColor = 0xFFFFFFFF,
-            keySecondaryTextColor = 0xFF9CA3AF,
-            accentColor = 0xFF60A5FA,
-            keyCornerRadiusDp = 8,
-            isDark = true
-        )
-
-        val AvailableThemes = listOf(NordDark, MaterialLight, OledBlack)
+        val AvailableThemes = listOf(OledBlack, MaterialLight)
     }
 }

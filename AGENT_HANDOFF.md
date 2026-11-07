@@ -269,6 +269,14 @@ Handle drag atas pada `ResizeOverlayView.kt` mengupdate `previewHeightRatio` pad
   - **Latar Belakang Ikon (`ic_launcher_background.xml`):** Mengganti warna hitam-kebiruan `#111622` menjadi **True OLED Pitch Black `#000000`** murni tanpa bias warna atau gradasi.
   - **Bodi & Tuts Ikon (`ic_launcher_foreground.xml`, `sboard_icon.svg`):** Mengganti bodi kebiruan `#1E2638` menjadi abu-abu netral gelap `#1C1C1C`, pelat dasar `#0D0D0D`, serta tuts dan spacebar monokrom solid murni (`#E6E6E6` & `#FFFFFF`).
 
+---
+
+## Ringkasan Eksekusi Rilis v1.0.22:
+- [x] **Deprecate Total Tema `NordDark` & Jadikan `OLED Black` Default Utama (`ThemeConfig.kt`, `SboardPreferences.kt`, `SboardIME.kt`, `SettingsScreen.kt`, `Theme.kt`, `Color.kt`)**:
+  - Menghapus palet `NordDark` (`#242933`, `#2E3440`, `#3B4252`) yang berwarna biru-abu dingin/kusam dari default keyboard.
+  - Menjadikan **`OLED Black` (`#000000` Pitch Black, `#121212` Surface, `#1E1E1E` Key)** sebagai tema default nomor satu pada DataStore preferences, inisialisasi keyboard di `SboardIME`, dan fallback `SettingsScreen`.
+  - Mengupdate `DarkColorScheme` pada `Theme.kt` dan `Color.kt` menggunakan warna netral OLED sejati dengan kontras proporsional, serta meng-override `surfaceVariant = OledBlackSurfaceVariant` (`#1E1E1E`) agar seluruh kartu pengaturan selaras, pekat, dan nyaman di mata.
+
 
 
 

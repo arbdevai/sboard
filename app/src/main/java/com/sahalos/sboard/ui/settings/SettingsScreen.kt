@@ -87,7 +87,7 @@ fun SettingsScreen(
     val longPressDelay by preferences.longPressDelayMs.collectAsStateWithLifecycle(initialValue = 300L)
     val enableLongPressSymbols by preferences.enableLongPressSymbols.collectAsStateWithLifecycle(initialValue = true)
     val enableVibration by preferences.enableVibration.collectAsStateWithLifecycle(initialValue = true)
-    val themeId by preferences.themeId.collectAsStateWithLifecycle(initialValue = "nord_dark")
+    val themeId by preferences.themeId.collectAsStateWithLifecycle(initialValue = "oled_black")
     val passiveSuggestions by preferences.enablePassiveSuggestions.collectAsStateWithLifecycle(initialValue = true)
     val enableKeyPopup by preferences.enableKeyPopupPreview.collectAsStateWithLifecycle(initialValue = true)
     val enableSpacebarCursorGlide by preferences.enableSpacebarCursorGlide.collectAsStateWithLifecycle(initialValue = true)

@@ -201,11 +201,11 @@ class SboardIME : InputMethodService(),
                 val heightRatio by preferences.keyboardHeightRatio.collectAsStateWithLifecycle(initialValue = 1.0f)
                 val enableLongPressSymbols by preferences.enableLongPressSymbols.collectAsStateWithLifecycle(initialValue = true)
                 val enableKeyPopup by preferences.enableKeyPopupPreview.collectAsStateWithLifecycle(initialValue = true)
-                val themeId by preferences.themeId.collectAsStateWithLifecycle(initialValue = "nord_dark")
+                val themeId by preferences.themeId.collectAsStateWithLifecycle(initialValue = "oled_black")
                 val clips by clipboardManager.clips.collectAsStateWithLifecycle()
                 val recentEmojis by preferences.recentEmojis.collectAsStateWithLifecycle(initialValue = emptyList())
 
-                val activeTheme = SboardTheme.AvailableThemes.find { it.id == themeId } ?: SboardTheme.NordDark
+                val activeTheme = SboardTheme.AvailableThemes.find { it.id == themeId } ?: SboardTheme.OledBlack
 
                 // Calculate exact keyboard bounds
                 val baseRowHeightDp = (48 * heightRatio).toInt()

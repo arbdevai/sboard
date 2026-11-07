@@ -52,7 +52,7 @@ class SboardPreferences(private val context: Context) {
     }
 
     val themeId: Flow<String> = context.dataStore.data.map { prefs ->
-        prefs[KEY_THEME_ID] ?: backupPrefs.getString("theme_id", "nord_dark") ?: "nord_dark"
+        prefs[KEY_THEME_ID] ?: backupPrefs.getString("theme_id", "oled_black") ?: "oled_black"
     }
 
     val enablePassiveSuggestions: Flow<Boolean> = context.dataStore.data.map { prefs ->
