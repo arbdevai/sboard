@@ -251,6 +251,16 @@ Handle drag atas pada `ResizeOverlayView.kt` mengupdate `previewHeightRatio` pad
 - [x] **Verifikasi Integritas Unduhan APK (`UpdateManager.kt`)**:
   - Menambahkan isolasi berkas `.part`, validasi `contentLength`, dan verifikasi CRC32 seluruh entri `ZipFile` sebelum instalasi untuk mencegah galat `Bad checksum` pada `classes.dex`.
 
+---
+
+## Ringkasan Eksekusi Rilis v1.0.20:
+- [x] **Desain Ikon APK Vektor/SVG Murni Bertema Solid Keyboard (`ic_launcher_background.xml`, `ic_launcher_foreground.xml`, `ic_launcher_monochrome.xml`, `sboard_icon.svg`)**:
+  - Mengganti ikon lama dengan geometri vektor murni yang merepresentasikan papan ketik mekanis QWERTY solid secara autentik:
+    - Latar belakang solid `#111622` (tanpa lingkaran gradien).
+    - Rangka bodi keyboard `#1E2638` dengan pelat dasar 3D `#0A0D14` dan garis tepi `#2E3B52`.
+    - 3 baris tuts (*keycaps*) solid `#ECEFF4` dengan tata letak baris tengah *staggered* dilengkapi garis taktil *home-row* (`F` & `J`), tombol Shift `#94A3B8`, serta tombol Spacebar lebar dan Enter dengan warna aksen solid `#38BDF8`.
+  - Menyertakan berkas SVG murni di `app/src/main/assets/sboard_icon.svg` dan siluet monokrom yang selaras di `ic_launcher_monochrome.xml`.
+
 
 
 

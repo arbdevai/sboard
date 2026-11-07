@@ -5,35 +5,81 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Keycap outer shadow base -->
+    <!-- Solid Keyboard 3D Base Shadow Plate -->
     <path
-        android:fillColor="#0E172A"
-        android:pathData="M 31,35 L 77,35 A 8,8 0 0,1 85,43 L 85,73 A 8,8 0 0,1 77,81 L 31,81 A 8,8 0 0,1 23,73 L 23,43 A 8,8 0 0,1 31,35 Z" />
+        android:fillColor="#0A0D14"
+        android:pathData="M29,34 L79,34 A7,7 0 0,1 86,41 L86,71 A7,7 0 0,1 79,78 L29,78 A7,7 0 0,1 22,71 L22,41 A7,7 0 0,1 29,34 Z" />
 
-    <!-- Keycap bevel / surface body -->
+    <!-- Solid Keyboard Main Frame Body -->
     <path
-        android:fillColor="#1E293B"
-        android:strokeColor="#334155"
+        android:fillColor="#1E2638"
+        android:strokeColor="#2E3B52"
         android:strokeWidth="1.5"
-        android:pathData="M 32,32 L 76,32 A 8,8 0 0,1 84,40 L 84,68 A 8,8 0 0,1 76,76 L 32,76 A 8,8 0 0,1 24,68 L 24,40 A 8,8 0 0,1 32,32 Z" />
+        android:pathData="M29,31 L79,31 A7,7 0 0,1 86,38 L86,67 A7,7 0 0,1 79,74 L29,74 A7,7 0 0,1 22,67 L22,38 A7,7 0 0,1 29,31 Z" />
 
-    <!-- Neon Top Accent Glow Strip -->
+    <!-- ROW 1: 5 Solid Top QWERTY Keycaps (y=36..44) -->
+    <!-- Key 1 -->
     <path
-        android:strokeColor="#38BDF8"
-        android:strokeWidth="2.5"
-        android:strokeLineCap="round"
-        android:pathData="M 36,36 L 72,36" />
-
-    <!-- Sharp, Futuristic S Monogram (Vector) -->
+        android:fillColor="#ECEFF4"
+        android:pathData="M28.5,36 L35.5,36 A1.8,1.8 0 0,1 37.3,37.8 L37.3,42.2 A1.8,1.8 0 0,1 35.5,44 L28.5,44 A1.8,1.8 0 0,1 26.7,42.2 L26.7,37.8 A1.8,1.8 0 0,1 28.5,36 Z" />
+    <!-- Key 2 -->
     <path
-        android:strokeColor="#00F0FF"
-        android:strokeWidth="3.8"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="M 62,45 C 57,41 49,42 46,46 C 43,50 44,54 48,56 L 60,58 C 64,60 65,64 62,68 C 59,72 50,73 45,69" />
+        android:fillColor="#ECEFF4"
+        android:pathData="M41.3,36 L48.3,36 A1.8,1.8 0 0,1 50.1,37.8 L50.1,42.2 A1.8,1.8 0 0,1 48.3,44 L41.3,44 A1.8,1.8 0 0,1 39.5,42.2 L39.5,37.8 A1.8,1.8 0 0,1 41.3,36 Z" />
+    <!-- Key 3 -->
+    <path
+        android:fillColor="#ECEFF4"
+        android:pathData="M54.1,36 L61.1,36 A1.8,1.8 0 0,1 62.9,37.8 L62.9,42.2 A1.8,1.8 0 0,1 61.1,44 L54.1,44 A1.8,1.8 0 0,1 52.3,42.2 L52.3,37.8 A1.8,1.8 0 0,1 54.1,36 Z" />
+    <!-- Key 4 -->
+    <path
+        android:fillColor="#ECEFF4"
+        android:pathData="M66.9,36 L73.9,36 A1.8,1.8 0 0,1 75.7,37.8 L75.7,42.2 A1.8,1.8 0 0,1 73.9,44 L66.9,44 A1.8,1.8 0 0,1 65.1,42.2 L65.1,37.8 A1.8,1.8 0 0,1 66.9,36 Z" />
+    <!-- Key 5 (Right edge key) -->
+    <path
+        android:fillColor="#94A3B8"
+        android:pathData="M79.3,36 L79.7,36 A1.6,1.6 0 0,1 81.3,37.6 L81.3,42.4 A1.6,1.6 0 0,1 79.7,44 L79.3,44 A1.6,1.6 0 0,1 77.7,42.4 L77.7,37.6 A1.6,1.6 0 0,1 79.3,36 Z" />
 
-    <!-- Spacebar Tactile Dot Accent -->
+    <!-- ROW 2: Staggered Home Row Keycaps (y=47..55) -->
+    <!-- Home Key 1 -->
+    <path
+        android:fillColor="#ECEFF4"
+        android:pathData="M31.5,47 L38.5,47 A1.8,1.8 0 0,1 40.3,48.8 L40.3,53.2 A1.8,1.8 0 0,1 38.5,55 L31.5,55 A1.8,1.8 0 0,1 29.7,53.2 L29.7,48.8 A1.8,1.8 0 0,1 31.5,47 Z" />
+    <!-- Home Key 2 (with F tactile ridge) -->
+    <path
+        android:fillColor="#ECEFF4"
+        android:pathData="M44.3,47 L51.3,47 A1.8,1.8 0 0,1 53.1,48.8 L53.1,53.2 A1.8,1.8 0 0,1 51.3,55 L44.3,55 A1.8,1.8 0 0,1 42.5,53.2 L42.5,48.8 A1.8,1.8 0 0,1 44.3,47 Z" />
+    <path
+        android:fillColor="#1E2638"
+        android:pathData="M46.3,52.6 L49.3,52.6 A0.6,0.6 0 0,1 49.3,53.8 L46.3,53.8 A0.6,0.6 0 0,1 46.3,52.6 Z" />
+    <!-- Home Key 3 (with J tactile ridge) -->
+    <path
+        android:fillColor="#ECEFF4"
+        android:pathData="M57.1,47 L64.1,47 A1.8,1.8 0 0,1 65.9,48.8 L65.9,53.2 A1.8,1.8 0 0,1 64.1,55 L57.1,55 A1.8,1.8 0 0,1 55.3,53.2 L55.3,48.8 A1.8,1.8 0 0,1 57.1,47 Z" />
+    <path
+        android:fillColor="#1E2638"
+        android:pathData="M59.1,52.6 L62.1,52.6 A0.6,0.6 0 0,1 62.1,53.8 L59.1,53.8 A0.6,0.6 0 0,1 59.1,52.6 Z" />
+    <!-- Home Key 4 -->
+    <path
+        android:fillColor="#ECEFF4"
+        android:pathData="M69.9,47 L76.9,47 A1.8,1.8 0 0,1 78.7,48.8 L78.7,53.2 A1.8,1.8 0 0,1 76.9,55 L69.9,55 A1.8,1.8 0 0,1 68.1,53.2 L68.1,48.8 A1.8,1.8 0 0,1 69.9,47 Z" />
+
+    <!-- ROW 3: Shift, Solid Wide Spacebar, and Solid Enter Key (y=58..67) -->
+    <!-- Left Shift Modifier Key -->
+    <path
+        android:fillColor="#94A3B8"
+        android:pathData="M28.5,58 L35.5,58 A1.8,1.8 0 0,1 37.3,59.8 L37.3,65.2 A1.8,1.8 0 0,1 35.5,67 L28.5,67 A1.8,1.8 0 0,1 26.7,65.2 L26.7,59.8 A1.8,1.8 0 0,1 28.5,58 Z" />
+
+    <!-- Center Solid Wide Spacebar (Nord Cyan Accent) -->
     <path
         android:fillColor="#38BDF8"
-        android:pathData="M 54,71 m -2,0 a 2,2 0 1,0 4,0 a 2,2 0 1,0 -4,0" />
+        android:pathData="M41.5,58 L66.5,58 A2,2 0 0,1 68.5,60 L68.5,65 A2,2 0 0,1 66.5,67 L41.5,67 A2,2 0 0,1 39.5,65 L39.5,60 A2,2 0 0,1 41.5,58 Z" />
+    <!-- Spacebar Center Grip Line -->
+    <path
+        android:fillColor="#0F172A"
+        android:pathData="M49,61.7 L59,61.7 A0.8,0.8 0 0,1 59,63.3 L49,63.3 A0.8,0.8 0 0,1 49,61.7 Z" />
+
+    <!-- Right Action / Enter Key -->
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M72.5,58 L79.5,58 A1.8,1.8 0 0,1 81.3,59.8 L81.3,65.2 A1.8,1.8 0 0,1 79.5,67 L72.5,67 A1.8,1.8 0 0,1 70.7,65.2 L70.7,59.8 A1.8,1.8 0 0,1 72.5,58 Z" />
 </vector>
