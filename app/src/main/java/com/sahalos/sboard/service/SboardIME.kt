@@ -112,6 +112,7 @@ class SboardIME : InputMethodService(),
 
     private var enableVibration = true
     private var isPasswordField = false
+    private var isTerminalField = false
 
     override fun onCreate() {
         super.onCreate()
@@ -254,10 +255,18 @@ class SboardIME : InputMethodService(),
                                         modifierState = modifierState.copy(isCtrlActive = !modifierState.isCtrlActive)
                                     }
                                 },
+                                onAltToggle = {
+                                    triggerHaptic()
+                                    modifierState = modifierState.copy(isAltActive = !modifierState.isAltActive)
+                                },
                                 onFnToggle = {
                                     if (android.os.SystemClock.uptimeMillis() - lastModeSwitchTimeMs > 350L) {
                                         triggerHaptic()
-                                        modifierState = modifierState.copy(isFnActive = !modifierState.isFnActive)
+                                        val nextFn = !modifierState.isFnActive
+                                        modifierState = modifierState.copy(
+                                            isFnActive = nextFn,
+                                            isAltActive = if (!nextFn) false else modifierState.isAltActive
+                                        )
                                     }
                                 },
                                 onFunctionKeyClick = { keyCode -> sendFunctionKey(keyCode) }
@@ -467,8 +476,23 @@ class SboardIME : InputMethodService(),
         currentSuggestions = emptyList()
         keyboardMode = KeyboardMode.KEYBOARD
 
-        // Check if password field
-        val variation = (info?.inputType ?: 0) and InputType.TYPE_MASK_VARIATION
+        // Check if terminal or password field
+        val inputType = info?.inputType ?: 0
+        val variation = inputType and InputType.TYPE_MASK_VARIATION
+        val flags = inputType and InputType.TYPE_MASK_FLAGS
+        val imeOptions = info?.imeOptions ?: 0
+        val imeAction = imeOptions and EditorInfo.IME_MASK_ACTION
+        val pkg = info?.packageName?.lowercase() ?: ""
+
+        val isKnownTerminalPkg = pkg.contains("devbox") || pkg.contains("termux") ||
+                pkg.contains("connectbot") || pkg.contains("juicessh") || pkg.contains("terminal")
+        val hasRawTerminalFlags = (inputType == InputType.TYPE_NULL && isKnownTerminalPkg) ||
+                (variation == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD &&
+                 (flags and InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS) != 0 &&
+                 imeAction == EditorInfo.IME_ACTION_NONE &&
+                 (isKnownTerminalPkg || (imeOptions and EditorInfo.IME_FLAG_NO_EXTRACT_UI) != 0))
+
+        isTerminalField = hasRawTerminalFlags
         isPasswordField = variation == InputType.TYPE_TEXT_VARIATION_PASSWORD ||
                 variation == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD ||
                 variation == InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD
@@ -554,7 +578,11 @@ class SboardIME : InputMethodService(),
             KeyType.CHARACTER -> {
                 if (modifierState.isCtrlActive) {
                     handleCtrlShortcut(key.primaryLabel)
-                    modifierState = modifierState.copy(isCtrlActive = false)
+                    modifierState = modifierState.copy(
+                        isCtrlActive = false,
+                        isAltActive = false,
+                        isShifted = if (modifierState.isCapsLock) modifierState.isShifted else false
+                    )
                     return
                 }
 
@@ -562,6 +590,26 @@ class SboardIME : InputMethodService(),
                     key.primaryLabel.uppercase()
                 } else {
                     key.primaryLabel
+                }
+
+                if (modifierState.isAltActive) {
+                    if (isTerminalField) {
+                        ic.commitText("\u001B$charToCommit", 1)
+                    } else {
+                        val keyCode = KeyEvent.keyCodeFromString("KEYCODE_${charToCommit.uppercase()}")
+                        if (keyCode != KeyEvent.KEYCODE_UNKNOWN) {
+                            val meta = KeyEvent.META_ALT_ON or KeyEvent.META_ALT_LEFT_ON
+                            ic.sendKeyEvent(KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, keyCode, 0, meta))
+                            ic.sendKeyEvent(KeyEvent(0L, 0L, KeyEvent.ACTION_UP, keyCode, 0, meta))
+                        } else {
+                            ic.commitText("\u001B$charToCommit", 1)
+                        }
+                    }
+                    modifierState = modifierState.copy(
+                        isAltActive = false,
+                        isShifted = if (modifierState.isCapsLock) modifierState.isShifted else false
+                    )
+                    return
                 }
 
                 ic.commitText(charToCommit, 1)
@@ -587,9 +635,20 @@ class SboardIME : InputMethodService(),
                 if (currentComposingWord.isNotEmpty()) {
                     PassiveSuggestionEngine.learnWord(currentComposingWord)
                 }
-                ic.commitText(" ", 1)
                 currentComposingWord = ""
                 currentSuggestions = emptyList()
+
+                if (isTerminalField && modifierState.isCtrlActive) {
+                    ic.commitText("\u0000", 1)
+                    modifierState = modifierState.copy(isCtrlActive = false, isAltActive = false)
+                    return
+                }
+                if (isTerminalField && modifierState.isAltActive) {
+                    ic.commitText("\u001B ", 1)
+                    modifierState = modifierState.copy(isAltActive = false)
+                    return
+                }
+                ic.commitText(" ", 1)
             }
             KeyType.BACKSPACE -> {
                 performBackspace()
@@ -607,7 +666,11 @@ class SboardIME : InputMethodService(),
                 modifierState = modifierState.copy(isCtrlActive = !modifierState.isCtrlActive)
             }
             KeyType.FN -> {
-                modifierState = modifierState.copy(isFnActive = !modifierState.isFnActive)
+                val nextFn = !modifierState.isFnActive
+                modifierState = modifierState.copy(
+                    isFnActive = nextFn,
+                    isAltActive = if (!nextFn) false else modifierState.isAltActive
+                )
             }
             KeyType.SYM -> {
                 val nextSymActive = !modifierState.isSymActive
@@ -630,6 +693,30 @@ class SboardIME : InputMethodService(),
                 }
                 currentComposingWord = ""
                 currentSuggestions = emptyList()
+
+                if (isTerminalField) {
+                    when {
+                        modifierState.isCtrlActive -> {
+                            ic.commitText("\u001B[13;5u", 1)
+                            modifierState = modifierState.copy(isCtrlActive = false, isAltActive = false)
+                        }
+                        modifierState.isAltActive -> {
+                            ic.commitText("\u001B\r", 1)
+                            modifierState = modifierState.copy(isAltActive = false)
+                        }
+                        modifierState.isShifted -> {
+                            ic.commitText("\u001B[13;2u", 1)
+                            if (!modifierState.isCapsLock) {
+                                modifierState = modifierState.copy(isShifted = false)
+                            }
+                        }
+                        else -> {
+                            sendDownUpKeyEvents(KeyEvent.KEYCODE_ENTER)
+                        }
+                    }
+                    return
+                }
+
                 if (currentActionId != EditorInfo.IME_ACTION_UNSPECIFIED && currentActionId != EditorInfo.IME_ACTION_NONE) {
                     ic.performEditorAction(currentActionId)
                 } else {
@@ -644,6 +731,16 @@ class SboardIME : InputMethodService(),
         triggerHaptic()
         val symbol = key.secondaryLabel ?: return
         val ic = currentInputConnection ?: return
+        if (modifierState.isCtrlActive) {
+            handleCtrlShortcut(symbol)
+            modifierState = modifierState.copy(isCtrlActive = false, isAltActive = false)
+            return
+        }
+        if (modifierState.isAltActive && isTerminalField) {
+            ic.commitText("\u001B$symbol", 1)
+            modifierState = modifierState.copy(isAltActive = false)
+            return
+        }
         ic.commitText(symbol, 1)
         currentComposingWord = ""
         currentSuggestions = emptyList()
@@ -652,27 +749,95 @@ class SboardIME : InputMethodService(),
     private fun handleCtrlShortcut(letter: String) {
         val ic = currentInputConnection ?: return
         val lower = letter.lowercase()
+
+        if (isTerminalField) {
+            val ch = lower.firstOrNull() ?: return
+            val ctrlChar: Char? = when (ch) {
+                in 'a'..'z' -> (ch - 'a' + 1).toChar()
+                '[', '3' -> '\u001B' // ESC
+                '\\', '4' -> '\u001C' // SIGQUIT
+                ']', '5' -> '\u001D' // GS
+                '^', '6' -> '\u001E' // RS
+                '_', '-', '/', '7' -> '\u001F' // US (Undo)
+                '@', '2', ' ' -> '\u0000' // NUL
+                '?', '8' -> '\u007F' // DEL
+                else -> null
+            }
+            if (ctrlChar != null) {
+                val prefix = if (modifierState.isAltActive) "\u001B" else ""
+                ic.commitText("$prefix$ctrlChar", 1)
+                return
+            }
+        }
+
         when (lower) {
-            "a" -> ic.performContextMenuAction(android.R.id.selectAll)
-            "c" -> ic.performContextMenuAction(android.R.id.copy)
-            "v" -> ic.performContextMenuAction(android.R.id.paste)
-            "x" -> ic.performContextMenuAction(android.R.id.cut)
-            "z" -> ic.performContextMenuAction(android.R.id.undo)
+            "a" -> {
+                if (!ic.performContextMenuAction(android.R.id.selectAll)) {
+                    sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_A)
+                }
+            }
+            "c" -> {
+                if (!ic.performContextMenuAction(android.R.id.copy)) {
+                    sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_C)
+                }
+            }
+            "v" -> {
+                if (!ic.performContextMenuAction(android.R.id.paste)) {
+                    sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_V)
+                }
+            }
+            "x" -> {
+                if (!ic.performContextMenuAction(android.R.id.cut)) {
+                    sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_X)
+                }
+            }
+            "z" -> {
+                if (!ic.performContextMenuAction(android.R.id.undo)) {
+                    sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_Z)
+                }
+            }
+            "y" -> {
+                if (!ic.performContextMenuAction(android.R.id.redo)) {
+                    sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_Y)
+                }
+            }
             else -> {
                 val keyCode = KeyEvent.keyCodeFromString("KEYCODE_${letter.uppercase()}")
                 if (keyCode != KeyEvent.KEYCODE_UNKNOWN) {
-                    val eventDown = KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, keyCode, 0, KeyEvent.META_CTRL_ON)
-                    val eventUp = KeyEvent(0L, 0L, KeyEvent.ACTION_UP, keyCode, 0, KeyEvent.META_CTRL_ON)
-                    ic.sendKeyEvent(eventDown)
-                    ic.sendKeyEvent(eventUp)
+                    sendCtrlKeyEvent(ic, keyCode)
                 }
             }
         }
     }
 
+    private fun sendCtrlKeyEvent(ic: android.view.inputmethod.InputConnection, keyCode: Int) {
+        var meta = KeyEvent.META_CTRL_ON or KeyEvent.META_CTRL_LEFT_ON
+        if (modifierState.isAltActive) {
+            meta = meta or KeyEvent.META_ALT_ON or KeyEvent.META_ALT_LEFT_ON
+        }
+        if (modifierState.isShifted) {
+            meta = meta or KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON
+        }
+        val now = android.os.SystemClock.uptimeMillis()
+        ic.sendKeyEvent(KeyEvent(now, now, KeyEvent.ACTION_DOWN, keyCode, 0, meta))
+        ic.sendKeyEvent(KeyEvent(now, now, KeyEvent.ACTION_UP, keyCode, 0, meta))
+    }
+
     private fun performBackspace() {
         triggerHaptic()
         val ic = currentInputConnection ?: return
+        if (isTerminalField) {
+            if (modifierState.isAltActive) {
+                ic.commitText("\u001B\u007F", 1)
+                modifierState = modifierState.copy(isAltActive = false)
+                return
+            }
+            if (modifierState.isCtrlActive) {
+                ic.commitText("\u0017", 1) // Ctrl+W (kill word backward)
+                modifierState = modifierState.copy(isCtrlActive = false)
+                return
+            }
+        }
         val selectedText = ic.getSelectedText(0)
         if (!selectedText.isNullOrEmpty()) {
             ic.commitText("", 1)
@@ -712,10 +877,82 @@ class SboardIME : InputMethodService(),
     private fun sendFunctionKey(keyCode: Int) {
         triggerHaptic()
         val ic = currentInputConnection ?: return
-        val eventDown = KeyEvent(KeyEvent.ACTION_DOWN, keyCode)
-        val eventUp = KeyEvent(KeyEvent.ACTION_UP, keyCode)
-        ic.sendKeyEvent(eventDown)
-        ic.sendKeyEvent(eventUp)
+
+        val shift = modifierState.isShifted
+        val alt = modifierState.isAltActive
+        val ctrl = modifierState.isCtrlActive
+        val modMask = (if (shift) 1 else 0) + (if (alt) 2 else 0) + (if (ctrl) 4 else 0)
+        val modCode = 1 + modMask
+
+        if (isTerminalField) {
+            // In terminal mode, emit standard VT100 / xterm escape sequences when needed
+            val terminalSeq: String? = when (keyCode) {
+                KeyEvent.KEYCODE_DPAD_UP -> if (modMask > 0) "\u001B[1;${modCode}A" else null
+                KeyEvent.KEYCODE_DPAD_DOWN -> if (modMask > 0) "\u001B[1;${modCode}B" else null
+                KeyEvent.KEYCODE_DPAD_RIGHT -> if (modMask > 0) "\u001B[1;${modCode}C" else null
+                KeyEvent.KEYCODE_DPAD_LEFT -> if (modMask > 0) "\u001B[1;${modCode}D" else null
+                KeyEvent.KEYCODE_TAB -> when {
+                    shift -> "\u001B[Z"
+                    alt -> "\u001B\t"
+                    else -> null
+                }
+                KeyEvent.KEYCODE_MOVE_HOME -> if (modMask > 0) "\u001B[1;${modCode}H" else "\u001B[H"
+                KeyEvent.KEYCODE_MOVE_END -> if (modMask > 0) "\u001B[1;${modCode}F" else "\u001B[F"
+                KeyEvent.KEYCODE_PAGE_UP -> if (modMask > 0) "\u001B[5;${modCode}~" else "\u001B[5~"
+                KeyEvent.KEYCODE_PAGE_DOWN -> if (modMask > 0) "\u001B[6;${modCode}~" else "\u001B[6~"
+                KeyEvent.KEYCODE_INSERT -> if (modMask > 0) "\u001B[2;${modCode}~" else "\u001B[2~"
+                KeyEvent.KEYCODE_FORWARD_DEL -> if (modMask > 0) "\u001B[3;${modCode}~" else "\u001B[3~"
+                KeyEvent.KEYCODE_F1 -> if (modMask > 0) "\u001B[1;${modCode}P" else "\u001BOP"
+                KeyEvent.KEYCODE_F2 -> if (modMask > 0) "\u001B[1;${modCode}Q" else "\u001BOQ"
+                KeyEvent.KEYCODE_F3 -> if (modMask > 0) "\u001B[1;${modCode}R" else "\u001BOR"
+                KeyEvent.KEYCODE_F4 -> if (modMask > 0) "\u001B[1;${modCode}S" else "\u001BOS"
+                KeyEvent.KEYCODE_F5 -> if (modMask > 0) "\u001B[15;${modCode}~" else "\u001B[15~"
+                KeyEvent.KEYCODE_F6 -> if (modMask > 0) "\u001B[17;${modCode}~" else "\u001B[17~"
+                KeyEvent.KEYCODE_F7 -> if (modMask > 0) "\u001B[18;${modCode}~" else "\u001B[18~"
+                KeyEvent.KEYCODE_F8 -> if (modMask > 0) "\u001B[19;${modCode}~" else "\u001B[19~"
+                KeyEvent.KEYCODE_F9 -> if (modMask > 0) "\u001B[20;${modCode}~" else "\u001B[20~"
+                KeyEvent.KEYCODE_F10 -> if (modMask > 0) "\u001B[21;${modCode}~" else "\u001B[21~"
+                KeyEvent.KEYCODE_F11 -> if (modMask > 0) "\u001B[23;${modCode}~" else "\u001B[23~"
+                KeyEvent.KEYCODE_F12 -> if (modMask > 0) "\u001B[24;${modCode}~" else "\u001B[24~"
+                else -> null
+            }
+
+            if (modMask > 0) {
+                modifierState = modifierState.copy(
+                    isCtrlActive = false,
+                    isAltActive = false,
+                    isShifted = if (modifierState.isCapsLock) modifierState.isShifted else false
+                )
+            }
+
+            if (terminalSeq != null) {
+                ic.commitText(terminalSeq, 1)
+                return
+            }
+
+            // Unmodified ESC, TAB, and DPAD arrows use sendDownUpKeyEvents so DevBox handles DECCKM cursor mode natively
+            sendDownUpKeyEvents(keyCode)
+            return
+        }
+
+        // Standard Android / WebView mode
+        var meta = 0
+        if (ctrl) meta = meta or KeyEvent.META_CTRL_ON or KeyEvent.META_CTRL_LEFT_ON
+        if (alt) meta = meta or KeyEvent.META_ALT_ON or KeyEvent.META_ALT_LEFT_ON
+        if (shift) meta = meta or KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON
+
+        if (meta != 0) {
+            val now = android.os.SystemClock.uptimeMillis()
+            ic.sendKeyEvent(KeyEvent(now, now, KeyEvent.ACTION_DOWN, keyCode, 0, meta))
+            ic.sendKeyEvent(KeyEvent(now, now, KeyEvent.ACTION_UP, keyCode, 0, meta))
+            modifierState = modifierState.copy(
+                isCtrlActive = false,
+                isAltActive = false,
+                isShifted = if (modifierState.isCapsLock) modifierState.isShifted else false
+            )
+        } else {
+            sendDownUpKeyEvents(keyCode)
+        }
     }
 
     private fun showImePicker() {

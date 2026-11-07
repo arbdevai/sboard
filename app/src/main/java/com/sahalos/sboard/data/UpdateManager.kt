@@ -108,9 +108,10 @@ class UpdateManager(private val context: Context) {
             if (!updateDir.exists()) {
                 updateDir.mkdirs()
             }
+            val partFile = File(updateDir, "Sboard-Update.apk.part")
             val apkFile = File(updateDir, "Sboard-Update.apk")
-            if (apkFile.exists()) {
-                apkFile.delete()
+            if (partFile.exists()) {
+                partFile.delete()
             }
 
             val url = URL(downloadUrl)
@@ -137,11 +138,11 @@ class UpdateManager(private val context: Context) {
             }
 
             val contentLength = targetConnection.contentLengthLong
+            var totalRead = 0L
             targetConnection.inputStream.use { input ->
-                FileOutputStream(apkFile).use { output ->
-                    val buffer = ByteArray(8 * 1024)
+                FileOutputStream(partFile).use { output ->
+                    val buffer = ByteArray(16 * 1024)
                     var bytesRead: Int
-                    var totalRead = 0L
 
                     while (input.read(buffer).also { bytesRead = it } != -1) {
                         output.write(buffer, 0, bytesRead)
@@ -154,7 +155,46 @@ class UpdateManager(private val context: Context) {
                         }
                     }
                     output.flush()
+                    output.fd.sync()
                 }
+            }
+
+            if (contentLength > 0 && totalRead != contentLength) {
+                partFile.delete()
+                return@withContext Result.failure(
+                    IllegalStateException("Unduhan APK terputus ($totalRead / $contentLength byte). Silakan ulangi.")
+                )
+            }
+
+            // Verify ZIP / DEX archive integrity before atomic rename
+            try {
+                java.util.zip.ZipFile(partFile).use { zip ->
+                    val entries = zip.entries()
+                    val verifyBuf = ByteArray(32 * 1024)
+                    while (entries.hasMoreElements()) {
+                        val entry = entries.nextElement()
+                        if (!entry.isDirectory) {
+                            zip.getInputStream(entry).use { zis ->
+                                while (zis.read(verifyBuf) != -1) {
+                                    // ZipInputStream/ZipFile verifies CRC32 on read
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (zipErr: Exception) {
+                partFile.delete()
+                return@withContext Result.failure(
+                    IllegalStateException("Berkas APK korup saat diunduh (${zipErr.message}). Silakan unduh ulang.")
+                )
+            }
+
+            if (apkFile.exists()) {
+                apkFile.delete()
+            }
+            if (!partFile.renameTo(apkFile)) {
+                partFile.copyTo(apkFile, overwrite = true)
+                partFile.delete()
             }
 
             Result.success(apkFile)

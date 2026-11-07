@@ -160,6 +160,23 @@ object KeyLayoutProvider {
         return listOf(row1, row2, row3, row4)
     }
 
+    fun getTerminalNavRow(): List<KeyModel> {
+        return listOf(
+            KeyModel(111, "ESC", null, 1.05f),          // KeyEvent.KEYCODE_ESCAPE
+            KeyModel(61, "TAB", null, 1.05f),           // KeyEvent.KEYCODE_TAB
+            KeyModel(-30, "ALT", null, 1.05f),          // Toggle Alt Modifier
+            KeyModel(21, "←", null, 0.95f),             // KeyEvent.KEYCODE_DPAD_LEFT
+            KeyModel(20, "↓", null, 0.95f),             // KeyEvent.KEYCODE_DPAD_DOWN
+            KeyModel(19, "↑", null, 0.95f),             // KeyEvent.KEYCODE_DPAD_UP
+            KeyModel(22, "→", null, 0.95f),             // KeyEvent.KEYCODE_DPAD_RIGHT
+            KeyModel(122, "HOME", null, 1.1f),          // KeyEvent.KEYCODE_MOVE_HOME
+            KeyModel(123, "END", null, 1.0f),           // KeyEvent.KEYCODE_MOVE_END
+            KeyModel(92, "PGUP", null, 1.1f),           // KeyEvent.KEYCODE_PAGE_UP
+            KeyModel(93, "PGDN", null, 1.1f),           // KeyEvent.KEYCODE_PAGE_DOWN
+            KeyModel(112, "DEL", null, 1.0f)            // KeyEvent.KEYCODE_FORWARD_DEL
+        )
+    }
+
     fun getFunctionKeysRow(): List<KeyModel> {
         return (1..12).map { fIndex ->
             KeyModel(

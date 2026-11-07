@@ -28,6 +28,7 @@ data class ModifierState(
     val isShifted: Boolean = false,
     val isCapsLock: Boolean = false,
     val isCtrlActive: Boolean = false,
+    val isAltActive: Boolean = false,
     val isFnActive: Boolean = false,
     val isSymActive: Boolean = false,
     val isSymPage2Active: Boolean = false

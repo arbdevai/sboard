@@ -238,6 +238,19 @@ Handle drag atas pada `ResizeOverlayView.kt` mengupdate `previewHeightRatio` pad
   - Memindahkan `[Clipboard]` (Paste) dan `[Resize]` ke sisi kanan toolbar mendampingi `[Settings]`.
   - Menambahkan guard transisi mode 350ms (`lastModeSwitchTimeMs`) agar keluar dari layar Clipboard/Emoji tidak memicu tombol `CTRL` secara tidak sengaja.
 
+---
+
+## Ringkasan Eksekusi Rilis v1.0.19:
+- [x] **Smart Terminal & Desktop Engine untuk `CTRL`, `ALT`, dan `FN` (`SboardIME.kt`, `FnRowView.kt`, `KeyLayoutProvider.kt`, `KeyModel.kt`)**:
+  - Deteksi otomatis konteks terminal (`isTerminalField`) untuk DevBox (`com.arbdev.devbox`), Termux (`com.termux`), dan view terminal berbasis `BaseInputConnection`.
+  - Dalam mode terminal, `CTRL + [A–Z]` mengirimkan byte kontrol ASCII murni (`0x01`–`0x1A`), `CTRL/SHIFT/ALT + Enter` mengirimkan urutan protokol Kitty/ANSI (`\u001B[13;5u`, `\u001B[13;2u`, `\u001B\r`), dan `CTRL/ALT + Backspace` menghapus kata sebelumnya (`\u0017`, `\u001B\u007F`).
+  - Memperbarui `FnRowView.kt` menjadi **2-Row Developer & Terminal Deck**:
+    - Baris 1: `ESC`, `TAB`, `ALT` (toggle modifier), `←`, `↓`, `↑`, `→` (dengan hold-to-repeat), `HOME`, `END`, `PGUP`, `PGDN`, `DEL`.
+    - Baris 2: `F1` s/d `F12` lengkap dengan translasi escape sequence VT100/xterm (`\u001BOP`..`\u001B[24~`) beserta encoding modifier (`\u001B[1;5C` untuk `Ctrl+→`, `\u001B[Z` untuk `Shift+Tab`, dll.).
+  - Dalam mode non-terminal (Web/EditText), tetap mempertahankan `performContextMenuAction` (`Ctrl+A/C/V/X/Z/Y`) dengan fallback `KeyEvent` bermodifier.
+- [x] **Verifikasi Integritas Unduhan APK (`UpdateManager.kt`)**:
+  - Menambahkan isolasi berkas `.part`, validasi `contentLength`, dan verifikasi CRC32 seluruh entri `ZipFile` sebelum instalasi untuk mencegah galat `Bad checksum` pada `classes.dex`.
+
 
 
 

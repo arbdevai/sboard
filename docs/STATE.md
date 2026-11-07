@@ -1,7 +1,7 @@
 # Sboard Project State & Evolution Log
 
-## Current Status (v1.0.18 - Production Grade)
-- **Active Version:** `1.0.18` (`versionCode = 10018`)
+## Current Status (v1.0.19 - Production Grade)
+- **Active Version:** `1.0.19` (`versionCode = 10019`)
 - **Git Branch:** `main`
 - **NDK Architectures:** `arm64-v8a`, `x86_64`
 - **Target Android SDK:** 36 (Min SDK: 30)
@@ -38,10 +38,13 @@
    - Tokenized word matching menghilangkan false positive (misal: wortel vs mobil).
    - Grid 8-kolom vertikal scrollable di `EmojiSearchToolbar.kt` di atas QWERTY keyboard.
 
-6. **Toolbar Ergonomis Sesuai Preferensi Pengguna:**
-   - File: `app/src/main/java/com/sahalos/sboard/ui/keyboard/SuggestionsBar.kt` & `SboardIME.kt`.
-   - Tombol `[CTRL]` dan `[FN]` di sisi kiri dengan proteksi transisi 350ms (`lastModeSwitchTimeMs`) agar kebal terhadap sentuhan tidak sengaja saat kembali dari layar Clipboard/Emoji.
-   - Tombol `[Clipboard]` (Paste), `[Resize]`, dan `[Settings]` di sisi kanan.
+6. **Toolbar Ergonomis & Terminal Developer Deck (`CTRL`, `ALT`, `FN`):**
+   - File: `SuggestionsBar.kt`, `FnRowView.kt`, `KeyLayoutProvider.kt`, dan `SboardIME.kt`.
+   - Tombol `[CTRL]` dan `[FN]` di sisi kiri dengan proteksi transisi 350ms (`lastModeSwitchTimeMs`) serta `[Clipboard]`, `[Resize]`, dan `[Settings]` di sisi kanan.
+   - Deteksi otomatis konteks terminal (`isTerminalField` untuk DevBox, Termux, ConnectBot, JuiceSSH):
+     - `CTRL + [A–Z]` mengirimkan karakter kontrol ASCII murni (`0x01`–`0x1A`, termasuk `Ctrl+C` `SIGINT`, `Ctrl+D` `EOF`, `Ctrl+Z` `SIGTSTP`, `Ctrl+L` clear, `Ctrl+X/O/W/K/U` nano, serta `Ctrl+Enter` / `Shift+Enter` protokol Kitty).
+     - `FnRowView` menampilkan **2-Row Developer & Terminal Deck**: Baris 1 (`ESC, TAB, ALT, ←, ↓, ↑, →, HOME, END, PGUP, PGDN, DEL` dengan hold-to-repeat pada panah & DEL) dan Baris 2 (`F1`–`F12` dengan pengiriman urutan escape ANSI/VT100 `\u001BOP`..`\u001B[24~` serta dukungan kombinasi modifier `Ctrl/Alt/Shift + Panah/Fn`).
+   - Pada mode non-terminal (Web/Browser/Aplikasi biasa), tetap menggunakan `performContextMenuAction` dan `KeyEvent` standar Android.
 
 7. **Gesture & Animasi:**
    - Spacebar cursor glide (`KEYCODE_DPAD_LEFT`/`RIGHT`).

@@ -59,6 +59,7 @@ fun SboardKeyboardView(
     onResizeClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onCtrlToggle: () -> Unit,
+    onAltToggle: () -> Unit = {},
     onFnToggle: () -> Unit,
     onFunctionKeyClick: (Int) -> Unit,
     showSuggestionsBar: Boolean = true,
@@ -101,6 +102,8 @@ fun SboardKeyboardView(
         if (modifierState.isFnActive) {
             FnRowView(
                 theme = theme,
+                isAltActive = modifierState.isAltActive,
+                onAltToggle = onAltToggle,
                 onFunctionKeyClick = onFunctionKeyClick
             )
         }
