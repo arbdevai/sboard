@@ -15,7 +15,7 @@ static STATE_MACHINE: ModifierStateMachine = ModifierStateMachine::new();
 
 #[no_mangle]
 pub extern "system" fn Java_com_sahalos_sboard_core_NativeCoreBridge_nativeGetVersion<'local>(
-    mut env: JNIEnv<'local>,
+    env: JNIEnv<'local>,
     _class: JClass<'local>,
 ) -> jstring {
     let output = env
@@ -38,7 +38,7 @@ pub extern "system" fn Java_com_sahalos_sboard_core_NativeCoreBridge_nativeGetBi
 
 #[no_mangle]
 pub extern "system" fn Java_com_sahalos_sboard_core_NativeCoreBridge_nativeResolveHit<'local>(
-    mut env: JNIEnv<'local>,
+    env: JNIEnv<'local>,
     _class: JClass<'local>,
     touch_x: jfloat,
     touch_y: jfloat,

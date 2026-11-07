@@ -42,4 +42,9 @@ impl ModifierStateMachine {
     pub fn is_active(&self, flag: u32) -> bool {
         (self.get() & flag) != 0
     }
+
+    #[inline]
+    pub fn reset(&self) {
+        self.state.store(0, Ordering::Relaxed);
+    }
 }
