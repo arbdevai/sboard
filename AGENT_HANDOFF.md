@@ -224,6 +224,21 @@ Handle drag atas pada `ResizeOverlayView.kt` mengupdate `previewHeightRatio` pad
 - [x] **Dokumentasi Baku Android Compose Builder (`docs/PRD.md`, `docs/STATE.md`)**:
   - Menyusun Product Requirements Document dan State Evolution Log resmi sesuai protokol memori persisten.
 
+---
+
+## Ringkasan Eksekusi Rilis v1.0.18:
+- [x] **Zero Dead-Zone Touch Area & Multi-Touch Rollover (`KeyView.kt`, `SboardKeyboardView.kt`)**:
+  - Memindahkan `.then(interactiveModifier)` ke `Box` terluar sebelum `.padding(horizontal = 2.dp, vertical = 3.dp)` sehingga seluruh area 100% bebas zona mati (0dp dead-zone).
+  - Mengganti `detectTapGestures` dengan `awaitEachGesture` kustom yang memiliki toleransi geser vertikal ekstra (`heightPx * 1.45f`) pada baris teratas (`qwertyuiop`) dan sistem `KeyRolloverController` untuk menangani tumpang tindih dua jempol saat mengetik cepat.
+- [x] **Integrasi Koreksi Spasial & Bigram Native Rust + Filter Kamus Anti-Typo (`sboard-core/src/lib.rs`, `Trie.kt`, `PassiveSuggestionEngine.kt`)**:
+  - Menghubungkan `NativeCoreBridge.resolveHit` dengan bobot gabungan Gaussian spatial probability + bigram probability Bahasa Indonesia untuk ketukan di area perbatasan tombol (`normX < 0.16f` atau `normX > 0.84f`).
+  - Memperbaiki akumulasi frekuensi kata di `Trie.insert` dan menerapkan ambang batas `minFrequency = 2` agar typo satu kali tidak masuk ke daftar saran kata.
+- [x] **Pertukaran Posisi Tombol Toolbar (`SuggestionsBar.kt`, `SboardIME.kt`)**:
+  - Memindahkan `[CTRL]` dan `[FN]` ke sisi kiri toolbar.
+  - Memindahkan `[Clipboard]` (Paste) dan `[Resize]` ke sisi kanan toolbar mendampingi `[Settings]`.
+  - Menambahkan guard transisi mode 350ms (`lastModeSwitchTimeMs`) agar keluar dari layar Clipboard/Emoji tidak memicu tombol `CTRL` secara tidak sengaja.
+
+
 
 
 

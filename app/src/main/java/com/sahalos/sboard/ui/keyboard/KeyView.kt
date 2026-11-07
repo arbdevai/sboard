@@ -6,10 +6,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -18,11 +16,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +40,8 @@ import com.sahalos.sboard.model.KeyModel
 import com.sahalos.sboard.model.KeyType
 import com.sahalos.sboard.model.ModifierState
 import com.sahalos.sboard.model.SboardTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun KeyView(
@@ -53,17 +54,21 @@ fun KeyView(
     isTopRow: Boolean = false,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
-    onLongClick: (() -> Unit)? = null
+    onClickWithCoord: ((normalizedX: Float, normalizedY: Float) -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
+    rolloverController: KeyRolloverController? = null
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isClickablePressed by interactionSource.collectIsPressedAsState()
     var isGesturePressed by remember { mutableStateOf(false) }
     var isLongPressed by remember { mutableStateOf(false) }
-    val isPressed = isClickablePressed || isGesturePressed
+
+    val currentOnClick by rememberUpdatedState(onClick)
+    val currentOnClickWithCoord by rememberUpdatedState(onClickWithCoord)
+    val currentOnLongClick by rememberUpdatedState(onLongClick)
+    val coroutineScope = rememberCoroutineScope()
 
     val shape = RoundedCornerShape(theme.keyCornerRadiusDp.dp)
 
-    val keyBgColor = when (key.type) {
+    val baseBgColor = when (key.type) {
         KeyType.ACTION -> Color(theme.keyActionColor)
         KeyType.SHIFT -> if (modifierState.isShifted || modifierState.isCapsLock) Color(theme.accentColor) else Color(theme.keyBackgroundColor)
         KeyType.CTRL -> if (modifierState.isCtrlActive) Color(theme.accentColor) else Color(theme.keyBackgroundColor)
@@ -71,56 +76,130 @@ fun KeyView(
         else -> Color(theme.keyBackgroundColor)
     }
 
+    val keyBgColor = if (isGesturePressed && key.type == KeyType.CHARACTER) {
+        baseBgColor.copy(alpha = 0.82f)
+    } else {
+        baseBgColor
+    }
+
     val textColor = when (key.type) {
         KeyType.ACTION -> if (theme.isDark) Color(0xFF1E293B) else Color.White
         else -> Color(theme.keyTextColor)
     }
 
-    val interactiveModifier = when {
-        onClick != null && onLongClick != null -> {
-            Modifier.pointerInput(key) {
-                detectTapGestures(
-                    onPress = {
-                        isGesturePressed = true
-                        isLongPressed = false
-                        try {
-                            awaitRelease()
-                        } finally {
-                            isGesturePressed = false
-                            isLongPressed = false
+    val hasClickHandler = onClick != null || onClickWithCoord != null
+
+    // Attach pointerInput to the OUTER Box before padding so there is 0dp dead-zone between keys
+    val interactiveModifier = if (hasClickHandler) {
+        Modifier.pointerInput(key.code, key.primaryLabel, onLongClick != null) {
+            awaitEachGesture {
+                val down = awaitFirstDown(requireUnconsumed = false)
+                down.consume()
+
+                val pointerId = down.id.value
+                val widthPx = size.width.coerceAtLeast(1).toFloat()
+                val heightPx = size.height.coerceAtLeast(1).toFloat()
+                var normX = (down.position.x / widthPx).coerceIn(0f, 1f)
+                var normY = (down.position.y / heightPx).coerceIn(0f, 1f)
+
+                isGesturePressed = true
+                isLongPressed = false
+                var longPressTriggered = false
+                var isCancelled = false
+                var committedByRollover = false
+
+                val invokeClickAction = {
+                    if (!committedByRollover && !longPressTriggered && !isCancelled) {
+                        committedByRollover = true
+                        val coordHandler = currentOnClickWithCoord
+                        if (coordHandler != null) {
+                            coordHandler(normX, normY)
+                        } else {
+                            currentOnClick?.invoke()
                         }
-                    },
-                    onTap = { onClick() },
-                    onLongPress = {
-                        isLongPressed = true
-                        onLongClick()
+                    }
+                }
+
+                val longPressJob = if (currentOnLongClick != null) {
+                    coroutineScope.launch {
+                        delay(280L)
+                        if (!isCancelled && !committedByRollover && isGesturePressed) {
+                            longPressTriggered = true
+                            isLongPressed = true
+                            rolloverController?.clearIfCurrent(pointerId)
+                            currentOnLongClick?.invoke()
+                        }
+                    }
+                } else null
+
+                // Register with multi-touch rollover controller so previous held key flushes immediately
+                rolloverController?.onNewKeyDown(
+                    pointerId = pointerId,
+                    commitAction = invokeClickAction,
+                    cancelLongPressAction = {
+                        longPressJob?.cancel()
                     }
                 )
+
+                try {
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        val change = event.changes.firstOrNull { it.id == down.id } ?: break
+
+                        if (!change.pressed) {
+                            change.consume()
+                            if (!longPressTriggered && !isCancelled && !committedByRollover) {
+                                rolloverController?.clearIfCurrent(pointerId)
+                                invokeClickAction()
+                            }
+                            break
+                        }
+
+                        // Update normalized coordinates while within key bounds
+                        val pos = change.position
+                        if (pos.x in 0f..widthPx && pos.y in 0f..heightPx) {
+                            normX = (pos.x / widthPx).coerceIn(0f, 1f)
+                            normY = (pos.y / heightPx).coerceIn(0f, 1f)
+                        }
+
+                        // Generous fast-typing tolerance (especially for top row qwertyuiop pull-down release)
+                        val maxMarginX = widthPx * 0.95f
+                        val maxMarginY = if (isTopRow) heightPx * 1.45f else heightPx * 1.15f
+                        if (pos.x < -maxMarginX || pos.x > widthPx + maxMarginX ||
+                            pos.y < -maxMarginY || pos.y > heightPx + maxMarginY
+                        ) {
+                            isCancelled = true
+                            longPressJob?.cancel()
+                            rolloverController?.clearIfCurrent(pointerId)
+                            break
+                        }
+                    }
+                } finally {
+                    longPressJob?.cancel()
+                    rolloverController?.clearIfCurrent(pointerId)
+                    isGesturePressed = false
+                    isLongPressed = false
+                }
             }
         }
-        onClick != null -> {
-            Modifier.clickable(
-                interactionSource = interactionSource,
-                indication = ripple(bounded = true, color = textColor.copy(alpha = 0.2f)),
-                onClick = onClick
-            )
-        }
-        else -> Modifier
+    } else {
+        Modifier
     }
 
-    // Outer container without clipping, allowing floating popup to overflow upwards
+    // Outer container captures full touch hitbox (0dp dead-zone) and allows popup to overflow upwards
     Box(
-        modifier = modifier.padding(horizontal = 2.dp, vertical = 3.dp),
+        modifier = modifier
+            .then(interactiveModifier)
+            .padding(horizontal = 2.dp, vertical = 3.dp),
         contentAlignment = Alignment.Center
     ) {
-        // Physical key surface (clipped with rounded corners)
+        // Physical key visual surface (clipped with rounded corners)
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .shadow(theme.keyElevationDp.dp, shape = shape)
                 .clip(shape)
-                .background(keyBgColor)
-                .then(interactiveModifier),
+                .background(keyBgColor),
             contentAlignment = Alignment.Center
         ) {
             // Secondary label on top-right (e.g. symbols / numbers)
@@ -205,7 +284,7 @@ fun KeyView(
         }
 
         // Floating Key Magnifier Popup with Spring Animation on Long Press
-        if (isPressed && enableKeyPopup && key.type == KeyType.CHARACTER) {
+        if (isGesturePressed && enableKeyPopup && key.type == KeyType.CHARACTER) {
             val popupChar = if (modifierState.isShifted || modifierState.isCapsLock) {
                 key.primaryLabel.uppercase()
             } else {
@@ -226,6 +305,45 @@ fun KeyView(
                     .offset(y = popupOffsetY)
                     .zIndex(100f)
             )
+        }
+    }
+}
+
+class KeyRolloverController {
+    private var activePointerId: Long = -1L
+    private var pendingCommit: (() -> Unit)? = null
+    private var cancelPendingLongPress: (() -> Unit)? = null
+
+    fun onNewKeyDown(
+        pointerId: Long,
+        commitAction: () -> Unit,
+        cancelLongPressAction: () -> Unit
+    ) {
+        if (pendingCommit != null && activePointerId != pointerId) {
+            cancelPendingLongPress?.invoke()
+            pendingCommit?.invoke()
+        }
+        activePointerId = pointerId
+        pendingCommit = commitAction
+        cancelPendingLongPress = cancelLongPressAction
+    }
+
+    fun flushAll() {
+        if (pendingCommit != null) {
+            cancelPendingLongPress?.invoke()
+            val action = pendingCommit
+            pendingCommit = null
+            cancelPendingLongPress = null
+            activePointerId = -1L
+            action?.invoke()
+        }
+    }
+
+    fun clearIfCurrent(pointerId: Long) {
+        if (activePointerId == pointerId) {
+            pendingCommit = null
+            cancelPendingLongPress = null
+            activePointerId = -1L
         }
     }
 }

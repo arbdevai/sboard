@@ -1,7 +1,6 @@
 package com.sahalos.sboard.core
 
 import com.sahalos.sboard.data.WordRecord
-import java.util.PriorityQueue
 
 class TrieNode {
     val children = mutableMapOf<Char, TrieNode>()
@@ -14,21 +13,48 @@ class TrieTree {
     private val root = TrieNode()
 
     @Synchronized
-    fun insert(record: WordRecord) {
+    fun insert(record: WordRecord, accumulate: Boolean = false) {
         val word = record.word.lowercase()
         var current = root
-        current.maxSubtreeFrequency = maxOf(current.maxSubtreeFrequency, record.frequency)
 
         for (ch in word) {
             current = current.children.getOrPut(ch) { TrieNode() }
-            current.maxSubtreeFrequency = maxOf(current.maxSubtreeFrequency, record.frequency)
         }
+
+        val existing = current.record
+        val finalRecord = if (accumulate && existing != null) {
+            existing.copy(
+                frequency = existing.frequency + record.frequency,
+                lastUsed = maxOf(existing.lastUsed, record.lastUsed)
+            )
+        } else {
+            record
+        }
+
         current.isWord = true
-        current.record = record
+        current.record = finalRecord
+
+        // Update maxSubtreeFrequency along path
+        var node = root
+        node.maxSubtreeFrequency = maxOf(node.maxSubtreeFrequency, finalRecord.frequency)
+        for (ch in word) {
+            node = node.children[ch] ?: break
+            node.maxSubtreeFrequency = maxOf(node.maxSubtreeFrequency, finalRecord.frequency)
+        }
     }
 
     @Synchronized
-    fun searchPrefix(prefix: String, maxCount: Int = 3): List<WordRecord> {
+    fun getWordFrequency(word: String): Int {
+        val clean = word.lowercase()
+        var current = root
+        for (ch in clean) {
+            current = current.children[ch] ?: return 0
+        }
+        return if (current.isWord) (current.record?.frequency ?: 0) else 0
+    }
+
+    @Synchronized
+    fun searchPrefix(prefix: String, maxCount: Int = 3, minFrequency: Int = 2): List<WordRecord> {
         val cleanPrefix = prefix.lowercase()
         var current = root
 
@@ -37,7 +63,7 @@ class TrieTree {
         }
 
         val results = mutableListOf<WordRecord>()
-        collectWords(current, results)
+        collectWords(current, results, minFrequency)
 
         results.sortWith(
             compareByDescending<WordRecord> { it.frequency }
@@ -47,17 +73,26 @@ class TrieTree {
         return results.take(maxCount)
     }
 
-    private fun collectWords(node: TrieNode, collector: MutableList<WordRecord>) {
+    private fun collectWords(
+        node: TrieNode,
+        collector: MutableList<WordRecord>,
+        minFrequency: Int
+    ) {
         if (node.isWord) {
-            node.record?.let { collector.add(it) }
+            val rec = node.record
+            if (rec != null && rec.frequency >= minFrequency) {
+                collector.add(rec)
+            }
         }
         for ((_, child) in node.children) {
-            collectWords(child, collector)
+            if (child.maxSubtreeFrequency >= minFrequency) {
+                collectWords(child, collector, minFrequency)
+            }
         }
     }
 
     @Synchronized
-    fun searchFuzzy(query: String, maxCount: Int = 3): List<WordRecord> {
+    fun searchFuzzy(query: String, maxCount: Int = 3, minFrequency: Int = 2): List<WordRecord> {
         val cleanQuery = query.lowercase()
         if (cleanQuery.length < 3) return emptyList()
 
@@ -65,14 +100,17 @@ class TrieTree {
         val currentDistances = IntArray(cleanQuery.length + 1) { it }
 
         for ((ch, child) in root.children) {
-            fuzzySearchRecursive(
-                node = child,
-                char = ch,
-                wordSoFar = ch.toString(),
-                query = cleanQuery,
-                prevDistances = currentDistances,
-                results = results
-            )
+            if (child.maxSubtreeFrequency >= minFrequency) {
+                fuzzySearchRecursive(
+                    node = child,
+                    char = ch,
+                    wordSoFar = ch.toString(),
+                    query = cleanQuery,
+                    prevDistances = currentDistances,
+                    minFrequency = minFrequency,
+                    results = results
+                )
+            }
         }
 
         results.sortWith(
@@ -89,6 +127,7 @@ class TrieTree {
         wordSoFar: String,
         query: String,
         prevDistances: IntArray,
+        minFrequency: Int,
         results: MutableList<WordRecord>
     ) {
         val size = prevDistances.size
@@ -111,18 +150,24 @@ class TrieTree {
         if (minDistance > 1) return
 
         if (currentDistances[size - 1] <= 1 && node.isWord && wordSoFar != query) {
-            node.record?.let { results.add(it) }
+            val rec = node.record
+            if (rec != null && rec.frequency >= minFrequency) {
+                results.add(rec)
+            }
         }
 
         for ((nextChar, nextNode) in node.children) {
-            fuzzySearchRecursive(
-                node = nextNode,
-                char = nextChar,
-                wordSoFar = wordSoFar + nextChar,
-                query = query,
-                prevDistances = currentDistances,
-                results = results
-            )
+            if (nextNode.maxSubtreeFrequency >= minFrequency) {
+                fuzzySearchRecursive(
+                    node = nextNode,
+                    char = nextChar,
+                    wordSoFar = wordSoFar + nextChar,
+                    query = query,
+                    prevDistances = currentDistances,
+                    minFrequency = minFrequency,
+                    results = results
+                )
+            }
         }
     }
 

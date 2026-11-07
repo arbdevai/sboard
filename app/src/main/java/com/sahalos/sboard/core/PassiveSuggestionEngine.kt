@@ -33,7 +33,7 @@ object PassiveSuggestionEngine {
                 try {
                     val words = helper.loadAllActiveWords(limit = 4000)
                     for (w in words) {
-                        trie.insert(w)
+                        trie.insert(w, accumulate = false)
                     }
                     isInitialized = true
                     Log.i(TAG, "Adaptive suggestion engine initialized with ${words.size} words in Trie")
@@ -50,7 +50,7 @@ object PassiveSuggestionEngine {
 
         val now = System.currentTimeMillis()
         val record = WordRecord(word = clean, frequency = boost, lastUsed = now)
-        trie.insert(record)
+        trie.insert(record, accumulate = true)
 
         // Persist to SQLite asynchronously in background
         scope.launch {
@@ -62,6 +62,12 @@ object PassiveSuggestionEngine {
         }
     }
 
+    fun hasPrefixMatch(prefix: String): Boolean {
+        if (prefix.isEmpty()) return false
+        return trie.searchPrefix(prefix, maxCount = 1, minFrequency = 2).isNotEmpty() ||
+            trie.getWordFrequency(prefix) >= 2
+    }
+
     fun getSuggestions(composingWord: String, maxCount: Int = 3): List<String> {
         val trimmed = composingWord.trim()
         if (trimmed.isEmpty()) return emptyList()
@@ -69,29 +75,33 @@ object PassiveSuggestionEngine {
         val isFirstCharUpper = trimmed.first().isUpperCase()
         val queryLower = trimmed.lowercase()
 
-        // 1. O(L) instant prefix match from Trie
-        val prefixRecords = trie.searchPrefix(queryLower, maxCount)
+        // 1. O(L) instant prefix match from Trie (only words with frequency >= 2 to filter out 1-time typos)
+        val prefixRecords = trie.searchPrefix(queryLower, maxCount = maxCount + 1, minFrequency = 2)
         val results = mutableListOf<String>()
 
         for (cand in prefixRecords) {
             if (cand.word != queryLower) {
                 results.add(formatWordCase(cand.word, isFirstCharUpper))
+                if (results.size >= maxCount) break
             }
         }
 
         // 2. Branch-pruned Trie fuzzy search if prefix candidates are fewer than maxCount
-        if (results.size < maxCount && queryLower.length >= 3) {
+        if (results.size < maxCount && queryLower.length >= 2) {
             val needed = maxCount - results.size
-            val fuzzyRecords = trie.searchFuzzy(queryLower, maxCount = needed * 2)
+            val fuzzyRecords = trie.searchFuzzy(queryLower, maxCount = needed * 3, minFrequency = 2)
 
-            val scoredFuzzy = fuzzyRecords.filter { it.word !in results.map { r -> r.lowercase() } && it.word != queryLower }
+            val scoredFuzzy = fuzzyRecords
+                .filter { it.word !in results.map { r -> r.lowercase() } && it.word != queryLower }
                 .map { rec ->
-                    val bigramBonus = if (rec.word.length >= 2 && queryLower.length >= 2) {
+                    val bigramBonus = if (rec.word.length >= 2) {
                         NativeCoreBridge.getBigramScore(rec.word[0], rec.word[1])
                     } else {
                         0.5f
                     }
-                    val finalScore = (rec.frequency * 1.0f) + (bigramBonus * 10f)
+                    // Give bonus if first letter matches what the user typed
+                    val firstCharBonus = if (rec.word.firstOrNull() == queryLower.firstOrNull()) 15f else 0f
+                    val finalScore = (rec.frequency * 1.2f) + (bigramBonus * 10f) + firstCharBonus
                     Pair(rec, finalScore)
                 }
                 .sortedByDescending { it.second }

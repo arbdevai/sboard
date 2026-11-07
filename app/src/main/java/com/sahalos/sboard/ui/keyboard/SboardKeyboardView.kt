@@ -3,7 +3,6 @@ package com.sahalos.sboard.ui.keyboard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -27,8 +25,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.sahalos.sboard.R
 import com.sahalos.sboard.core.KeyLayoutProvider
+import com.sahalos.sboard.core.NativeCoreBridge
+import com.sahalos.sboard.core.PassiveSuggestionEngine
 import com.sahalos.sboard.model.KeyModel
 import com.sahalos.sboard.model.KeyType
 import com.sahalos.sboard.model.ModifierState
@@ -46,6 +45,7 @@ fun SboardKeyboardView(
     keyboardHeightRatio: Float,
     enableLongPressSymbols: Boolean,
     enableKeyPopup: Boolean = true,
+    composingWord: String = "",
     actionImeLabel: String?,
     actionIconRes: Int,
     onKeyClick: (KeyModel) -> Unit,
@@ -67,6 +67,8 @@ fun SboardKeyboardView(
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
     val glideThresholdPx = with(density) { 12.dp.toPx() }
+    val rolloverController = remember { KeyRolloverController() }
+    val currentComposingWord by rememberUpdatedState(composingWord)
 
     val rows = when {
         modifierState.isSymPage2Active -> KeyLayoutProvider.getSymbolsPage2Rows()
@@ -79,7 +81,7 @@ fun SboardKeyboardView(
             .fillMaxWidth()
             .background(Color(theme.backgroundColor))
     ) {
-        // Suggestions & Quick Action Strip (Ctrl, Fn, Clipboard, Resize, Settings)
+        // Suggestions & Quick Action Strip (CTRL, FN on Left; Suggestions Center; Clipboard, Resize, Settings on Right)
         if (showSuggestionsBar) {
             SuggestionsBar(
                 suggestions = suggestions,
@@ -108,7 +110,7 @@ fun SboardKeyboardView(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 4.dp, vertical = 2.dp)
+                .padding(horizontal = 2.dp, vertical = 1.dp)
         ) {
             rows.forEachIndexed { rowIndex, rowKeys ->
                 Row(
@@ -116,7 +118,7 @@ fun SboardKeyboardView(
                         .fillMaxWidth()
                         .height(baseRowHeight)
                 ) {
-                    rowKeys.forEach { key ->
+                    rowKeys.forEachIndexed { keyIndex, key ->
                         val keyWeight = key.weight
 
                         when (key.type) {
@@ -139,6 +141,9 @@ fun SboardKeyboardView(
                                         .pointerInput(key) {
                                             awaitEachGesture {
                                                 val down = awaitFirstDown(requireUnconsumed = false)
+                                                // Immediately flush any held character key so fast typing before Space never swaps order
+                                                rolloverController.flushAll()
+
                                                 val startX = down.position.x
                                                 val startY = down.position.y
                                                 var isDragging = false
@@ -214,9 +219,9 @@ fun SboardKeyboardView(
                                         .pointerInput(Unit) {
                                             detectTapGestures(
                                                 onPress = {
-                                                    // Instant tap on ACTION_DOWN
+                                                    // Flush any pending key before deleting
+                                                    rolloverController.flushAll()
                                                     onKeyClick(key)
-                                                    // Controlled repeat delete: 350ms initial delay, 45ms repeat
                                                     repeatJob = coroutineScope.launch {
                                                         delay(350L)
                                                         while (true) {
@@ -256,7 +261,18 @@ fun SboardKeyboardView(
                                     modifier = Modifier
                                         .weight(keyWeight)
                                         .fillMaxHeight(),
-                                    onClick = { onKeyClick(key) },
+                                    rolloverController = rolloverController,
+                                    onClickWithCoord = { normX, normY ->
+                                        val resolvedKey = resolveSpatialAndBigramKey(
+                                            tappedKey = key,
+                                            keyIndex = keyIndex,
+                                            rowKeys = rowKeys,
+                                            normX = normX,
+                                            normY = normY,
+                                            composingWord = currentComposingWord
+                                        )
+                                        onKeyClick(resolvedKey)
+                                    },
                                     onLongClick = if (enableLongPressSymbols && !key.secondaryLabel.isNullOrEmpty()) {
                                         { onKeyLongClick(key) }
                                     } else null
@@ -272,5 +288,66 @@ fun SboardKeyboardView(
         if (bottomPaddingDp > 0) {
             Spacer(modifier = Modifier.height(bottomPaddingDp.dp))
         }
+    }
+}
+
+private fun resolveSpatialAndBigramKey(
+    tappedKey: KeyModel,
+    keyIndex: Int,
+    rowKeys: List<KeyModel>,
+    normX: Float,
+    normY: Float,
+    composingWord: String
+): KeyModel {
+    if (tappedKey.type != KeyType.CHARACTER || tappedKey.primaryLabel.length != 1 || !tappedKey.primaryLabel[0].isLetter()) {
+        return tappedKey
+    }
+
+    // Only intervene if touch landed in the outer 16% horizontal border zone between adjacent character keys
+    val neighborKey = when {
+        normX < 0.16f && keyIndex > 0 -> rowKeys[keyIndex - 1]
+        normX > 0.84f && keyIndex < rowKeys.lastIndex -> rowKeys[keyIndex + 1]
+        else -> null
+    }
+
+    if (neighborKey == null || neighborKey.type != KeyType.CHARACTER ||
+        neighborKey.primaryLabel.length != 1 || !neighborKey.primaryLabel[0].isLetter()
+    ) {
+        return tappedKey
+    }
+
+    // 1. Dictionary prefix check when composing a word
+    if (composingWord.isNotEmpty()) {
+        val prefixTapped = composingWord + tappedKey.primaryLabel
+        val prefixNeighbor = composingWord + neighborKey.primaryLabel
+        val validTapped = PassiveSuggestionEngine.hasPrefixMatch(prefixTapped)
+        val validNeighbor = PassiveSuggestionEngine.hasPrefixMatch(prefixNeighbor)
+
+        if (!validTapped && validNeighbor) {
+            return neighborKey
+        }
+        if (validTapped && !validNeighbor) {
+            return tappedKey
+        }
+    }
+
+    // 2. Native Rust Spatial Gaussian + Bigram Probability resolution
+    val prevChar = composingWord.lastOrNull() ?: ' '
+    val unitWidth = 100f
+    val unitHeight = 100f
+    // Tapped key center is at X = 50, neighbor center is at X = -50 (left) or X = +150 (right)
+    val neighborCenterX = if (normX < 0.16f) -50f else 150f
+    val flatKeyData = floatArrayOf(
+        tappedKey.code.toFloat(), 50f, 50f, unitWidth, unitHeight,
+        neighborKey.code.toFloat(), neighborCenterX, 50f, unitWidth, unitHeight
+    )
+    val touchX = normX * unitWidth
+    val touchY = normY * unitHeight
+
+    val resolvedCode = NativeCoreBridge.resolveHit(touchX, touchY, prevChar, flatKeyData)
+    return if (resolvedCode == neighborKey.code) {
+        neighborKey
+    } else {
+        tappedKey
     }
 }

@@ -93,6 +93,12 @@ class SboardIME : InputMethodService(),
     // Screen mode (Keyboard, Clipboard, Resize, Emoji, Emoji Search)
     private var keyboardMode by mutableStateOf(KeyboardMode.KEYBOARD)
     private var emojiSearchQuery by mutableStateOf("")
+    private var lastModeSwitchTimeMs = 0L
+
+    private fun switchToKeyboardMode() {
+        lastModeSwitchTimeMs = android.os.SystemClock.uptimeMillis()
+        keyboardMode = KeyboardMode.KEYBOARD
+    }
 
     // Keyboard state
     private var modifierState by mutableStateOf(ModifierState())
@@ -221,6 +227,7 @@ class SboardIME : InputMethodService(),
                                 modifierState = modifierState,
                                 theme = activeTheme,
                                 suggestions = if (isPasswordField) emptyList() else currentSuggestions,
+                                composingWord = currentComposingWord,
                                 bottomPaddingDp = bottomPadding,
                                 keyboardHeightRatio = heightRatio,
                                 enableLongPressSymbols = enableLongPressSymbols,
@@ -242,12 +249,16 @@ class SboardIME : InputMethodService(),
                                 },
                                 onSettingsClick = { openSettings() },
                                 onCtrlToggle = {
-                                    triggerHaptic()
-                                    modifierState = modifierState.copy(isCtrlActive = !modifierState.isCtrlActive)
+                                    if (android.os.SystemClock.uptimeMillis() - lastModeSwitchTimeMs > 350L) {
+                                        triggerHaptic()
+                                        modifierState = modifierState.copy(isCtrlActive = !modifierState.isCtrlActive)
+                                    }
                                 },
                                 onFnToggle = {
-                                    triggerHaptic()
-                                    modifierState = modifierState.copy(isFnActive = !modifierState.isFnActive)
+                                    if (android.os.SystemClock.uptimeMillis() - lastModeSwitchTimeMs > 350L) {
+                                        triggerHaptic()
+                                        modifierState = modifierState.copy(isFnActive = !modifierState.isFnActive)
+                                    }
                                 },
                                 onFunctionKeyClick = { keyCode -> sendFunctionKey(keyCode) }
                             )
@@ -259,12 +270,12 @@ class SboardIME : InputMethodService(),
                                 totalKeyboardHeight = totalKeyboardHeightDp,
                                 onClipClick = { text ->
                                     commitTextDirectly(text)
-                                    keyboardMode = KeyboardMode.KEYBOARD
+                                    switchToKeyboardMode()
                                 },
                                 onTogglePin = { clipId -> clipboardManager.togglePin(clipId) },
                                 onDeleteClip = { clipId -> clipboardManager.removeClip(clipId) },
                                 onClearAll = { clipboardManager.clearAllUnpinned() },
-                                onBackToKeyboard = { keyboardMode = KeyboardMode.KEYBOARD }
+                                onBackToKeyboard = { switchToKeyboardMode() }
                             )
                         }
                         KeyboardMode.EMOJI -> {
@@ -279,7 +290,7 @@ class SboardIME : InputMethodService(),
                                     }
                                 },
                                 onBackspaceClick = { performBackspace() },
-                                onBackToKeyboard = { keyboardMode = KeyboardMode.KEYBOARD },
+                                onBackToKeyboard = { switchToKeyboardMode() },
                                 onOpenEmojiSearch = {
                                     emojiSearchQuery = ""
                                     keyboardMode = KeyboardMode.EMOJI_SEARCH
@@ -313,7 +324,7 @@ class SboardIME : InputMethodService(),
                                     onClearQuery = { emojiSearchQuery = "" },
                                     onCloseSearch = {
                                         emojiSearchQuery = ""
-                                        keyboardMode = KeyboardMode.KEYBOARD
+                                        switchToKeyboardMode()
                                     },
                                     onQuickFilterClick = { tag ->
                                         emojiSearchQuery = tag
@@ -347,7 +358,7 @@ class SboardIME : InputMethodService(),
                                                 }
                                             }
                                             KeyType.ACTION -> {
-                                                keyboardMode = KeyboardMode.KEYBOARD
+                                                switchToKeyboardMode()
                                             }
                                             KeyType.SYM -> {
                                                 modifierState = modifierState.copy(isSymActive = !modifierState.isSymActive, isSymPage2Active = false)
@@ -429,13 +440,13 @@ class SboardIME : InputMethodService(),
                                         previewHeightRatio = 1.0f
                                         previewBottomPaddingDp = 0
                                     },
-                                    onCancel = { keyboardMode = KeyboardMode.KEYBOARD },
+                                    onCancel = { switchToKeyboardMode() },
                                     onSave = {
                                         serviceScope.launch {
                                             preferences.setKeyboardHeightRatio(previewHeightRatio)
                                             preferences.setBottomPaddingDp(previewBottomPaddingDp)
                                         }
-                                        keyboardMode = KeyboardMode.KEYBOARD
+                                        switchToKeyboardMode()
                                     }
                                 )
                             }

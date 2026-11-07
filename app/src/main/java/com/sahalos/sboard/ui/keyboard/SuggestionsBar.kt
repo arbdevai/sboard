@@ -53,42 +53,44 @@ fun SuggestionsBar(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // 1. Left side: Tools (Clipboard & Resize) with comfortable spacing
+        // 1. Left side: Modifiers (CTRL & FN)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            // Clipboard button
+            // Ctrl Button (Flat icon style, consistent with tools)
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(6.dp))
-                    .clickable { onClipboardClick() }
+                    .clickable { onCtrlClick() }
                     .padding(horizontal = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_clipboard),
-                    contentDescription = "Papan Klip",
-                    tint = textColor.copy(alpha = 0.85f),
-                    modifier = Modifier.size(18.dp)
+                Text(
+                    text = "CTRL",
+                    color = if (isCtrlActive) accentColor else textColor.copy(alpha = 0.85f),
+                    fontSize = 11.sp,
+                    fontWeight = if (isCtrlActive) FontWeight.Bold else FontWeight.SemiBold,
+                    letterSpacing = 0.5.sp
                 )
             }
 
-            // Resize button
+            // Fn Button (Flat icon style, consistent with tools)
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(6.dp))
-                    .clickable { onResizeClick() }
+                    .clickable { onFnClick() }
                     .padding(horizontal = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_resize),
-                    contentDescription = "Atur Ukuran",
-                    tint = textColor.copy(alpha = 0.85f),
-                    modifier = Modifier.size(18.dp)
+                Text(
+                    text = "FN",
+                    color = if (isFnActive) accentColor else textColor.copy(alpha = 0.85f),
+                    fontSize = 11.sp,
+                    fontWeight = if (isFnActive) FontWeight.Bold else FontWeight.SemiBold,
+                    letterSpacing = 0.5.sp
                 )
             }
         }
@@ -132,44 +134,42 @@ fun SuggestionsBar(
             }
         }
 
-        // 3. Right side: Modifiers (CTRL, FN) & Settings
+        // 3. Right side: Tools (Clipboard/Paste, Resize, Settings)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            // Ctrl Button (Flat icon style, consistent with tools)
+            // Clipboard button
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(6.dp))
-                    .clickable { onCtrlClick() }
-                    .padding(horizontal = 6.dp),
+                    .clickable { onClipboardClick() }
+                    .padding(horizontal = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "CTRL",
-                    color = if (isCtrlActive) accentColor else textColor.copy(alpha = 0.85f),
-                    fontSize = 11.sp,
-                    fontWeight = if (isCtrlActive) FontWeight.Bold else FontWeight.SemiBold,
-                    letterSpacing = 0.5.sp
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_clipboard),
+                    contentDescription = "Papan Klip",
+                    tint = textColor.copy(alpha = 0.85f),
+                    modifier = Modifier.size(18.dp)
                 )
             }
 
-            // Fn Button (Flat icon style, consistent with tools)
+            // Resize button
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(6.dp))
-                    .clickable { onFnClick() }
-                    .padding(horizontal = 6.dp),
+                    .clickable { onResizeClick() }
+                    .padding(horizontal = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "FN",
-                    color = if (isFnActive) accentColor else textColor.copy(alpha = 0.85f),
-                    fontSize = 11.sp,
-                    fontWeight = if (isFnActive) FontWeight.Bold else FontWeight.SemiBold,
-                    letterSpacing = 0.5.sp
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_resize),
+                    contentDescription = "Atur Ukuran",
+                    tint = textColor.copy(alpha = 0.85f),
+                    modifier = Modifier.size(18.dp)
                 )
             }
 
