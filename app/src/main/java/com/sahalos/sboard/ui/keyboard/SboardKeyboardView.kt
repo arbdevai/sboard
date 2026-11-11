@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,12 +46,20 @@ fun SboardKeyboardView(
     keyboardHeightRatio: Float,
     enableLongPressSymbols: Boolean,
     enableKeyPopup: Boolean = true,
+    enableNumberRow: Boolean = false,
+    isNumberPad: Boolean = false,
+    isPhonePad: Boolean = false,
+    isDecimalNumber: Boolean = false,
+    isSignedNumber: Boolean = false,
+    isNumericOverriddenToAlpha: Boolean = false,
     composingWord: String = "",
     actionImeLabel: String?,
     actionIconRes: Int,
     onKeyClick: (KeyModel) -> Unit,
     onKeyLongClick: (KeyModel) -> Unit,
-    onBackspaceRepeat: () -> Unit,
+    onBackspaceRepeat: () -> Unit = {},
+    onBackspaceRepeatStart: () -> Unit = onBackspaceRepeat,
+    onBackspaceRepeatStop: () -> Unit = {},
     onCursorMove: (Int) -> Unit,
     onShowImePicker: () -> Unit,
     onSuggestionClick: (String) -> Unit,
@@ -71,10 +80,37 @@ fun SboardKeyboardView(
     val rolloverController = remember { KeyRolloverController() }
     val currentComposingWord by rememberUpdatedState(composingWord)
 
+    DisposableEffect(Unit) {
+        onDispose {
+            onBackspaceRepeatStop()
+        }
+    }
+
+    val isNumpadActive = isNumberPad && !isNumericOverriddenToAlpha
+    val isPhonepadActive = isPhonePad && !isNumericOverriddenToAlpha
+
     val rows = when {
+        isNumpadActive -> KeyLayoutProvider.getNumberPadRows(isDecimal = isDecimalNumber, isSigned = isSignedNumber)
+        isPhonepadActive -> KeyLayoutProvider.getPhonePadRows()
         modifierState.isSymPage2Active -> KeyLayoutProvider.getSymbolsPage2Rows()
         modifierState.isSymActive -> KeyLayoutProvider.getSymbolsRows()
-        else -> KeyLayoutProvider.getQwertyRows()
+        else -> {
+            val qwerty = KeyLayoutProvider.getQwertyRows()
+            val adjustedQwerty = if (isNumberPad || isPhonePad) {
+                qwerty.map { row ->
+                    row.map { k ->
+                        if (k.type == KeyType.SYM) k.copy(primaryLabel = "123") else k
+                    }
+                }
+            } else {
+                qwerty
+            }
+            if (enableNumberRow) {
+                listOf(KeyLayoutProvider.getNumberRow()) + adjustedQwerty
+            } else {
+                adjustedQwerty
+            }
+        }
     }
 
     Column(
@@ -83,7 +119,8 @@ fun SboardKeyboardView(
             .background(Color(theme.backgroundColor))
     ) {
         // Suggestions & Quick Action Strip (CTRL, FN on Left; Suggestions Center; Clipboard, Resize, Settings on Right)
-        if (showSuggestionsBar) {
+        val shouldShowSuggestionsBar = showSuggestionsBar && !isNumpadActive && !isPhonepadActive
+        if (shouldShowSuggestionsBar) {
             SuggestionsBar(
                 suggestions = suggestions,
                 theme = theme,
@@ -109,7 +146,8 @@ fun SboardKeyboardView(
         }
 
         // Main Keyboard Area
-        val baseRowHeight = (48 * keyboardHeightRatio).dp
+        val is5RowActive = enableNumberRow && !isNumpadActive && !isPhonepadActive && !modifierState.isSymActive && !modifierState.isSymPage2Active
+        val baseRowHeight = (if (is5RowActive) 42 * keyboardHeightRatio else 48 * keyboardHeightRatio).dp
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -214,32 +252,29 @@ fun SboardKeyboardView(
                                 }
                             }
                             KeyType.BACKSPACE -> {
-                                var repeatJob by remember { mutableStateOf<Job?>(null) }
                                 Box(
                                     modifier = Modifier
                                         .weight(keyWeight)
                                         .fillMaxHeight()
-                                        .pointerInput(Unit) {
-                                            detectTapGestures(
-                                                onPress = {
-                                                    // Flush any pending key before deleting
-                                                    rolloverController.flushAll()
-                                                    onKeyClick(key)
-                                                    repeatJob = coroutineScope.launch {
-                                                        delay(350L)
-                                                        while (true) {
-                                                            onBackspaceRepeat()
-                                                            delay(45L)
+                                        .pointerInput(key) {
+                                            awaitEachGesture {
+                                                val down = awaitFirstDown(requireUnconsumed = false)
+                                                // Flush any pending key before deleting
+                                                rolloverController.flushAll()
+                                                onKeyClick(key)
+                                                onBackspaceRepeatStart()
+                                                try {
+                                                    while (true) {
+                                                        val event = awaitPointerEvent()
+                                                        val change = event.changes.firstOrNull { it.id == down.id }
+                                                        if (change == null || !change.pressed) {
+                                                            break
                                                         }
                                                     }
-                                                    try {
-                                                        awaitRelease()
-                                                    } finally {
-                                                        repeatJob?.cancel()
-                                                        repeatJob = null
-                                                    }
+                                                } finally {
+                                                    onBackspaceRepeatStop()
                                                 }
-                                            )
+                                            }
                                         }
                                 ) {
                                     KeyView(

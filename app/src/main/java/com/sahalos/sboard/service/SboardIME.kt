@@ -113,6 +113,28 @@ class SboardIME : InputMethodService(),
     private var enableVibration = true
     private var isPasswordField = false
     private var isTerminalField = false
+    private var isNumberPadField by mutableStateOf(false)
+    private var isPhonePadField by mutableStateOf(false)
+    private var isDecimalNumberField by mutableStateOf(false)
+    private var isSignedNumberField by mutableStateOf(false)
+    private var isNumericOverriddenToAlpha by mutableStateOf(false)
+    private var backspaceRepeatJob: Job? = null
+
+    private fun startBackspaceRepeat() {
+        stopBackspaceRepeat()
+        backspaceRepeatJob = serviceScope.launch {
+            delay(350L)
+            while (isActive) {
+                performBackspace()
+                delay(45L)
+            }
+        }
+    }
+
+    private fun stopBackspaceRepeat() {
+        backspaceRepeatJob?.cancel()
+        backspaceRepeatJob = null
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -201,6 +223,7 @@ class SboardIME : InputMethodService(),
                 val heightRatio by preferences.keyboardHeightRatio.collectAsStateWithLifecycle(initialValue = 1.0f)
                 val enableLongPressSymbols by preferences.enableLongPressSymbols.collectAsStateWithLifecycle(initialValue = true)
                 val enableKeyPopup by preferences.enableKeyPopupPreview.collectAsStateWithLifecycle(initialValue = true)
+                val enableNumberRow by preferences.enableNumberRow.collectAsStateWithLifecycle(initialValue = true)
                 val themeId by preferences.themeId.collectAsStateWithLifecycle(initialValue = "oled_black")
                 val clips by clipboardManager.clips.collectAsStateWithLifecycle()
                 val recentEmojis by preferences.recentEmojis.collectAsStateWithLifecycle(initialValue = emptyList())
@@ -208,14 +231,16 @@ class SboardIME : InputMethodService(),
                 val activeTheme = SboardTheme.AvailableThemes.find { it.id == themeId } ?: SboardTheme.OledBlack
 
                 // Calculate exact keyboard bounds
-                val baseRowHeightDp = (48 * heightRatio).toInt()
-                val totalKeyboardHeightDp = (42 + (baseRowHeightDp * 4) + bottomPadding).dp
+                val is5RowActive = enableNumberRow && !isNumberPadField && !isPhonePadField && !modifierState.isSymActive && !modifierState.isSymPage2Active
+                val rowMultiplier = if (is5RowActive) 5 else 4
+                val baseRowHeightDp = (if (is5RowActive) 42 * heightRatio else 48 * heightRatio).toInt()
+                val totalKeyboardHeightDp = (42 + (baseRowHeightDp * rowMultiplier) + bottomPadding).dp
 
                 // Local states for live resize preview
                 var previewHeightRatio by remember(heightRatio) { mutableFloatStateOf(heightRatio) }
                 var previewBottomPaddingDp by remember(bottomPadding) { mutableIntStateOf(bottomPadding) }
-                val previewBaseRowHeightDp = (48 * previewHeightRatio).toInt()
-                val previewTotalHeightDp = (42 + (previewBaseRowHeightDp * 4) + previewBottomPaddingDp).dp
+                val previewBaseRowHeightDp = (if (is5RowActive) 42 * previewHeightRatio else 48 * previewHeightRatio).toInt()
+                val previewTotalHeightDp = (42 + (previewBaseRowHeightDp * rowMultiplier) + previewBottomPaddingDp).dp
 
                 AnimatedContent(
                     targetState = keyboardMode,
@@ -227,17 +252,25 @@ class SboardIME : InputMethodService(),
                             SboardKeyboardView(
                                 modifierState = modifierState,
                                 theme = activeTheme,
-                                suggestions = if (isPasswordField) emptyList() else currentSuggestions,
+                                suggestions = if (isPasswordField || isNumberPadField || isPhonePadField) emptyList() else currentSuggestions,
                                 composingWord = currentComposingWord,
                                 bottomPaddingDp = bottomPadding,
                                 keyboardHeightRatio = heightRatio,
                                 enableLongPressSymbols = enableLongPressSymbols,
                                 enableKeyPopup = enableKeyPopup,
+                                enableNumberRow = enableNumberRow,
+                                isNumberPad = isNumberPadField,
+                                isPhonePad = isPhonePadField,
+                                isDecimalNumber = isDecimalNumberField,
+                                isSignedNumber = isSignedNumberField,
+                                isNumericOverriddenToAlpha = isNumericOverriddenToAlpha,
                                 actionImeLabel = currentActionLabel,
                                 actionIconRes = currentActionIcon,
                                 onKeyClick = { key -> handleKeyClick(key) },
                                 onKeyLongClick = { key -> handleKeyLongClick(key) },
                                 onBackspaceRepeat = { performBackspace() },
+                                onBackspaceRepeatStart = { startBackspaceRepeat() },
+                                onBackspaceRepeatStop = { stopBackspaceRepeat() },
                                 onCursorMove = { offset -> moveCursor(offset) },
                                 onShowImePicker = { showImePicker() },
                                 onSuggestionClick = { word -> commitSuggestion(word) },
@@ -467,17 +500,92 @@ class SboardIME : InputMethodService(),
         return composeView
     }
 
+    override fun onStartInput(attribute: EditorInfo?, restarting: Boolean) {
+        super.onStartInput(attribute, restarting)
+        stopBackspaceRepeat()
+        resolveInputType(attribute)
+        resolveImeAction(attribute)
+    }
+
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         installViewTreeOwners()
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
 
+        stopBackspaceRepeat()
         currentComposingWord = ""
         currentSuggestions = emptyList()
         keyboardMode = KeyboardMode.KEYBOARD
 
-        // Check if terminal or password field
+        // Reset modifier state to guarantee clean QWERTY layer on each session (Issue 3 fix)
+        modifierState = modifierState.copy(
+            isShifted = false,
+            isCapsLock = false,
+            isCtrlActive = false,
+            isAltActive = false,
+            isFnActive = false,
+            isSymActive = false,
+            isSymPage2Active = false
+        )
+        isNumericOverriddenToAlpha = false
+
+        resolveInputType(info)
+        resolveImeAction(info)
+    }
+
+    override fun onWindowShown() {
+        super.onWindowShown()
+        installViewTreeOwners()
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    }
+
+    override fun onWindowHidden() {
+        super.onWindowHidden()
+        stopBackspaceRepeat()
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+        keyboardMode = KeyboardMode.KEYBOARD
+        modifierState = modifierState.copy(
+            isShifted = false,
+            isCapsLock = false,
+            isCtrlActive = false,
+            isAltActive = false,
+            isFnActive = false,
+            isSymActive = false,
+            isSymPage2Active = false
+        )
+        isNumericOverriddenToAlpha = false
+    }
+
+    override fun onFinishInputView(finishingInput: Boolean) {
+        super.onFinishInputView(finishingInput)
+        stopBackspaceRepeat()
+        currentComposingWord = ""
+        currentSuggestions = emptyList()
+        modifierState = modifierState.copy(
+            isShifted = false,
+            isCapsLock = false,
+            isCtrlActive = false,
+            isAltActive = false,
+            isFnActive = false,
+            isSymActive = false,
+            isSymPage2Active = false
+        )
+        isNumericOverriddenToAlpha = false
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopBackspaceRepeat()
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        store.clear()
+        serviceScope.cancel()
+        clipboardManager.destroy()
+    }
+
+    private fun resolveInputType(info: EditorInfo?) {
         val inputType = info?.inputType ?: 0
+        val inputClass = inputType and InputType.TYPE_MASK_CLASS
         val variation = inputType and InputType.TYPE_MASK_VARIATION
         val flags = inputType and InputType.TYPE_MASK_FLAGS
         val imeOptions = info?.imeOptions ?: 0
@@ -495,41 +603,29 @@ class SboardIME : InputMethodService(),
         isTerminalField = hasRawTerminalFlags
         isPasswordField = variation == InputType.TYPE_TEXT_VARIATION_PASSWORD ||
                 variation == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD ||
-                variation == InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD
+                variation == InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD ||
+                variation == InputType.TYPE_NUMBER_VARIATION_PASSWORD
 
-        // Evaluate Dynamic Action Key
-        resolveImeAction(info)
-    }
-
-    override fun onWindowShown() {
-        super.onWindowShown()
-        installViewTreeOwners()
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    }
-
-    override fun onWindowHidden() {
-        super.onWindowHidden()
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-        keyboardMode = KeyboardMode.KEYBOARD
-    }
-
-    override fun onFinishInputView(finishingInput: Boolean) {
-        super.onFinishInputView(finishingInput)
-        currentComposingWord = ""
-        currentSuggestions = emptyList()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-        store.clear()
-        serviceScope.cancel()
-        clipboardManager.destroy()
+        isNumberPadField = (inputClass == InputType.TYPE_CLASS_NUMBER) || (inputClass == InputType.TYPE_CLASS_DATETIME)
+        isPhonePadField = (inputClass == InputType.TYPE_CLASS_PHONE)
+        isDecimalNumberField = (flags and InputType.TYPE_NUMBER_FLAG_DECIMAL) != 0
+        isSignedNumberField = (flags and InputType.TYPE_NUMBER_FLAG_SIGNED) != 0
     }
 
     private fun resolveImeAction(info: EditorInfo?) {
-        val action = (info?.imeOptions ?: 0) and EditorInfo.IME_MASK_ACTION
+        val imeOptions = info?.imeOptions ?: 0
+        val inputType = info?.inputType ?: 0
+        val action = imeOptions and EditorInfo.IME_MASK_ACTION
+        val isMultiLine = (inputType and InputType.TYPE_TEXT_FLAG_MULTI_LINE) != 0
+        val noEnterAction = (imeOptions and EditorInfo.IME_FLAG_NO_ENTER_ACTION) != 0
+
+        if (noEnterAction || (isMultiLine && (action == EditorInfo.IME_ACTION_UNSPECIFIED || action == EditorInfo.IME_ACTION_NONE))) {
+            currentActionId = EditorInfo.IME_ACTION_NONE
+            currentActionIcon = R.drawable.ic_enter
+            currentActionLabel = null
+            return
+        }
+
         currentActionId = action
         when (action) {
             EditorInfo.IME_ACTION_SEARCH -> {
@@ -562,7 +658,7 @@ class SboardIME : InputMethodService(),
     private fun commitTextDirectly(text: String) {
         triggerHaptic()
         val ic = currentInputConnection ?: return
-        if (currentComposingWord.isNotEmpty()) {
+        if (currentComposingWord.isNotEmpty() && !isPasswordField) {
             PassiveSuggestionEngine.learnWord(currentComposingWord)
         }
         ic.commitText(text, 1)
@@ -632,7 +728,7 @@ class SboardIME : InputMethodService(),
                 }
             }
             KeyType.SPACE -> {
-                if (currentComposingWord.isNotEmpty()) {
+                if (currentComposingWord.isNotEmpty() && !isPasswordField) {
                     PassiveSuggestionEngine.learnWord(currentComposingWord)
                 }
                 currentComposingWord = ""
@@ -673,11 +769,15 @@ class SboardIME : InputMethodService(),
                 )
             }
             KeyType.SYM -> {
-                val nextSymActive = !modifierState.isSymActive
-                modifierState = modifierState.copy(
-                    isSymActive = nextSymActive,
-                    isSymPage2Active = false
-                )
+                if (isNumberPadField || isPhonePadField) {
+                    isNumericOverriddenToAlpha = !isNumericOverriddenToAlpha
+                } else {
+                    val nextSymActive = !modifierState.isSymActive
+                    modifierState = modifierState.copy(
+                        isSymActive = nextSymActive,
+                        isSymPage2Active = false
+                    )
+                }
             }
             KeyType.SYM_PAGE_2 -> {
                 modifierState = modifierState.copy(
@@ -688,7 +788,7 @@ class SboardIME : InputMethodService(),
                 keyboardMode = KeyboardMode.EMOJI
             }
             KeyType.ACTION -> {
-                if (currentComposingWord.isNotEmpty()) {
+                if (currentComposingWord.isNotEmpty() && !isPasswordField) {
                     PassiveSuggestionEngine.learnWord(currentComposingWord)
                 }
                 currentComposingWord = ""
@@ -718,9 +818,12 @@ class SboardIME : InputMethodService(),
                 }
 
                 if (currentActionId != EditorInfo.IME_ACTION_UNSPECIFIED && currentActionId != EditorInfo.IME_ACTION_NONE) {
-                    ic.performEditorAction(currentActionId)
+                    val performed = ic.performEditorAction(currentActionId)
+                    if (!performed) {
+                        sendDownUpKeyEvents(KeyEvent.KEYCODE_ENTER)
+                    }
                 } else {
-                    sendKeyChar('\n')
+                    sendDownUpKeyEvents(KeyEvent.KEYCODE_ENTER)
                 }
             }
             else -> {}

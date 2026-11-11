@@ -92,6 +92,7 @@ fun SettingsScreen(
     val enableKeyPopup by preferences.enableKeyPopupPreview.collectAsStateWithLifecycle(initialValue = true)
     val enableSpacebarCursorGlide by preferences.enableSpacebarCursorGlide.collectAsStateWithLifecycle(initialValue = true)
     val enableClipboardHistory by preferences.enableClipboardHistory.collectAsStateWithLifecycle(initialValue = true)
+    val enableNumberRow by preferences.enableNumberRow.collectAsStateWithLifecycle(initialValue = true)
 
     // IME Dynamic Status on Lifecycle ON_RESUME
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -452,6 +453,17 @@ fun SettingsScreen(
                         onCheckedChange = { checked ->
                             coroutineScope.launch {
                                 preferences.setEnablePassiveSuggestions(checked)
+                            }
+                        }
+                    )
+
+                    SettingSwitchRow(
+                        title = "Baris Angka",
+                        subtitle = "Tampilkan baris angka khusus (1-0) permanen di atas huruf QWERTY.",
+                        checked = enableNumberRow,
+                        onCheckedChange = { checked ->
+                            coroutineScope.launch {
+                                preferences.setEnableNumberRow(checked)
                             }
                         }
                     )

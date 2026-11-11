@@ -187,4 +187,75 @@ object KeyLayoutProvider {
             )
         }
     }
+
+    fun getNumberRow(): List<KeyModel> {
+        return listOf(
+            KeyModel('1'.code, "1", null, 1.0f),
+            KeyModel('2'.code, "2", null, 1.0f),
+            KeyModel('3'.code, "3", null, 1.0f),
+            KeyModel('4'.code, "4", null, 1.0f),
+            KeyModel('5'.code, "5", null, 1.0f),
+            KeyModel('6'.code, "6", null, 1.0f),
+            KeyModel('7'.code, "7", null, 1.0f),
+            KeyModel('8'.code, "8", null, 1.0f),
+            KeyModel('9'.code, "9", null, 1.0f),
+            KeyModel('0'.code, "0", null, 1.0f)
+        )
+    }
+
+    fun getNumberPadRows(isDecimal: Boolean = true, isSigned: Boolean = false): List<List<KeyModel>> {
+        val row1 = listOf(
+            KeyModel('1'.code, "1", null, 1.0f),
+            KeyModel('2'.code, "2", null, 1.0f),
+            KeyModel('3'.code, "3", null, 1.0f),
+            KeyModel(-2, "DEL", null, 1.0f, KeyType.BACKSPACE)
+        )
+        val row2 = listOf(
+            KeyModel('4'.code, "4", null, 1.0f),
+            KeyModel('5'.code, "5", null, 1.0f),
+            KeyModel('6'.code, "6", null, 1.0f),
+            KeyModel(if (isSigned) '-'.code else ':'.code, if (isSigned) "-" else ":", null, 1.0f)
+        )
+        val row3 = listOf(
+            KeyModel('7'.code, "7", null, 1.0f),
+            KeyModel('8'.code, "8", null, 1.0f),
+            KeyModel('9'.code, "9", null, 1.0f),
+            KeyModel(if (isDecimal) '.'.code else ','.code, if (isDecimal) "." else ",", null, 1.0f)
+        )
+        val row4 = listOf(
+            KeyModel(-3, "ABC", null, 1.0f, KeyType.SYM),
+            KeyModel('0'.code, "0", null, 1.0f),
+            KeyModel(32, "SPACE", null, 1.0f, KeyType.SPACE),
+            KeyModel(-6, "ENTER", null, 1.0f, KeyType.ACTION)
+        )
+        return listOf(row1, row2, row3, row4)
+    }
+
+    fun getPhonePadRows(): List<List<KeyModel>> {
+        val row1 = listOf(
+            KeyModel('1'.code, "1", null, 1.0f),
+            KeyModel('2'.code, "2", null, 1.0f),
+            KeyModel('3'.code, "3", null, 1.0f),
+            KeyModel(-2, "DEL", null, 1.0f, KeyType.BACKSPACE)
+        )
+        val row2 = listOf(
+            KeyModel('4'.code, "4", null, 1.0f),
+            KeyModel('5'.code, "5", null, 1.0f),
+            KeyModel('6'.code, "6", null, 1.0f),
+            KeyModel('+'.code, "+", null, 1.0f)
+        )
+        val row3 = listOf(
+            KeyModel('7'.code, "7", null, 1.0f),
+            KeyModel('8'.code, "8", null, 1.0f),
+            KeyModel('9'.code, "9", null, 1.0f),
+            KeyModel('*'.code, "*", null, 1.0f)
+        )
+        val row4 = listOf(
+            KeyModel(-3, "ABC", null, 1.0f, KeyType.SYM),
+            KeyModel('0'.code, "0", null, 1.0f),
+            KeyModel('#'.code, "#", null, 1.0f),
+            KeyModel(-6, "ENTER", null, 1.0f, KeyType.ACTION)
+        )
+        return listOf(row1, row2, row3, row4)
+    }
 }

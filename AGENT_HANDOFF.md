@@ -277,6 +277,23 @@ Handle drag atas pada `ResizeOverlayView.kt` mengupdate `previewHeightRatio` pad
   - Menjadikan **`OLED Black` (`#000000` Pitch Black, `#121212` Surface, `#1E1E1E` Key)** sebagai tema default nomor satu pada DataStore preferences, inisialisasi keyboard di `SboardIME`, dan fallback `SettingsScreen`.
   - Mengupdate `DarkColorScheme` pada `Theme.kt` dan `Color.kt` menggunakan warna netral OLED sejati dengan kontras proporsional, serta meng-override `surfaceVariant = OledBlackSurfaceVariant` (`#1E1E1E`) agar seluruh kartu pengaturan selaras, pekat, dan nyaman di mata.
 
+---
+
+## Ringkasan Eksekusi Rilis v1.0.23:
+- [x] **Stabilisasi Backspace Repeat (Solusi Tuntas Bug Infinite Delete Loop)**:
+  - Menggantikan coroutine lepas Compose `detectTapGestures` dengan `awaitEachGesture` yang terikat lifecycle Service (`startBackspaceRepeat()` dan `stopBackspaceRepeat()`).
+  - Pembersihan mutlak di `onWindowHidden()`, `onFinishInputView()`, dan `onDestroy()` menjamin penghapusan tidak pernah bocor ke aplikasi lain.
+- [x] **Akurasi Tombol Enter / Search / Baris Baru**:
+  - Implementasi `onStartInput()` untuk update real-time saat fokus field berubah.
+  - Evaluasi cerdas `IME_FLAG_NO_ENTER_ACTION` dan `TYPE_TEXT_FLAG_MULTI_LINE` dengan fallback aman `sendDownUpKeyEvents(KeyEvent.KEYCODE_ENTER)`.
+- [x] **Pembersihan Layer Keyboard (Anti-Stuck Simbol)**:
+  - Reset total `modifierState` pada `onStartInputView()`, `onFinishInputView()`, dan `onWindowHidden()` memastikan keyboard selalu mulai dari QWERTY alfabet.
+- [x] **Fitur Dedicated Number Row (Baris Angka 1-0)**:
+  - Penambahan baris angka mandiri di atas QWERTY dengan toggle on/off di menu Pengaturan (*Tata Letak & Mengetik*).
+- [x] **Dukungan Penuh Form Input Angka Murni (Numpad 3x4 & Phone Pad)**:
+  - Deteksi otomatis `TYPE_CLASS_NUMBER`, `TYPE_CLASS_PHONE`, dan PIN perbankan dengan tata letak kalkulator/telepon dan tombol alih `ABC`.
+
+
 
 
 

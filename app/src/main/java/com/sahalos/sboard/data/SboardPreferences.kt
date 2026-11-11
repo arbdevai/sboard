@@ -29,6 +29,7 @@ class SboardPreferences(private val context: Context) {
         val KEY_SPACEBAR_CURSOR_GLIDE = booleanPreferencesKey("enable_spacebar_cursor_glide")
         val KEY_CLIPBOARD_HISTORY = booleanPreferencesKey("enable_clipboard_history")
         val KEY_RECENT_EMOJIS = stringPreferencesKey("recent_emojis")
+        val KEY_ENABLE_NUMBER_ROW = booleanPreferencesKey("enable_number_row")
     }
 
     val bottomPaddingDp: Flow<Int> = context.dataStore.data.map { prefs ->
@@ -69,6 +70,10 @@ class SboardPreferences(private val context: Context) {
 
     val enableClipboardHistory: Flow<Boolean> = context.dataStore.data.map { prefs ->
         prefs[KEY_CLIPBOARD_HISTORY] ?: backupPrefs.getBoolean("enable_clipboard_history", true)
+    }
+
+    val enableNumberRow: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[KEY_ENABLE_NUMBER_ROW] ?: backupPrefs.getBoolean("enable_number_row", true)
     }
 
     val recentEmojis: Flow<List<String>> = context.dataStore.data.map { prefs ->
@@ -124,6 +129,11 @@ class SboardPreferences(private val context: Context) {
     suspend fun setEnableClipboardHistory(enabled: Boolean) {
         backupPrefs.edit().putBoolean("enable_clipboard_history", enabled).apply()
         context.dataStore.edit { it[KEY_CLIPBOARD_HISTORY] = enabled }
+    }
+
+    suspend fun setEnableNumberRow(enabled: Boolean) {
+        backupPrefs.edit().putBoolean("enable_number_row", enabled).apply()
+        context.dataStore.edit { it[KEY_ENABLE_NUMBER_ROW] = enabled }
     }
 
     suspend fun addRecentEmoji(emoji: String) {
