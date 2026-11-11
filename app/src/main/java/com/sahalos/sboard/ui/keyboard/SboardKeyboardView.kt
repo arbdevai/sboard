@@ -145,9 +145,10 @@ fun SboardKeyboardView(
             )
         }
 
-        // Main Keyboard Area
-        val is5RowActive = enableNumberRow && !isNumpadActive && !isPhonepadActive && !modifierState.isSymActive && !modifierState.isSymPage2Active
-        val baseRowHeight = (if (is5RowActive) 42 * keyboardHeightRatio else 48 * keyboardHeightRatio).dp
+        // Main Keyboard Area with Fixed Total Content Height (Prevents window jumping between QWERTY & Symbols)
+        val has5RowsConfigured = enableNumberRow && !isNumpadActive && !isPhonepadActive
+        val totalContentHeight = if (has5RowsConfigured) (210 * keyboardHeightRatio) else (192 * keyboardHeightRatio)
+        val baseRowHeight = (totalContentHeight / rows.size.coerceAtLeast(1)).dp
         Column(
             modifier = Modifier
                 .fillMaxWidth()

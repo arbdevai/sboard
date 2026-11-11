@@ -233,17 +233,16 @@ class SboardIME : InputMethodService(),
 
                 val activeTheme = SboardTheme.AvailableThemes.find { it.id == themeId } ?: SboardTheme.OledBlack
 
-                // Calculate exact keyboard bounds
-                val is5RowActive = enableNumberRow && !isNumberPadField && !isPhonePadField && !modifierState.isSymActive && !modifierState.isSymPage2Active
-                val rowMultiplier = if (is5RowActive) 5 else 4
-                val baseRowHeightDp = (if (is5RowActive) 42 * heightRatio else 48 * heightRatio).toInt()
-                val totalKeyboardHeightDp = (42 + (baseRowHeightDp * rowMultiplier) + bottomPadding).dp
+                // Calculate exact keyboard bounds with locked constant container height (No layer size jumping)
+                val has5RowsConfigured = enableNumberRow && !isNumberPadField && !isPhonePadField
+                val contentAreaHeightDp = if (has5RowsConfigured) (210 * heightRatio).toInt() else (192 * heightRatio).toInt()
+                val totalKeyboardHeightDp = (42 + contentAreaHeightDp + bottomPadding).dp
 
                 // Local states for live resize preview
                 var previewHeightRatio by remember(heightRatio) { mutableFloatStateOf(heightRatio) }
                 var previewBottomPaddingDp by remember(bottomPadding) { mutableIntStateOf(bottomPadding) }
-                val previewBaseRowHeightDp = (if (is5RowActive) 42 * previewHeightRatio else 48 * previewHeightRatio).toInt()
-                val previewTotalHeightDp = (42 + (previewBaseRowHeightDp * rowMultiplier) + previewBottomPaddingDp).dp
+                val previewContentAreaHeightDp = if (has5RowsConfigured) (210 * previewHeightRatio).toInt() else (192 * previewHeightRatio).toInt()
+                val previewTotalHeightDp = (42 + previewContentAreaHeightDp + previewBottomPaddingDp).dp
 
                 AnimatedContent(
                     targetState = keyboardMode,

@@ -1,7 +1,7 @@
 # Sboard Project State & Evolution Log
 
-## Current Status (v1.0.23 - Production Grade)
-- **Active Version:** `1.0.23` (`versionCode = 10023`)
+## Current Status (v1.0.24 - Production Grade)
+- **Active Version:** `1.0.24` (`versionCode = 10024`)
 - **Git Branch:** `main`
 - **NDK Architectures:** `arm64-v8a`, `x86_64`
 - **Target Android SDK:** 36 (Min SDK: 30)
@@ -10,7 +10,17 @@
 
 ## Logika & Modul yang Telah Beroperasi Penuh
 
-1. **Pemulihan & Stabilisasi Backspace Repeat (Anti Infinite-Delete Loop):**
+1. **Penguncian Tinggi Keyboard Konstan (Lock Frame Height Antara QWERTY & Simbol):**
+   - File: `app/src/main/java/com/sahalos/sboard/service/SboardIME.kt` dan `SboardKeyboardView.kt`.
+   - Mengunci total tinggi jendela keyboard (`totalKeyboardHeightDp`) agar tidak pernah berubah/melompat saat pengguna beralih antara QWERTY dan Simbol `?123` / `=\<`.
+   - Mengisi ruang area tombol secara proporsional: saat 5 baris tiap baris berukuran 42dp, dan saat 4 baris simbol tiap baris otomatis membesar ke 52.5dp sehingga ketinggian jendela keyboard di layar tetap stabil dan presisi seperti Gboard/FlorisBoard.
+
+2. **Stabilitas Sesi Riwayat Emoji (Session-Stable Recent Emojis Anti-Dancing Grid):**
+   - File: `app/src/main/java/com/sahalos/sboard/ui/keyboard/EmojiScreen.kt`.
+   - Membekukan tata letak kisi (*grid*) riwayat emoji selama layar emoji dibuka dengan `stableRecentList`.
+   - Mengizinkan pengguna melakukan spam pengetikan emoji berulang kali di koordinat yang sama tanpa ada emoji yang melompat ke posisi indeks 0 secara mendadak. Pembaruan urutan riwayat tetap tersimpan di DataStore dan baru diaplikasikan pada sesi baru berikutnya.
+
+3. **Pemulihan & Stabilisasi Backspace Repeat (Anti Infinite-Delete Loop):**
    - File: `app/src/main/java/com/sahalos/sboard/ui/keyboard/SboardKeyboardView.kt` dan `SboardIME.kt`.
    - Menggantikan `coroutineScope.launch` di dalam `detectTapGestures` yang rentan suspension hang dengan siklus pointer `awaitEachGesture` yang terhubung langsung ke `startBackspaceRepeat()` dan `stopBackspaceRepeat()`.
    - Menambahkan pembersihan mutlak di `onWindowHidden()`, `onFinishInputView()`, dan `onDestroy()` pada `SboardIME` serta `DisposableEffect(Unit)` di Compose sehingga repeat backspace tidak akan pernah bocor (*leak*) atau nyangkut saat berpindah aplikasi.

@@ -293,6 +293,17 @@ Handle drag atas pada `ResizeOverlayView.kt` mengupdate `previewHeightRatio` pad
 - [x] **Dukungan Penuh Form Input Angka Murni (Numpad 3x4 & Phone Pad)**:
   - Deteksi otomatis `TYPE_CLASS_NUMBER`, `TYPE_CLASS_PHONE`, dan PIN perbankan dengan tata letak kalkulator/telepon dan tombol alih `ABC`.
 
+---
+
+## Ringkasan Eksekusi Rilis v1.0.24:
+- [x] **Penguncian Ketinggian Jendela Keyboard Konstan Antara QWERTY & Simbol (`SboardIME.kt`, `SboardKeyboardView.kt`)**:
+  - Mengunci total ketinggian jendela keyboard `totalKeyboardHeightDp` agar tidak pernah menyusut atau melompat saat berpindah ke halaman simbol `?123` / `=\<`.
+  - Menerapkan pembagian proporsional otomatis `(totalContentHeight / rows.size)` sehingga tombol simbol membesar vertikal secara mulus (52.5dp) mengisi seluruh frame keyboard persis standar Gboard/FlorisBoard.
+- [x] **Stabilitas Sesi Riwayat Emoji Anti-Geser / Spam-Friendly (`EmojiScreen.kt`)**:
+  - Membekukan tata letak kisi emoji selama picker dibuka menggunakan `stableRecentList`.
+  - Mengetuk atau melakukan spamming emoji berkali-kali pada tab riwayat tidak mengubah posisi visual emoji, memungkinkan pengetikan berulang di titik yang sama tanpa guncangan layout.
+
+
 
 
 

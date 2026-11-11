@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -63,6 +64,13 @@ fun EmojiScreen(
 
     var selectedCategory by remember {
         mutableStateOf(if (recentEmojis.isNotEmpty()) EmojiCategory.RECENT else EmojiCategory.SMILEYS)
+    }
+
+    // Session-stable recent list: prevents visual reordering/jumping while typing so spamming emoji in history is rock-solid
+    val stableRecentList = remember {
+        mutableStateListOf<String>().apply {
+            addAll(recentEmojis)
+        }
     }
 
     Column(
@@ -147,10 +155,10 @@ fun EmojiScreen(
         }
 
         // 2. Middle Area: Spacious 8-Column Emoji Grid (Over 80% screen area)
-        val displayedEmojis = remember(selectedCategory, recentEmojis) {
-            if (selectedCategory == EmojiCategory.RECENT) {
-                recentEmojis
-            } else {
+        val displayedEmojis = if (selectedCategory == EmojiCategory.RECENT) {
+            stableRecentList
+        } else {
+            remember(selectedCategory) {
                 EmojiProvider.getEmojisForCategory(context, selectedCategory)
             }
         }
@@ -186,7 +194,12 @@ fun EmojiScreen(
                             modifier = Modifier
                                 .size(38.dp)
                                 .clip(RoundedCornerShape(6.dp))
-                                .clickable { onEmojiClick(emoji) },
+                                .clickable {
+                                    onEmojiClick(emoji)
+                                    if (!stableRecentList.contains(emoji)) {
+                                        stableRecentList.add(0, emoji)
+                                    }
+                                },
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
