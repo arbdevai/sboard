@@ -13,8 +13,8 @@ android {
         applicationId = "com.sahalos.sboard"
         minSdk = 30
         targetSdk = 36
-        versionCode = 10024
-        versionName = "1.0.24"
+        versionCode = 10025
+        versionName = "1.0.25"
 
         ndk {
             abiFilters.addAll(listOf("arm64-v8a", "x86_64"))

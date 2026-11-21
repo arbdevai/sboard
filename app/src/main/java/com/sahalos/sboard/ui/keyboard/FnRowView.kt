@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sahalos.sboard.core.KeyLayoutProvider
+import com.sahalos.sboard.model.ModifierState
 import com.sahalos.sboard.model.SboardTheme
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -39,6 +40,7 @@ import kotlinx.coroutines.launch
 fun FnRowView(
     theme: SboardTheme,
     isAltActive: Boolean,
+    modifierState: ModifierState = ModifierState(),
     onAltToggle: () -> Unit,
     onFunctionKeyClick: (Int) -> Unit,
     modifier: Modifier = Modifier
@@ -52,6 +54,8 @@ fun FnRowView(
     val coroutineScope = rememberCoroutineScope()
     val currentOnFnKeyClick by rememberUpdatedState(onFunctionKeyClick)
     val currentOnAltToggle by rememberUpdatedState(onAltToggle)
+
+    val isSelectionActive = modifierState.isShiftActive || modifierState.isSelecting
 
     Column(
         modifier = modifier
@@ -72,9 +76,17 @@ fun FnRowView(
                 val isRepeatable = key.code in listOf(19, 20, 21, 22, 112)
                 val isAltKey = key.code == -30
                 val isArrow = key.code in listOf(19, 20, 21, 22)
-                val bg = if (isAltKey && isAltActive) accentColor.copy(alpha = 0.22f) else keyBgColor
+                val isHomeEnd = key.code in listOf(122, 123)
+
+                val bg = when {
+                    isAltKey && isAltActive -> accentColor.copy(alpha = 0.22f)
+                    isSelectionActive && (isArrow || isHomeEnd) -> accentColor.copy(alpha = 0.20f)
+                    else -> keyBgColor
+                }
+
                 val labelColor = when {
                     isAltKey && isAltActive -> accentColor
+                    isSelectionActive && (isArrow || isHomeEnd) -> accentColor
                     isArrow -> accentColor
                     else -> textColor.copy(alpha = 0.92f)
                 }
@@ -117,10 +129,10 @@ fun FnRowView(
                         .clip(RoundedCornerShape(4.dp))
                         .background(bg)
                         .then(
-                            if (isAltKey && isAltActive) {
-                                Modifier.border(1.dp, accentColor, RoundedCornerShape(4.dp))
-                            } else {
-                                Modifier
+                            when {
+                                isAltKey && isAltActive -> Modifier.border(1.dp, accentColor, RoundedCornerShape(4.dp))
+                                isSelectionActive && (isArrow || isHomeEnd) -> Modifier.border(1.dp, accentColor.copy(alpha = 0.7f), RoundedCornerShape(4.dp))
+                                else -> Modifier
                             }
                         )
                         .then(interactionMod),
@@ -130,7 +142,7 @@ fun FnRowView(
                         text = key.primaryLabel,
                         color = labelColor,
                         fontSize = if (isArrow) 13.sp else 9.5.sp,
-                        fontWeight = if (isArrow || (isAltKey && isAltActive)) FontWeight.Bold else FontWeight.SemiBold,
+                        fontWeight = if (isArrow || (isAltKey && isAltActive) || (isSelectionActive && isHomeEnd)) FontWeight.Bold else FontWeight.SemiBold,
                         maxLines = 1
                     )
                 }

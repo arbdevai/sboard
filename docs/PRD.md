@@ -50,3 +50,13 @@ Sboard (Sahal Board) adalah aplikasi papan ketik (Input Method Editor / IME) unt
 3. **Pencarian Emoji Tokenized:** Pencarian berbasis token awalan kata resmi Unicode CLDR Bahasa Indonesia dan Inggris.
 4. **EmojiCompat Font Fallback:** Terintegrasi resmi melalui `DefaultEmojiCompatConfig` saat `onCreate()` untuk mencegah kemunculan karakter kotak kosong (*tofu*).
 5. **In-App Updater:** Deteksi otomatis rilis GitHub terbaru, pengunduhan aman ke storage lokal, dan instalasi melalui Android `FileProvider`.
+
+---
+
+## 4. Spesifikasi Real PC Keyboard (Roadmap Masa Depan)
+
+1. **Mesin Kombinasi CTRL Universal:** Dukungan penuh `Ctrl+A..Z`, navigasi kata (`Ctrl+←/→`), hapus kata (`Ctrl+Backspace/Del`), navigasi dokumen (`Ctrl+Home/End`), tab & window (`Ctrl+T/W/N`), dan multi-chording (`Ctrl+Shift+Z/←/→`).
+2. **Tombol SHIFT Mandiri (Hardware-Grade Modifier):** Tri-state latching/locking (`OFF`, `LATCHED`, `LOCKED/Caps Lock`), transformasi baris angka menjadi simbol PC (`!@#$%^&*()`), dan chording bersama modifier lain.
+3. **Mesin Seleksi Teks Presisi (Text Selection):** Seleksi teks langsung via keyboard (`Shift+Panah`, `Ctrl+Shift+Panah`, `Shift+Home/End`), Selection Glide pada Spacebar (geser spasi dengan Shift aktif untuk memblok teks), serta Contextual Selection HUD (Cut, Copy, Paste, Select All).
+4. **Detail Lengkap:** Lihat dokumen acuan di [docs/PC_KEYBOARD_ROADMAP.md](file:///home/coder/projects/sboard/docs/PC_KEYBOARD_ROADMAP.md).
+

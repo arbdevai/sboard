@@ -84,6 +84,9 @@ fun KeyView(
 
     val textColor = when (key.type) {
         KeyType.ACTION -> if (theme.isDark) Color(0xFF1E293B) else Color.White
+        KeyType.SHIFT -> if (modifierState.isShifted || modifierState.isCapsLock) (if (theme.isDark) Color(0xFF000000) else Color.White) else Color(theme.keyTextColor)
+        KeyType.CTRL -> if (modifierState.isCtrlActive) (if (theme.isDark) Color(0xFF000000) else Color.White) else Color(theme.keyTextColor)
+        KeyType.FN -> if (modifierState.isFnActive) (if (theme.isDark) Color(0xFF000000) else Color.White) else Color(theme.keyTextColor)
         else -> Color(theme.keyTextColor)
     }
 

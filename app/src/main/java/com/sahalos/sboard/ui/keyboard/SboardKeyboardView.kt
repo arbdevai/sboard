@@ -69,6 +69,13 @@ fun SboardKeyboardView(
     onSettingsClick: () -> Unit,
     onCtrlToggle: () -> Unit,
     onAltToggle: () -> Unit = {},
+    onShiftToggle: () -> Unit = {},
+    onSelectToggle: () -> Unit = {},
+    onCutClick: () -> Unit = {},
+    onCopyClick: () -> Unit = {},
+    onPasteClick: () -> Unit = {},
+    onSelectAllClick: () -> Unit = {},
+    hasSelection: Boolean = false,
     onFnToggle: () -> Unit,
     onFunctionKeyClick: (Int) -> Unit,
     showSuggestionsBar: Boolean = true,
@@ -95,7 +102,7 @@ fun SboardKeyboardView(
         modifierState.isSymPage2Active -> KeyLayoutProvider.getSymbolsPage2Rows()
         modifierState.isSymActive -> KeyLayoutProvider.getSymbolsRows()
         else -> {
-            val qwerty = KeyLayoutProvider.getQwertyRows()
+            val qwerty = KeyLayoutProvider.getQwertyRows(isShifted = modifierState.isShiftActive)
             val adjustedQwerty = if (isNumberPad || isPhonePad) {
                 qwerty.map { row ->
                     row.map { k ->
@@ -106,7 +113,7 @@ fun SboardKeyboardView(
                 qwerty
             }
             if (enableNumberRow) {
-                listOf(KeyLayoutProvider.getNumberRow()) + adjustedQwerty
+                listOf(KeyLayoutProvider.getNumberRow(isShifted = modifierState.isShiftActive)) + adjustedQwerty
             } else {
                 adjustedQwerty
             }
@@ -118,20 +125,31 @@ fun SboardKeyboardView(
             .fillMaxWidth()
             .background(Color(theme.backgroundColor))
     ) {
-        // Suggestions & Quick Action Strip (CTRL, FN on Left; Suggestions Center; Clipboard, Resize, Settings on Right)
+        // Suggestions & Quick Action Strip (CTRL, SHIFT, SEL, FN on Left; Selection HUD / Suggestions Center; Tools on Right)
         val shouldShowSuggestionsBar = showSuggestionsBar && !isNumpadActive && !isPhonepadActive
         if (shouldShowSuggestionsBar) {
             SuggestionsBar(
                 suggestions = suggestions,
                 theme = theme,
                 isCtrlActive = modifierState.isCtrlActive,
+                isCtrlLocked = modifierState.isCtrlLocked,
+                isShiftActive = modifierState.isShiftActive,
+                isCapsLock = modifierState.isCapsLock,
+                isSelecting = modifierState.isSelecting,
+                hasSelection = hasSelection,
                 isFnActive = modifierState.isFnActive,
                 onCtrlClick = onCtrlToggle,
+                onShiftClick = onShiftToggle,
+                onSelectToggle = onSelectToggle,
                 onFnClick = onFnToggle,
                 onSuggestionClick = onSuggestionClick,
                 onClipboardClick = onClipboardClick,
                 onResizeClick = onResizeClick,
-                onSettingsClick = onSettingsClick
+                onSettingsClick = onSettingsClick,
+                onCutClick = onCutClick,
+                onCopyClick = onCopyClick,
+                onPasteClick = onPasteClick,
+                onSelectAllClick = onSelectAllClick
             )
         }
 
@@ -140,6 +158,7 @@ fun SboardKeyboardView(
             FnRowView(
                 theme = theme,
                 isAltActive = modifierState.isAltActive,
+                modifierState = modifierState,
                 onAltToggle = onAltToggle,
                 onFunctionKeyClick = onFunctionKeyClick
             )

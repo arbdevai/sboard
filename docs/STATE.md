@@ -1,7 +1,7 @@
 # Sboard Project State & Evolution Log
 
-## Current Status (v1.0.24 - Production Grade)
-- **Active Version:** `1.0.24` (`versionCode = 10024`)
+## Current Status (v1.0.25 - Real PC Keyboard Edition)
+- **Active Version:** `1.0.25` (`versionCode = 10025`)
 - **Git Branch:** `main`
 - **NDK Architectures:** `arm64-v8a`, `x86_64`
 - **Target Android SDK:** 36 (Min SDK: 30)
@@ -10,7 +10,22 @@
 
 ## Logika & Modul yang Telah Beroperasi Penuh
 
-1. **Penguncian Tinggi Keyboard Konstan (Lock Frame Height Antara QWERTY & Simbol):**
+1. **Mesin Real PC Keyboard (Kombinasi Ctrl Lengkap, Shift Mandiri & Selection Glide):**
+   - File: `KeyModel.kt`, `KeyLayoutProvider.kt`, `SboardIME.kt`, `SuggestionsBar.kt`, `FnRowView.kt`, `KeyView.kt`, `SboardKeyboardView.kt`.
+   - **Kombinasi Ctrl PC Lengkap:**
+     - Menangani `Ctrl+A` (Select All), `Ctrl+C` (Copy), `Ctrl+V` (Paste), `Ctrl+X` (Cut), `Ctrl+Z` (Undo), `Ctrl+Y` (Redo), `Ctrl+Shift+Z` (Redo PC), `Ctrl+W` (Close / kill word), `Ctrl+F` (Find), `Ctrl+S` (Save), `Ctrl+D` (Bookmark/Delete), `Ctrl+T` (New Tab), `Ctrl+N` (New Window), `Ctrl+P` (Quick Open/Print), `Ctrl+R` (Reload/Reverse Search), `Ctrl+K/B/I/U/O/L/G/E/H/J/Q`.
+     - **Navigasi & Penghapusan Kata (Word-Level Editing):** `Ctrl+Backspace` menghapus kata sebelumnya ke batas kata (space/newline/punctuation) di Android EditText dan terminal (`\u0017`). `Ctrl + Panah ←/→` melompat kata demi kata.
+   - **Tombol Shift Mandiri & Tri-State Latching:**
+     - State machine: `OFF` -> `LATCHED` (aktif 1x lalu auto-unlatch setelah 1 karakter diketik) -> `LOCKED` (double-tap untuk Caps Lock permanen).
+     - **Transformasi Simbol Baris Angka:** Saat Shift aktif, baris angka `1-0` bertransformasi seketika menjadi simbol PC `! @ # $ % ^ & * ( )`. Tanda baca `,` dan `.` bertransformasi menjadi `<` dan `>`.
+     - Tombol `[SHIFT]` mandiri tersedia di baris 3 QWERTY dan bilah alat atas (`SuggestionsBar`).
+   - **Fitur Seleksi Teks Presisi (Precision Text Selection & Selection Glide):**
+     - **Selection Glide pada Spacebar:** Saat Shift atau SEL aktif, menggeser (*drag*) Spacebar tidak hanya menggerakkan kursor melainkan memblok/menyeleksi teks per karakter (atau per kata jika Ctrl juga aktif) via `KEYCODE_DPAD_LEFT/RIGHT` + `META_SHIFT_ON`.
+     - **Seleksi via Panah:** `Shift + Panah ←↓↑→` menyeleksi karakter dan baris teks. `Ctrl + Shift + Panah` menyeleksi kata demi kata.
+     - **Contextual Selection HUD:** Saat ada teks yang diblok (`hasActiveSelection` via `onUpdateSelection` atau `isSelecting`), bilah saran kata otomatis menampilkan tombol aksi: `[CUT]`, `[COPY]`, `[PASTE]`, `[ALL]`.
+     - Indikator visual seleksi pada Fn Row dan toolbar (`[SEL]` toggle).
+
+2. **Penguncian Tinggi Keyboard Konstan (Lock Frame Height Antara QWERTY & Simbol):**
    - File: `app/src/main/java/com/sahalos/sboard/service/SboardIME.kt` dan `SboardKeyboardView.kt`.
    - Mengunci total tinggi jendela keyboard (`totalKeyboardHeightDp`) agar tidak pernah berubah/melompat saat pengguna beralih antara QWERTY dan Simbol `?123` / `=\<`.
    - Mengisi ruang area tombol secara proporsional: saat 5 baris tiap baris berukuran 42dp, dan saat 4 baris simbol tiap baris otomatis membesar ke 52.5dp sehingga ketinggian jendela keyboard di layar tetap stabil dan presisi seperti Gboard/FlorisBoard.

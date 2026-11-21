@@ -5,52 +5,52 @@ import com.sahalos.sboard.model.KeyType
 
 object KeyLayoutProvider {
 
-    fun getQwertyRows(): List<List<KeyModel>> {
+    fun getQwertyRows(isShifted: Boolean = false): List<List<KeyModel>> {
         val row1 = listOf(
-            KeyModel('q'.code, "q", "1", 1.0f),
-            KeyModel('w'.code, "w", "2", 1.0f),
-            KeyModel('e'.code, "e", "3", 1.0f),
-            KeyModel('r'.code, "r", "4", 1.0f),
-            KeyModel('t'.code, "t", "5", 1.0f),
-            KeyModel('y'.code, "y", "6", 1.0f),
-            KeyModel('u'.code, "u", "7", 1.0f),
-            KeyModel('i'.code, "i", "8", 1.0f),
-            KeyModel('o'.code, "o", "9", 1.0f),
-            KeyModel('p'.code, "p", "0", 1.0f)
+            KeyModel('q'.code, if (isShifted) "Q" else "q", "1", 1.0f),
+            KeyModel('w'.code, if (isShifted) "W" else "w", "2", 1.0f),
+            KeyModel('e'.code, if (isShifted) "E" else "e", "3", 1.0f),
+            KeyModel('r'.code, if (isShifted) "R" else "r", "4", 1.0f),
+            KeyModel('t'.code, if (isShifted) "T" else "t", "5", 1.0f),
+            KeyModel('y'.code, if (isShifted) "Y" else "y", "6", 1.0f),
+            KeyModel('u'.code, if (isShifted) "U" else "u", "7", 1.0f),
+            KeyModel('i'.code, if (isShifted) "I" else "i", "8", 1.0f),
+            KeyModel('o'.code, if (isShifted) "O" else "o", "9", 1.0f),
+            KeyModel('p'.code, if (isShifted) "P" else "p", "0", 1.0f)
         )
 
         val row2 = listOf(
             KeyModel(-10, "", null, 0.5f, KeyType.SPACER),
-            KeyModel('a'.code, "a", "@", 1.0f),
-            KeyModel('s'.code, "s", "#", 1.0f),
-            KeyModel('d'.code, "d", "$", 1.0f),
-            KeyModel('f'.code, "f", "%", 1.0f),
-            KeyModel('g'.code, "g", "&", 1.0f),
-            KeyModel('h'.code, "h", "*", 1.0f),
-            KeyModel('j'.code, "j", "-", 1.0f),
-            KeyModel('k'.code, "k", "+", 1.0f),
-            KeyModel('l'.code, "l", "/", 1.0f),
+            KeyModel('a'.code, if (isShifted) "A" else "a", "@", 1.0f),
+            KeyModel('s'.code, if (isShifted) "S" else "s", "#", 1.0f),
+            KeyModel('d'.code, if (isShifted) "D" else "d", "$", 1.0f),
+            KeyModel('f'.code, if (isShifted) "F" else "f", "%", 1.0f),
+            KeyModel('g'.code, if (isShifted) "G" else "g", "&", 1.0f),
+            KeyModel('h'.code, if (isShifted) "H" else "h", "*", 1.0f),
+            KeyModel('j'.code, if (isShifted) "J" else "j", "-", 1.0f),
+            KeyModel('k'.code, if (isShifted) "K" else "k", "+", 1.0f),
+            KeyModel('l'.code, if (isShifted) "L" else "l", "/", 1.0f),
             KeyModel(-11, "", null, 0.5f, KeyType.SPACER)
         )
 
         val row3 = listOf(
             KeyModel(-1, "SHIFT", null, 1.3f, KeyType.SHIFT),
-            KeyModel('z'.code, "z", "_", 1.0f),
-            KeyModel('x'.code, "x", "\"", 1.0f),
-            KeyModel('c'.code, "c", "'", 1.0f),
-            KeyModel('v'.code, "v", ":", 1.0f),
-            KeyModel('b'.code, "b", ";", 1.0f),
-            KeyModel('n'.code, "n", "!", 1.0f),
-            KeyModel('m'.code, "m", "?", 1.0f),
+            KeyModel('z'.code, if (isShifted) "Z" else "z", "_", 1.0f),
+            KeyModel('x'.code, if (isShifted) "X" else "x", "\"", 1.0f),
+            KeyModel('c'.code, if (isShifted) "C" else "c", "'", 1.0f),
+            KeyModel('v'.code, if (isShifted) "V" else "v", ":", 1.0f),
+            KeyModel('b'.code, if (isShifted) "B" else "b", ";", 1.0f),
+            KeyModel('n'.code, if (isShifted) "N" else "n", "!", 1.0f),
+            KeyModel('m'.code, if (isShifted) "M" else "m", "?", 1.0f),
             KeyModel(-2, "DEL", null, 1.3f, KeyType.BACKSPACE)
         )
 
         val row4 = listOf(
             KeyModel(-3, "?123", null, 1.3f, KeyType.SYM),
             KeyModel(-20, "EMOJI", null, 1.0f, KeyType.EMOJI),
-            KeyModel(','.code, ",", "<", 1.0f),
+            KeyModel(if (isShifted) '<'.code else ','.code, if (isShifted) "<" else ",", if (isShifted) "," else "<", 1.0f),
             KeyModel(32, "SPACE", null, 4.3f, KeyType.SPACE),
-            KeyModel('.'.code, ".", ">", 1.0f),
+            KeyModel(if (isShifted) '>'.code else '.'.code, if (isShifted) ">" else ".", if (isShifted) "." else ">", 1.0f),
             KeyModel(-6, "ENTER", null, 1.4f, KeyType.ACTION)
         )
 
@@ -188,19 +188,26 @@ object KeyLayoutProvider {
         }
     }
 
-    fun getNumberRow(): List<KeyModel> {
-        return listOf(
-            KeyModel('1'.code, "1", null, 1.0f),
-            KeyModel('2'.code, "2", null, 1.0f),
-            KeyModel('3'.code, "3", null, 1.0f),
-            KeyModel('4'.code, "4", null, 1.0f),
-            KeyModel('5'.code, "5", null, 1.0f),
-            KeyModel('6'.code, "6", null, 1.0f),
-            KeyModel('7'.code, "7", null, 1.0f),
-            KeyModel('8'.code, "8", null, 1.0f),
-            KeyModel('9'.code, "9", null, 1.0f),
-            KeyModel('0'.code, "0", null, 1.0f)
+    fun getNumberRow(isShifted: Boolean = false): List<KeyModel> {
+        val pairs = listOf(
+            Pair('1', '!'),
+            Pair('2', '@'),
+            Pair('3', '#'),
+            Pair('4', '$'),
+            Pair('5', '%'),
+            Pair('6', '^'),
+            Pair('7', '&'),
+            Pair('8', '*'),
+            Pair('9', '('),
+            Pair('0', ')')
         )
+        return pairs.map { (num, sym) ->
+            if (isShifted) {
+                KeyModel(sym.code, sym.toString(), num.toString(), 1.0f)
+            } else {
+                KeyModel(num.code, num.toString(), sym.toString(), 1.0f)
+            }
+        }
     }
 
     fun getNumberPadRows(isDecimal: Boolean = true, isSigned: Boolean = false): List<List<KeyModel>> {

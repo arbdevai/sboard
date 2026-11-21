@@ -105,8 +105,88 @@ class SboardIME : InputMethodService(),
 
     // Keyboard state
     private var modifierState by mutableStateOf(ModifierState())
+    private var hasActiveSelection by mutableStateOf(false)
     private var currentComposingWord by mutableStateOf("")
     private var currentSuggestions by mutableStateOf<List<String>>(emptyList())
+    private var lastCtrlTapTimeMs = 0L
+    private var lastShiftTapTimeMs = 0L
+    private var lastAltTapTimeMs = 0L
+
+    private fun toggleCtrl() {
+        triggerHaptic()
+        val now = android.os.SystemClock.uptimeMillis()
+        if (modifierState.isCtrlLocked) {
+            modifierState = modifierState.copy(isCtrlActive = false, isCtrlLocked = false)
+        } else if (modifierState.isCtrlActive) {
+            if (now - lastCtrlTapTimeMs < 450L) {
+                modifierState = modifierState.copy(isCtrlActive = true, isCtrlLocked = true)
+            } else {
+                modifierState = modifierState.copy(isCtrlActive = false, isCtrlLocked = false)
+            }
+        } else {
+            modifierState = modifierState.copy(isCtrlActive = true, isCtrlLocked = false)
+        }
+        lastCtrlTapTimeMs = now
+    }
+
+    private fun toggleShift() {
+        triggerHaptic()
+        val now = android.os.SystemClock.uptimeMillis()
+        if (modifierState.isCapsLock) {
+            modifierState = modifierState.copy(isShifted = false, isCapsLock = false)
+        } else if (modifierState.isShifted) {
+            if (now - lastShiftTapTimeMs < 450L) {
+                modifierState = modifierState.copy(isShifted = true, isCapsLock = true)
+            } else {
+                modifierState = modifierState.copy(isShifted = false, isCapsLock = false)
+            }
+        } else {
+            modifierState = modifierState.copy(isShifted = true, isCapsLock = false)
+        }
+        lastShiftTapTimeMs = now
+    }
+
+    private fun toggleSelect() {
+        triggerHaptic()
+        val next = !modifierState.isSelecting
+        modifierState = modifierState.copy(isSelecting = next)
+    }
+
+    private fun performCut() {
+        triggerHaptic()
+        val ic = currentInputConnection ?: return
+        if (!ic.performContextMenuAction(android.R.id.cut)) {
+            sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_X)
+        }
+        modifierState = modifierState.copy(isSelecting = false)
+    }
+
+    private fun performCopy() {
+        triggerHaptic()
+        val ic = currentInputConnection ?: return
+        if (!ic.performContextMenuAction(android.R.id.copy)) {
+            sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_C)
+        }
+        modifierState = modifierState.copy(isSelecting = false)
+    }
+
+    private fun performPaste() {
+        triggerHaptic()
+        val ic = currentInputConnection ?: return
+        if (!ic.performContextMenuAction(android.R.id.paste)) {
+            sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_V)
+        }
+        modifierState = modifierState.copy(isSelecting = false)
+    }
+
+    private fun performSelectAll() {
+        triggerHaptic()
+        val ic = currentInputConnection ?: return
+        if (!ic.performContextMenuAction(android.R.id.selectAll)) {
+            sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_A)
+        }
+        modifierState = modifierState.copy(isSelecting = true)
+    }
 
     // Dynamic Action Key
     private var currentActionIcon by mutableStateOf(R.drawable.ic_enter)
@@ -286,14 +366,25 @@ class SboardIME : InputMethodService(),
                                 onSettingsClick = { openSettings() },
                                 onCtrlToggle = {
                                     if (android.os.SystemClock.uptimeMillis() - lastModeSwitchTimeMs > 350L) {
-                                        triggerHaptic()
-                                        modifierState = modifierState.copy(isCtrlActive = !modifierState.isCtrlActive)
+                                        toggleCtrl()
                                     }
                                 },
                                 onAltToggle = {
                                     triggerHaptic()
-                                    modifierState = modifierState.copy(isAltActive = !modifierState.isAltActive)
+                                    val next = !modifierState.isAltActive
+                                    modifierState = modifierState.copy(isAltActive = next, isAltLocked = false)
                                 },
+                                onShiftToggle = {
+                                    toggleShift()
+                                },
+                                onSelectToggle = {
+                                    toggleSelect()
+                                },
+                                onCutClick = { performCut() },
+                                onCopyClick = { performCopy() },
+                                onPasteClick = { performPaste() },
+                                onSelectAllClick = { performSelectAll() },
+                                hasSelection = hasActiveSelection || modifierState.isSelecting,
                                 onFnToggle = {
                                     if (android.os.SystemClock.uptimeMillis() - lastModeSwitchTimeMs > 350L) {
                                         triggerHaptic()
@@ -520,15 +611,8 @@ class SboardIME : InputMethodService(),
         keyboardMode = KeyboardMode.KEYBOARD
 
         // Reset modifier state to guarantee clean QWERTY layer on each session (Issue 3 fix)
-        modifierState = modifierState.copy(
-            isShifted = false,
-            isCapsLock = false,
-            isCtrlActive = false,
-            isAltActive = false,
-            isFnActive = false,
-            isSymActive = false,
-            isSymPage2Active = false
-        )
+        modifierState = ModifierState()
+        hasActiveSelection = false
         isNumericOverriddenToAlpha = false
 
         resolveInputType(info)
@@ -546,15 +630,8 @@ class SboardIME : InputMethodService(),
         stopBackspaceRepeat()
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
         keyboardMode = KeyboardMode.KEYBOARD
-        modifierState = modifierState.copy(
-            isShifted = false,
-            isCapsLock = false,
-            isCtrlActive = false,
-            isAltActive = false,
-            isFnActive = false,
-            isSymActive = false,
-            isSymPage2Active = false
-        )
+        modifierState = ModifierState()
+        hasActiveSelection = false
         isNumericOverriddenToAlpha = false
     }
 
@@ -563,16 +640,21 @@ class SboardIME : InputMethodService(),
         stopBackspaceRepeat()
         currentComposingWord = ""
         currentSuggestions = emptyList()
-        modifierState = modifierState.copy(
-            isShifted = false,
-            isCapsLock = false,
-            isCtrlActive = false,
-            isAltActive = false,
-            isFnActive = false,
-            isSymActive = false,
-            isSymPage2Active = false
-        )
+        modifierState = ModifierState()
+        hasActiveSelection = false
         isNumericOverriddenToAlpha = false
+    }
+
+    override fun onUpdateSelection(
+        oldSelStart: Int,
+        oldSelEnd: Int,
+        newSelStart: Int,
+        newSelEnd: Int,
+        candidatesStart: Int,
+        candidatesEnd: Int
+    ) {
+        super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd)
+        hasActiveSelection = (newSelStart != newSelEnd)
     }
 
     override fun onDestroy() {
@@ -676,16 +758,20 @@ class SboardIME : InputMethodService(),
             KeyType.CHARACTER -> {
                 if (modifierState.isCtrlActive) {
                     handleCtrlShortcut(key.primaryLabel)
-                    modifierState = modifierState.copy(
-                        isCtrlActive = false,
-                        isAltActive = false,
-                        isShifted = if (modifierState.isCapsLock) modifierState.isShifted else false
-                    )
+                    if (!modifierState.isCtrlLocked) {
+                        modifierState = modifierState.copy(isCtrlActive = false)
+                    }
+                    if (modifierState.isAltActive && !modifierState.isAltLocked) {
+                        modifierState = modifierState.copy(isAltActive = false)
+                    }
+                    if (modifierState.isShifted && !modifierState.isCapsLock) {
+                        modifierState = modifierState.copy(isShifted = false)
+                    }
                     return
                 }
 
-                val charToCommit = if (modifierState.isShifted || modifierState.isCapsLock) {
-                    key.primaryLabel.uppercase()
+                val charToCommit = if (key.primaryLabel.length == 1 && key.primaryLabel[0].isLetter()) {
+                    if (modifierState.isShiftActive) key.primaryLabel.uppercase() else key.primaryLabel.lowercase()
                 } else {
                     key.primaryLabel
                 }
@@ -697,16 +783,19 @@ class SboardIME : InputMethodService(),
                         val keyCode = KeyEvent.keyCodeFromString("KEYCODE_${charToCommit.uppercase()}")
                         if (keyCode != KeyEvent.KEYCODE_UNKNOWN) {
                             val meta = KeyEvent.META_ALT_ON or KeyEvent.META_ALT_LEFT_ON
-                            ic.sendKeyEvent(KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, keyCode, 0, meta))
-                            ic.sendKeyEvent(KeyEvent(0L, 0L, KeyEvent.ACTION_UP, keyCode, 0, meta))
+                            val now = android.os.SystemClock.uptimeMillis()
+                            ic.sendKeyEvent(KeyEvent(now, now, KeyEvent.ACTION_DOWN, keyCode, 0, meta))
+                            ic.sendKeyEvent(KeyEvent(now, now, KeyEvent.ACTION_UP, keyCode, 0, meta))
                         } else {
                             ic.commitText("\u001B$charToCommit", 1)
                         }
                     }
-                    modifierState = modifierState.copy(
-                        isAltActive = false,
-                        isShifted = if (modifierState.isCapsLock) modifierState.isShifted else false
-                    )
+                    if (!modifierState.isAltLocked) {
+                        modifierState = modifierState.copy(isAltActive = false)
+                    }
+                    if (modifierState.isShifted && !modifierState.isCapsLock) {
+                        modifierState = modifierState.copy(isShifted = false)
+                    }
                     return
                 }
 
@@ -738,12 +827,13 @@ class SboardIME : InputMethodService(),
 
                 if (isTerminalField && modifierState.isCtrlActive) {
                     ic.commitText("\u0000", 1)
-                    modifierState = modifierState.copy(isCtrlActive = false, isAltActive = false)
+                    if (!modifierState.isCtrlLocked) modifierState = modifierState.copy(isCtrlActive = false)
+                    if (!modifierState.isAltLocked) modifierState = modifierState.copy(isAltActive = false)
                     return
                 }
                 if (isTerminalField && modifierState.isAltActive) {
                     ic.commitText("\u001B ", 1)
-                    modifierState = modifierState.copy(isAltActive = false)
+                    if (!modifierState.isAltLocked) modifierState = modifierState.copy(isAltActive = false)
                     return
                 }
                 ic.commitText(" ", 1)
@@ -752,16 +842,13 @@ class SboardIME : InputMethodService(),
                 performBackspace()
             }
             KeyType.SHIFT -> {
-                if (modifierState.isCapsLock) {
-                    modifierState = modifierState.copy(isShifted = false, isCapsLock = false)
-                } else if (modifierState.isShifted) {
-                    modifierState = modifierState.copy(isCapsLock = true)
-                } else {
-                    modifierState = modifierState.copy(isShifted = true)
-                }
+                toggleShift()
             }
             KeyType.CTRL -> {
-                modifierState = modifierState.copy(isCtrlActive = !modifierState.isCtrlActive)
+                toggleCtrl()
+            }
+            KeyType.SELECT -> {
+                toggleSelect()
             }
             KeyType.FN -> {
                 val nextFn = !modifierState.isFnActive
@@ -838,17 +925,21 @@ class SboardIME : InputMethodService(),
         val ic = currentInputConnection ?: return
         if (modifierState.isCtrlActive) {
             handleCtrlShortcut(symbol)
-            modifierState = modifierState.copy(isCtrlActive = false, isAltActive = false)
+            if (!modifierState.isCtrlLocked) modifierState = modifierState.copy(isCtrlActive = false)
+            if (!modifierState.isAltLocked) modifierState = modifierState.copy(isAltActive = false)
             return
         }
         if (modifierState.isAltActive && isTerminalField) {
             ic.commitText("\u001B$symbol", 1)
-            modifierState = modifierState.copy(isAltActive = false)
+            if (!modifierState.isAltLocked) modifierState = modifierState.copy(isAltActive = false)
             return
         }
         ic.commitText(symbol, 1)
         currentComposingWord = ""
         currentSuggestions = emptyList()
+        if (modifierState.isShifted && !modifierState.isCapsLock) {
+            modifierState = modifierState.copy(isShifted = false)
+        }
     }
 
     private fun handleCtrlShortcut(letter: String) {
@@ -880,31 +971,98 @@ class SboardIME : InputMethodService(),
                 if (!ic.performContextMenuAction(android.R.id.selectAll)) {
                     sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_A)
                 }
+                modifierState = modifierState.copy(isSelecting = true)
             }
             "c" -> {
                 if (!ic.performContextMenuAction(android.R.id.copy)) {
                     sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_C)
                 }
+                modifierState = modifierState.copy(isSelecting = false)
             }
             "v" -> {
                 if (!ic.performContextMenuAction(android.R.id.paste)) {
                     sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_V)
                 }
+                modifierState = modifierState.copy(isSelecting = false)
             }
             "x" -> {
                 if (!ic.performContextMenuAction(android.R.id.cut)) {
                     sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_X)
                 }
+                modifierState = modifierState.copy(isSelecting = false)
             }
             "z" -> {
-                if (!ic.performContextMenuAction(android.R.id.undo)) {
-                    sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_Z)
+                if (modifierState.isShiftActive) {
+                    if (!ic.performContextMenuAction(android.R.id.redo)) {
+                        sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_Z)
+                    }
+                } else {
+                    if (!ic.performContextMenuAction(android.R.id.undo)) {
+                        sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_Z)
+                    }
                 }
             }
             "y" -> {
                 if (!ic.performContextMenuAction(android.R.id.redo)) {
                     sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_Y)
                 }
+            }
+            "w" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_W)
+            }
+            "f" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_F)
+            }
+            "s" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_S)
+            }
+            "d" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_D)
+            }
+            "t" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_T)
+            }
+            "n" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_N)
+            }
+            "p" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_P)
+            }
+            "r" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_R)
+            }
+            "k" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_K)
+            }
+            "b" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_B)
+            }
+            "i" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_I)
+            }
+            "u" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_U)
+            }
+            "o" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_O)
+            }
+            "l" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_L)
+            }
+            "g" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_G)
+            }
+            "e" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_E)
+            }
+            "h" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_H)
+            }
+            "j" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_J)
+            }
+            "q" -> {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_Q)
             }
             else -> {
                 val keyCode = KeyEvent.keyCodeFromString("KEYCODE_${letter.uppercase()}")
@@ -920,7 +1078,7 @@ class SboardIME : InputMethodService(),
         if (modifierState.isAltActive) {
             meta = meta or KeyEvent.META_ALT_ON or KeyEvent.META_ALT_LEFT_ON
         }
-        if (modifierState.isShifted) {
+        if (modifierState.isShiftActive || modifierState.isSelecting) {
             meta = meta or KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON
         }
         val now = android.os.SystemClock.uptimeMillis()
@@ -934,23 +1092,53 @@ class SboardIME : InputMethodService(),
         if (isTerminalField) {
             if (modifierState.isAltActive) {
                 ic.commitText("\u001B\u007F", 1)
-                modifierState = modifierState.copy(isAltActive = false)
+                if (!modifierState.isAltLocked) modifierState = modifierState.copy(isAltActive = false)
                 return
             }
             if (modifierState.isCtrlActive) {
                 ic.commitText("\u0017", 1) // Ctrl+W (kill word backward)
-                modifierState = modifierState.copy(isCtrlActive = false)
+                if (!modifierState.isCtrlLocked) modifierState = modifierState.copy(isCtrlActive = false)
                 return
             }
         }
         val selectedText = ic.getSelectedText(0)
         if (!selectedText.isNullOrEmpty()) {
             ic.commitText("", 1)
-        } else {
-            val deleted = ic.deleteSurroundingText(1, 0)
-            if (!deleted) {
-                sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
+            modifierState = modifierState.copy(isSelecting = false)
+            return
+        }
+
+        // Ctrl + Backspace in normal apps: Delete word backward
+        if (modifierState.isCtrlActive) {
+            val textBefore = ic.getTextBeforeCursor(128, 0)?.toString() ?: ""
+            if (textBefore.isNotEmpty()) {
+                var i = textBefore.length - 1
+                while (i >= 0 && textBefore[i].isWhitespace()) {
+                    i--
+                }
+                while (i >= 0 && !textBefore[i].isWhitespace()) {
+                    i--
+                }
+                val deleteCount = textBefore.length - (i + 1)
+                if (deleteCount > 0) {
+                    ic.deleteSurroundingText(deleteCount, 0)
+                } else {
+                    sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_DEL)
+                }
+            } else {
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_DEL)
             }
+            if (!modifierState.isCtrlLocked) {
+                modifierState = modifierState.copy(isCtrlActive = false)
+            }
+            currentComposingWord = ""
+            currentSuggestions = emptyList()
+            return
+        }
+
+        val deleted = ic.deleteSurroundingText(1, 0)
+        if (!deleted) {
+            sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
         }
         if (currentComposingWord.isNotEmpty()) {
             currentComposingWord = currentComposingWord.dropLast(1)
@@ -960,10 +1148,26 @@ class SboardIME : InputMethodService(),
 
     private fun moveCursor(offset: Int) {
         triggerHaptic()
+        val ic = currentInputConnection ?: return
         val keyCode = if (offset > 0) KeyEvent.KEYCODE_DPAD_RIGHT else KeyEvent.KEYCODE_DPAD_LEFT
         val count = kotlin.math.abs(offset)
-        for (i in 0 until count) {
-            sendDownUpKeyEvents(keyCode)
+
+        val isShift = modifierState.isShiftActive || modifierState.isSelecting
+        val isCtrl = modifierState.isCtrlActive
+
+        if (isShift || isCtrl) {
+            var meta = 0
+            if (isShift) meta = meta or KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON
+            if (isCtrl) meta = meta or KeyEvent.META_CTRL_ON or KeyEvent.META_CTRL_LEFT_ON
+            val now = android.os.SystemClock.uptimeMillis()
+            for (i in 0 until count) {
+                ic.sendKeyEvent(KeyEvent(now, now, KeyEvent.ACTION_DOWN, keyCode, 0, meta))
+                ic.sendKeyEvent(KeyEvent(now, now, KeyEvent.ACTION_UP, keyCode, 0, meta))
+            }
+        } else {
+            for (i in 0 until count) {
+                sendDownUpKeyEvents(keyCode)
+            }
         }
     }
 
@@ -983,7 +1187,7 @@ class SboardIME : InputMethodService(),
         triggerHaptic()
         val ic = currentInputConnection ?: return
 
-        val shift = modifierState.isShifted
+        val shift = modifierState.isShiftActive || modifierState.isSelecting
         val alt = modifierState.isAltActive
         val ctrl = modifierState.isCtrlActive
         val modMask = (if (shift) 1 else 0) + (if (alt) 2 else 0) + (if (ctrl) 4 else 0)
@@ -1024,8 +1228,8 @@ class SboardIME : InputMethodService(),
 
             if (modMask > 0) {
                 modifierState = modifierState.copy(
-                    isCtrlActive = false,
-                    isAltActive = false,
+                    isCtrlActive = if (modifierState.isCtrlLocked) modifierState.isCtrlActive else false,
+                    isAltActive = if (modifierState.isAltLocked) modifierState.isAltActive else false,
                     isShifted = if (modifierState.isCapsLock) modifierState.isShifted else false
                 )
             }
@@ -1051,8 +1255,8 @@ class SboardIME : InputMethodService(),
             ic.sendKeyEvent(KeyEvent(now, now, KeyEvent.ACTION_DOWN, keyCode, 0, meta))
             ic.sendKeyEvent(KeyEvent(now, now, KeyEvent.ACTION_UP, keyCode, 0, meta))
             modifierState = modifierState.copy(
-                isCtrlActive = false,
-                isAltActive = false,
+                isCtrlActive = if (modifierState.isCtrlLocked) modifierState.isCtrlActive else false,
+                isAltActive = if (modifierState.isAltLocked) modifierState.isAltActive else false,
                 isShifted = if (modifierState.isCapsLock) modifierState.isShifted else false
             )
         } else {
