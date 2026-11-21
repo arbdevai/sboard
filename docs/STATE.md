@@ -1,7 +1,7 @@
 # Sboard Project State & Evolution Log
 
-## Current Status (v1.0.25 - Real PC Keyboard Edition)
-- **Active Version:** `1.0.25` (`versionCode = 10025`)
+## Current Status (v1.0.26 - Dual-Endpoint Selection Edition)
+- **Active Version:** `1.0.26` (`versionCode = 10026`)
 - **Git Branch:** `main`
 - **NDK Architectures:** `arm64-v8a`, `x86_64`
 - **Target Android SDK:** 36 (Min SDK: 30)
@@ -10,7 +10,16 @@
 
 ## Logika & Modul yang Telah Beroperasi Penuh
 
-1. **Mesin Real PC Keyboard (Kombinasi Ctrl Lengkap, Shift Mandiri & Selection Glide):**
+1. **Seleksi Teks Ujung ke Ujung Presisi (Dual-Endpoint Selection Glide - Opsi 1):**
+   - File: `KeyModel.kt`, `SboardIME.kt`, `SuggestionsBar.kt`, `FnRowView.kt`, `SboardKeyboardView.kt`.
+   - **Pemilih Handle Batas Seleksi (`[◀ Awal]` & `[Akhir ▶]`):**
+     - Ketika ada teks terseleksi (`hasActiveSelection` via `onUpdateSelection` Android atau Shift aktif), bilah alat tengah otomatis bertransformasi menjadi **Dual-Endpoint Boundary Switcher**.
+     - Tombol **`[◀ Awal]`**: Mengunci ujung akhir teks di posisinya, dan mengalihkan kontrol geser ke ujung kiri/awal. Menyeret Spacebar atau menekan tombol panah secara independen mengubah batas awal seleksi (`selectionStartPos`) tanpa mengubah batas akhir.
+     - Tombol **`[Akhir ▶]`**: Mengunci ujung awal teks di posisinya, dan mengalihkan kontrol geser ke ujung kanan/akhir (`selectionEndPos`).
+     - Tombol **`[Lepas]`**: Melepas blok seleksi seketika dan mereset kursor ke posisi normal.
+   - **Pembersihan Toolbar:** Menghapus tombol `[SEL]` redundan dan tombol aksi copy/cut yang memenuhi toolbar. Alur kerja copy/cut tetap bersih dan otentik ala PC menggunakan shortcut `Ctrl+C`, `Ctrl+X`, `Ctrl+V`, `Ctrl+A`.
+
+2. **Mesin Real PC Keyboard (Kombinasi Ctrl Lengkap & Shift Mandiri):**
    - File: `KeyModel.kt`, `KeyLayoutProvider.kt`, `SboardIME.kt`, `SuggestionsBar.kt`, `FnRowView.kt`, `KeyView.kt`, `SboardKeyboardView.kt`.
    - **Kombinasi Ctrl PC Lengkap:**
      - Menangani `Ctrl+A` (Select All), `Ctrl+C` (Copy), `Ctrl+V` (Paste), `Ctrl+X` (Cut), `Ctrl+Z` (Undo), `Ctrl+Y` (Redo), `Ctrl+Shift+Z` (Redo PC), `Ctrl+W` (Close / kill word), `Ctrl+F` (Find), `Ctrl+S` (Save), `Ctrl+D` (Bookmark/Delete), `Ctrl+T` (New Tab), `Ctrl+N` (New Window), `Ctrl+P` (Quick Open/Print), `Ctrl+R` (Reload/Reverse Search), `Ctrl+K/B/I/U/O/L/G/E/H/J/Q`.
@@ -19,11 +28,6 @@
      - State machine: `OFF` -> `LATCHED` (aktif 1x lalu auto-unlatch setelah 1 karakter diketik) -> `LOCKED` (double-tap untuk Caps Lock permanen).
      - **Transformasi Simbol Baris Angka:** Saat Shift aktif, baris angka `1-0` bertransformasi seketika menjadi simbol PC `! @ # $ % ^ & * ( )`. Tanda baca `,` dan `.` bertransformasi menjadi `<` dan `>`.
      - Tombol `[SHIFT]` mandiri tersedia di baris 3 QWERTY dan bilah alat atas (`SuggestionsBar`).
-   - **Fitur Seleksi Teks Presisi (Precision Text Selection & Selection Glide):**
-     - **Selection Glide pada Spacebar:** Saat Shift atau SEL aktif, menggeser (*drag*) Spacebar tidak hanya menggerakkan kursor melainkan memblok/menyeleksi teks per karakter (atau per kata jika Ctrl juga aktif) via `KEYCODE_DPAD_LEFT/RIGHT` + `META_SHIFT_ON`.
-     - **Seleksi via Panah:** `Shift + Panah ←↓↑→` menyeleksi karakter dan baris teks. `Ctrl + Shift + Panah` menyeleksi kata demi kata.
-     - **Contextual Selection HUD:** Saat ada teks yang diblok (`hasActiveSelection` via `onUpdateSelection` atau `isSelecting`), bilah saran kata otomatis menampilkan tombol aksi: `[CUT]`, `[COPY]`, `[PASTE]`, `[ALL]`.
-     - Indikator visual seleksi pada Fn Row dan toolbar (`[SEL]` toggle).
 
 2. **Penguncian Tinggi Keyboard Konstan (Lock Frame Height Antara QWERTY & Simbol):**
    - File: `app/src/main/java/com/sahalos/sboard/service/SboardIME.kt` dan `SboardKeyboardView.kt`.

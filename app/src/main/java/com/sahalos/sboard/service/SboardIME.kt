@@ -59,6 +59,7 @@ import com.sahalos.sboard.model.KeyType
 import com.sahalos.sboard.model.KeyboardMode
 import com.sahalos.sboard.model.ModifierState
 import com.sahalos.sboard.model.SboardTheme
+import com.sahalos.sboard.model.SelectionHandle
 import com.sahalos.sboard.core.EmojiCategory
 import com.sahalos.sboard.core.EmojiProvider
 import com.sahalos.sboard.ui.keyboard.ClipboardScreen
@@ -146,46 +147,21 @@ class SboardIME : InputMethodService(),
         lastShiftTapTimeMs = now
     }
 
-    private fun toggleSelect() {
-        triggerHaptic()
-        val next = !modifierState.isSelecting
-        modifierState = modifierState.copy(isSelecting = next)
-    }
+    private var activeSelectionHandle by mutableStateOf(SelectionHandle.END)
+    private var selectionStartPos by mutableIntStateOf(0)
+    private var selectionEndPos by mutableIntStateOf(0)
 
-    private fun performCut() {
+    private fun deselectText() {
         triggerHaptic()
         val ic = currentInputConnection ?: return
-        if (!ic.performContextMenuAction(android.R.id.cut)) {
-            sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_X)
+        val pos = selectionEndPos
+        ic.setSelection(pos, pos)
+        selectionStartPos = pos
+        selectionEndPos = pos
+        hasActiveSelection = false
+        if (modifierState.isShifted && !modifierState.isCapsLock) {
+            modifierState = modifierState.copy(isShifted = false)
         }
-        modifierState = modifierState.copy(isSelecting = false)
-    }
-
-    private fun performCopy() {
-        triggerHaptic()
-        val ic = currentInputConnection ?: return
-        if (!ic.performContextMenuAction(android.R.id.copy)) {
-            sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_C)
-        }
-        modifierState = modifierState.copy(isSelecting = false)
-    }
-
-    private fun performPaste() {
-        triggerHaptic()
-        val ic = currentInputConnection ?: return
-        if (!ic.performContextMenuAction(android.R.id.paste)) {
-            sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_V)
-        }
-        modifierState = modifierState.copy(isSelecting = false)
-    }
-
-    private fun performSelectAll() {
-        triggerHaptic()
-        val ic = currentInputConnection ?: return
-        if (!ic.performContextMenuAction(android.R.id.selectAll)) {
-            sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_A)
-        }
-        modifierState = modifierState.copy(isSelecting = true)
     }
 
     // Dynamic Action Key
@@ -377,14 +353,13 @@ class SboardIME : InputMethodService(),
                                 onShiftToggle = {
                                     toggleShift()
                                 },
-                                onSelectToggle = {
-                                    toggleSelect()
+                                hasSelection = hasActiveSelection,
+                                activeSelectionHandle = activeSelectionHandle,
+                                onSelectHandleChange = { handle ->
+                                    triggerHaptic()
+                                    activeSelectionHandle = handle
                                 },
-                                onCutClick = { performCut() },
-                                onCopyClick = { performCopy() },
-                                onPasteClick = { performPaste() },
-                                onSelectAllClick = { performSelectAll() },
-                                hasSelection = hasActiveSelection || modifierState.isSelecting,
+                                onDeselectClick = { deselectText() },
                                 onFnToggle = {
                                     if (android.os.SystemClock.uptimeMillis() - lastModeSwitchTimeMs > 350L) {
                                         triggerHaptic()
@@ -613,6 +588,9 @@ class SboardIME : InputMethodService(),
         // Reset modifier state to guarantee clean QWERTY layer on each session (Issue 3 fix)
         modifierState = ModifierState()
         hasActiveSelection = false
+        activeSelectionHandle = SelectionHandle.END
+        selectionStartPos = 0
+        selectionEndPos = 0
         isNumericOverriddenToAlpha = false
 
         resolveInputType(info)
@@ -632,6 +610,9 @@ class SboardIME : InputMethodService(),
         keyboardMode = KeyboardMode.KEYBOARD
         modifierState = ModifierState()
         hasActiveSelection = false
+        activeSelectionHandle = SelectionHandle.END
+        selectionStartPos = 0
+        selectionEndPos = 0
         isNumericOverriddenToAlpha = false
     }
 
@@ -642,6 +623,9 @@ class SboardIME : InputMethodService(),
         currentSuggestions = emptyList()
         modifierState = ModifierState()
         hasActiveSelection = false
+        activeSelectionHandle = SelectionHandle.END
+        selectionStartPos = 0
+        selectionEndPos = 0
         isNumericOverriddenToAlpha = false
     }
 
@@ -654,6 +638,8 @@ class SboardIME : InputMethodService(),
         candidatesEnd: Int
     ) {
         super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd)
+        selectionStartPos = minOf(newSelStart, newSelEnd)
+        selectionEndPos = maxOf(newSelStart, newSelEnd)
         hasActiveSelection = (newSelStart != newSelEnd)
     }
 
@@ -847,9 +833,6 @@ class SboardIME : InputMethodService(),
             KeyType.CTRL -> {
                 toggleCtrl()
             }
-            KeyType.SELECT -> {
-                toggleSelect()
-            }
             KeyType.FN -> {
                 val nextFn = !modifierState.isFnActive
                 modifierState = modifierState.copy(
@@ -971,25 +954,21 @@ class SboardIME : InputMethodService(),
                 if (!ic.performContextMenuAction(android.R.id.selectAll)) {
                     sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_A)
                 }
-                modifierState = modifierState.copy(isSelecting = true)
             }
             "c" -> {
                 if (!ic.performContextMenuAction(android.R.id.copy)) {
                     sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_C)
                 }
-                modifierState = modifierState.copy(isSelecting = false)
             }
             "v" -> {
                 if (!ic.performContextMenuAction(android.R.id.paste)) {
                     sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_V)
                 }
-                modifierState = modifierState.copy(isSelecting = false)
             }
             "x" -> {
                 if (!ic.performContextMenuAction(android.R.id.cut)) {
                     sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_X)
                 }
-                modifierState = modifierState.copy(isSelecting = false)
             }
             "z" -> {
                 if (modifierState.isShiftActive) {
@@ -1078,7 +1057,7 @@ class SboardIME : InputMethodService(),
         if (modifierState.isAltActive) {
             meta = meta or KeyEvent.META_ALT_ON or KeyEvent.META_ALT_LEFT_ON
         }
-        if (modifierState.isShiftActive || modifierState.isSelecting) {
+        if (modifierState.isShiftActive) {
             meta = meta or KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON
         }
         val now = android.os.SystemClock.uptimeMillis()
@@ -1104,7 +1083,7 @@ class SboardIME : InputMethodService(),
         val selectedText = ic.getSelectedText(0)
         if (!selectedText.isNullOrEmpty()) {
             ic.commitText("", 1)
-            modifierState = modifierState.copy(isSelecting = false)
+            hasActiveSelection = false
             return
         }
 
@@ -1149,16 +1128,58 @@ class SboardIME : InputMethodService(),
     private fun moveCursor(offset: Int) {
         triggerHaptic()
         val ic = currentInputConnection ?: return
-        val keyCode = if (offset > 0) KeyEvent.KEYCODE_DPAD_RIGHT else KeyEvent.KEYCODE_DPAD_LEFT
         val count = kotlin.math.abs(offset)
+        val step = if (offset > 0) 1 else -1
 
-        val isShift = modifierState.isShiftActive || modifierState.isSelecting
+        val isSelectionActive = hasActiveSelection || modifierState.isShiftActive
+
+        if (isSelectionActive) {
+            var currentStart = selectionStartPos
+            var currentEnd = selectionEndPos
+
+            for (i in 0 until count) {
+                if (currentStart == currentEnd) {
+                    if (activeSelectionHandle == SelectionHandle.START) {
+                        currentStart = (currentStart + step).coerceAtLeast(0)
+                    } else {
+                        currentEnd = (currentEnd + step).coerceAtLeast(0)
+                    }
+                } else {
+                    if (activeSelectionHandle == SelectionHandle.START) {
+                        val nextStart = (currentStart + step).coerceAtLeast(0)
+                        if (nextStart <= currentEnd) {
+                            currentStart = nextStart
+                        } else {
+                            currentStart = currentEnd
+                            currentEnd = nextStart
+                            activeSelectionHandle = SelectionHandle.END
+                        }
+                    } else {
+                        val nextEnd = (currentEnd + step).coerceAtLeast(0)
+                        if (nextEnd >= currentStart) {
+                            currentEnd = nextEnd
+                        } else {
+                            currentEnd = currentStart
+                            currentStart = nextEnd
+                            activeSelectionHandle = SelectionHandle.START
+                        }
+                    }
+                }
+            }
+
+            selectionStartPos = currentStart
+            selectionEndPos = currentEnd
+            hasActiveSelection = (currentStart != currentEnd)
+            ic.setSelection(currentStart, currentEnd)
+            return
+        }
+
+        // Standard non-selection cursor movement
+        val keyCode = if (offset > 0) KeyEvent.KEYCODE_DPAD_RIGHT else KeyEvent.KEYCODE_DPAD_LEFT
         val isCtrl = modifierState.isCtrlActive
 
-        if (isShift || isCtrl) {
-            var meta = 0
-            if (isShift) meta = meta or KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON
-            if (isCtrl) meta = meta or KeyEvent.META_CTRL_ON or KeyEvent.META_CTRL_LEFT_ON
+        if (isCtrl) {
+            val meta = KeyEvent.META_CTRL_ON or KeyEvent.META_CTRL_LEFT_ON
             val now = android.os.SystemClock.uptimeMillis()
             for (i in 0 until count) {
                 ic.sendKeyEvent(KeyEvent(now, now, KeyEvent.ACTION_DOWN, keyCode, 0, meta))
@@ -1187,7 +1208,19 @@ class SboardIME : InputMethodService(),
         triggerHaptic()
         val ic = currentInputConnection ?: return
 
-        val shift = modifierState.isShiftActive || modifierState.isSelecting
+        // Navigation arrows in selection mode move the active boundary
+        if (hasActiveSelection || modifierState.isShiftActive) {
+            if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
+                moveCursor(-1)
+                return
+            }
+            if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
+                moveCursor(1)
+                return
+            }
+        }
+
+        val shift = modifierState.isShiftActive
         val alt = modifierState.isAltActive
         val ctrl = modifierState.isCtrlActive
         val modMask = (if (shift) 1 else 0) + (if (alt) 2 else 0) + (if (ctrl) 4 else 0)

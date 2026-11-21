@@ -41,6 +41,7 @@ fun FnRowView(
     theme: SboardTheme,
     isAltActive: Boolean,
     modifierState: ModifierState = ModifierState(),
+    hasSelection: Boolean = false,
     onAltToggle: () -> Unit,
     onFunctionKeyClick: (Int) -> Unit,
     modifier: Modifier = Modifier
@@ -55,7 +56,7 @@ fun FnRowView(
     val currentOnFnKeyClick by rememberUpdatedState(onFunctionKeyClick)
     val currentOnAltToggle by rememberUpdatedState(onAltToggle)
 
-    val isSelectionActive = modifierState.isShiftActive || modifierState.isSelecting
+    val isSelectionActive = modifierState.isShiftActive || hasSelection
 
     Column(
         modifier = modifier

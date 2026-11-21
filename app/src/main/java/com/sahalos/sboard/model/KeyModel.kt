@@ -13,8 +13,7 @@ enum class KeyType {
     SETTINGS,
     SPACER,
     EMOJI,
-    SYM_PAGE_2,
-    SELECT
+    SYM_PAGE_2
 }
 
 data class KeyModel(
@@ -31,6 +30,11 @@ enum class ModifierLatch {
     LOCKED
 }
 
+enum class SelectionHandle {
+    START,
+    END
+}
+
 data class ModifierState(
     val isShifted: Boolean = false,
     val isCapsLock: Boolean = false,
@@ -40,8 +44,7 @@ data class ModifierState(
     val isAltLocked: Boolean = false,
     val isFnActive: Boolean = false,
     val isSymActive: Boolean = false,
-    val isSymPage2Active: Boolean = false,
-    val isSelecting: Boolean = false
+    val isSymPage2Active: Boolean = false
 ) {
     val isShiftActive: Boolean get() = isShifted || isCapsLock
 }

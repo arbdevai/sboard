@@ -33,6 +33,7 @@ import com.sahalos.sboard.model.KeyModel
 import com.sahalos.sboard.model.KeyType
 import com.sahalos.sboard.model.ModifierState
 import com.sahalos.sboard.model.SboardTheme
+import com.sahalos.sboard.model.SelectionHandle
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -70,12 +71,10 @@ fun SboardKeyboardView(
     onCtrlToggle: () -> Unit,
     onAltToggle: () -> Unit = {},
     onShiftToggle: () -> Unit = {},
-    onSelectToggle: () -> Unit = {},
-    onCutClick: () -> Unit = {},
-    onCopyClick: () -> Unit = {},
-    onPasteClick: () -> Unit = {},
-    onSelectAllClick: () -> Unit = {},
     hasSelection: Boolean = false,
+    activeSelectionHandle: SelectionHandle = SelectionHandle.END,
+    onSelectHandleChange: (SelectionHandle) -> Unit = {},
+    onDeselectClick: () -> Unit = {},
     onFnToggle: () -> Unit,
     onFunctionKeyClick: (Int) -> Unit,
     showSuggestionsBar: Boolean = true,
@@ -125,7 +124,7 @@ fun SboardKeyboardView(
             .fillMaxWidth()
             .background(Color(theme.backgroundColor))
     ) {
-        // Suggestions & Quick Action Strip (CTRL, SHIFT, SEL, FN on Left; Selection HUD / Suggestions Center; Tools on Right)
+        // Suggestions & Quick Action Strip (CTRL, SHIFT, FN on Left; Endpoint Boundary Switcher / Suggestions Center; Tools on Right)
         val shouldShowSuggestionsBar = showSuggestionsBar && !isNumpadActive && !isPhonepadActive
         if (shouldShowSuggestionsBar) {
             SuggestionsBar(
@@ -135,21 +134,18 @@ fun SboardKeyboardView(
                 isCtrlLocked = modifierState.isCtrlLocked,
                 isShiftActive = modifierState.isShiftActive,
                 isCapsLock = modifierState.isCapsLock,
-                isSelecting = modifierState.isSelecting,
-                hasSelection = hasSelection,
                 isFnActive = modifierState.isFnActive,
+                hasSelection = hasSelection,
+                activeSelectionHandle = activeSelectionHandle,
                 onCtrlClick = onCtrlToggle,
                 onShiftClick = onShiftToggle,
-                onSelectToggle = onSelectToggle,
                 onFnClick = onFnToggle,
                 onSuggestionClick = onSuggestionClick,
                 onClipboardClick = onClipboardClick,
                 onResizeClick = onResizeClick,
                 onSettingsClick = onSettingsClick,
-                onCutClick = onCutClick,
-                onCopyClick = onCopyClick,
-                onPasteClick = onPasteClick,
-                onSelectAllClick = onSelectAllClick
+                onSelectHandleChange = onSelectHandleChange,
+                onDeselectClick = onDeselectClick
             )
         }
 
@@ -159,6 +155,7 @@ fun SboardKeyboardView(
                 theme = theme,
                 isAltActive = modifierState.isAltActive,
                 modifierState = modifierState,
+                hasSelection = hasSelection,
                 onAltToggle = onAltToggle,
                 onFunctionKeyClick = onFunctionKeyClick
             )

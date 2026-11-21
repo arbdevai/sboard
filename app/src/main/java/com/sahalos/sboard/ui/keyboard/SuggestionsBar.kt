@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sahalos.sboard.R
 import com.sahalos.sboard.model.SboardTheme
+import com.sahalos.sboard.model.SelectionHandle
 
 @Composable
 fun SuggestionsBar(
@@ -35,21 +36,18 @@ fun SuggestionsBar(
     isCtrlLocked: Boolean = false,
     isShiftActive: Boolean = false,
     isCapsLock: Boolean = false,
-    isSelecting: Boolean = false,
-    hasSelection: Boolean = false,
     isFnActive: Boolean = false,
+    hasSelection: Boolean = false,
+    activeSelectionHandle: SelectionHandle = SelectionHandle.END,
     onCtrlClick: () -> Unit,
     onShiftClick: () -> Unit = {},
-    onSelectToggle: () -> Unit = {},
     onFnClick: () -> Unit,
     onSuggestionClick: (String) -> Unit,
     onClipboardClick: () -> Unit,
     onResizeClick: () -> Unit,
     onSettingsClick: () -> Unit,
-    onCutClick: () -> Unit = {},
-    onCopyClick: () -> Unit = {},
-    onPasteClick: () -> Unit = {},
-    onSelectAllClick: () -> Unit = {},
+    onSelectHandleChange: (SelectionHandle) -> Unit = {},
+    onDeselectClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val barBgColor = Color(theme.surfaceColor)
@@ -62,13 +60,13 @@ fun SuggestionsBar(
             .height(42.dp)
             .background(barBgColor)
             .padding(horizontal = 4.dp, vertical = 3.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // 1. Left side: Modifiers (CTRL, SHIFT, SEL, FN)
+        // 1. Left side: Modifiers (CTRL, SHIFT, FN)
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(2.dp)
+            horizontalArrangement = Arrangement.spacedBy(3.dp)
         ) {
             // CTRL Button (Shows lock indicator if locked)
             Box(
@@ -85,7 +83,7 @@ fun SuggestionsBar(
                         }
                     )
                     .clickable { onCtrlClick() }
-                    .padding(horizontal = 6.dp),
+                    .padding(horizontal = 7.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -112,7 +110,7 @@ fun SuggestionsBar(
                         }
                     )
                     .clickable { onShiftClick() }
-                    .padding(horizontal = 6.dp),
+                    .padding(horizontal = 7.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -124,40 +122,13 @@ fun SuggestionsBar(
                 )
             }
 
-            // SEL Button (Text Selection Mode Toggle)
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .clip(RoundedCornerShape(6.dp))
-                    .then(
-                        if (isSelecting) {
-                            Modifier
-                                .background(accentColor.copy(alpha = 0.25f))
-                                .border(1.dp, accentColor, RoundedCornerShape(6.dp))
-                        } else {
-                            Modifier
-                        }
-                    )
-                    .clickable { onSelectToggle() }
-                    .padding(horizontal = 6.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "SEL",
-                    color = if (isSelecting) accentColor else textColor.copy(alpha = 0.85f),
-                    fontSize = 10.5.sp,
-                    fontWeight = if (isSelecting) FontWeight.Bold else FontWeight.SemiBold,
-                    letterSpacing = 0.5.sp
-                )
-            }
-
             // FN Button
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(6.dp))
                     .clickable { onFnClick() }
-                    .padding(horizontal = 6.dp),
+                    .padding(horizontal = 7.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -170,7 +141,7 @@ fun SuggestionsBar(
             }
         }
 
-        // 2. Center: Contextual Selection Action HUD OR Word Suggestions
+        // 2. Center: Dual-Endpoint Boundary Switcher ([◀ Awal] | [Akhir ▶]) OR Word Suggestions
         Row(
             modifier = Modifier
                 .weight(1f)
@@ -179,37 +150,85 @@ fun SuggestionsBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            if (hasSelection || isSelecting) {
-                // PC Selection HUD: CUT, COPY, PASTE, ALL
+            if (hasSelection) {
+                // Option 1: Endpoint Boundary Switcher
                 Row(
                     modifier = Modifier.fillMaxHeight(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
-                    val actions = listOf(
-                        "CUT" to onCutClick,
-                        "COPY" to onCopyClick,
-                        "PASTE" to onPasteClick,
-                        "ALL" to onSelectAllClick
-                    )
-                    actions.forEach { (label, onClickAction) ->
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight(0.85f)
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(Color(theme.keyBackgroundColor))
-                                .clickable { onClickAction() }
-                                .padding(horizontal = 6.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = label,
-                                color = if (label == "ALL") accentColor else textColor.copy(alpha = 0.92f),
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 0.4.sp
+                    // Button: [◀ Awal] (Ujung Kiri)
+                    val isStartActive = activeSelectionHandle == SelectionHandle.START
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight(0.85f)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(
+                                if (isStartActive) accentColor.copy(alpha = 0.25f) else Color(theme.keyBackgroundColor)
                             )
-                        }
+                            .then(
+                                if (isStartActive) {
+                                    Modifier.border(1.dp, accentColor, RoundedCornerShape(6.dp))
+                                } else {
+                                    Modifier
+                                }
+                            )
+                            .clickable { onSelectHandleChange(SelectionHandle.START) }
+                            .padding(horizontal = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "◀ Awal",
+                            color = if (isStartActive) accentColor else textColor.copy(alpha = 0.85f),
+                            fontSize = 11.sp,
+                            fontWeight = if (isStartActive) FontWeight.Bold else FontWeight.SemiBold
+                        )
+                    }
+
+                    // Button: [Akhir ▶] (Ujung Kanan)
+                    val isEndActive = activeSelectionHandle == SelectionHandle.END
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight(0.85f)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(
+                                if (isEndActive) accentColor.copy(alpha = 0.25f) else Color(theme.keyBackgroundColor)
+                            )
+                            .then(
+                                if (isEndActive) {
+                                    Modifier.border(1.dp, accentColor, RoundedCornerShape(6.dp))
+                                } else {
+                                    Modifier
+                                }
+                            )
+                            .clickable { onSelectHandleChange(SelectionHandle.END) }
+                            .padding(horizontal = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Akhir ▶",
+                            color = if (isEndActive) accentColor else textColor.copy(alpha = 0.85f),
+                            fontSize = 11.sp,
+                            fontWeight = if (isEndActive) FontWeight.Bold else FontWeight.SemiBold
+                        )
+                    }
+
+                    // Button: [Lepas] (Deselect)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight(0.85f)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(Color(theme.keyBackgroundColor))
+                            .clickable { onDeselectClick() }
+                            .padding(horizontal = 7.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Lepas",
+                            color = textColor.copy(alpha = 0.70f),
+                            fontSize = 10.5.sp,
+                            fontWeight = FontWeight.Normal
+                        )
                     }
                 }
             } else if (suggestions.isEmpty()) {
