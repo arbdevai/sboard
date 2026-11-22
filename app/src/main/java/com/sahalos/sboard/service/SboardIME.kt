@@ -172,6 +172,8 @@ class SboardIME : InputMethodService(),
     private var enableVibration = true
     private var isPasswordField = false
     private var isTerminalField = false
+    private var isEmailField = false
+    private var isUriField = false
     private var isNumberPadField by mutableStateOf(false)
     private var isPhonePadField by mutableStateOf(false)
     private var isDecimalNumberField by mutableStateOf(false)
@@ -182,10 +184,10 @@ class SboardIME : InputMethodService(),
     private fun startBackspaceRepeat() {
         stopBackspaceRepeat()
         backspaceRepeatJob = serviceScope.launch {
-            delay(350L)
+            delay(170L)
             while (isActive) {
                 performBackspace()
-                delay(45L)
+                delay(28L)
             }
         }
     }
@@ -310,7 +312,7 @@ class SboardIME : InputMethodService(),
                             SboardKeyboardView(
                                 modifierState = modifierState,
                                 theme = activeTheme,
-                                suggestions = if (isPasswordField || isNumberPadField || isPhonePadField) emptyList() else currentSuggestions,
+                                suggestions = if (isPasswordField || isEmailField || isUriField || isNumberPadField || isPhonePadField) emptyList() else currentSuggestions,
                                 composingWord = currentComposingWord,
                                 bottomPaddingDp = bottomPadding,
                                 keyboardHeightRatio = heightRatio,
@@ -671,10 +673,20 @@ class SboardIME : InputMethodService(),
                  (isKnownTerminalPkg || (imeOptions and EditorInfo.IME_FLAG_NO_EXTRACT_UI) != 0))
 
         isTerminalField = hasRawTerminalFlags
-        isPasswordField = variation == InputType.TYPE_TEXT_VARIATION_PASSWORD ||
-                variation == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD ||
-                variation == InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD ||
-                variation == InputType.TYPE_NUMBER_VARIATION_PASSWORD
+
+        // Password detection: visible password is only a password if NOT a terminal
+        isPasswordField = when (variation) {
+            InputType.TYPE_TEXT_VARIATION_PASSWORD,
+            InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD,
+            InputType.TYPE_NUMBER_VARIATION_PASSWORD -> true
+            InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD -> !isTerminalField
+            else -> false
+        }
+
+        // Email and URI field detection: disable word composing, disable autocorrect
+        isEmailField = variation == InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS ||
+                variation == InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS
+        isUriField = variation == InputType.TYPE_TEXT_VARIATION_URI
 
         isNumberPadField = (inputClass == InputType.TYPE_CLASS_NUMBER) || (inputClass == InputType.TYPE_CLASS_DATETIME)
         isPhonePadField = (inputClass == InputType.TYPE_CLASS_PHONE)
@@ -728,7 +740,7 @@ class SboardIME : InputMethodService(),
     private fun commitTextDirectly(text: String) {
         triggerHaptic()
         val ic = currentInputConnection ?: return
-        if (currentComposingWord.isNotEmpty() && !isPasswordField) {
+        if (currentComposingWord.isNotEmpty() && !isPasswordField && !isEmailField && !isUriField) {
             PassiveSuggestionEngine.learnWord(currentComposingWord)
         }
         ic.commitText(text, 1)
@@ -787,8 +799,8 @@ class SboardIME : InputMethodService(),
 
                 ic.commitText(charToCommit, 1)
 
-                // Update composing word for passive suggestions
-                if (!isPasswordField && charToCommit.length == 1 && charToCommit[0].isLetter()) {
+                // Update composing word for passive suggestions (skip for password/email/URI fields)
+                if (!isPasswordField && !isEmailField && !isUriField && charToCommit.length == 1 && charToCommit[0].isLetter()) {
                     currentComposingWord += charToCommit
                     currentSuggestions = PassiveSuggestionEngine.getSuggestions(currentComposingWord)
                 } else {
@@ -805,7 +817,7 @@ class SboardIME : InputMethodService(),
                 }
             }
             KeyType.SPACE -> {
-                if (currentComposingWord.isNotEmpty() && !isPasswordField) {
+                if (currentComposingWord.isNotEmpty() && !isPasswordField && !isEmailField && !isUriField) {
                     PassiveSuggestionEngine.learnWord(currentComposingWord)
                 }
                 currentComposingWord = ""
@@ -860,7 +872,7 @@ class SboardIME : InputMethodService(),
                 keyboardMode = KeyboardMode.EMOJI
             }
             KeyType.ACTION -> {
-                if (currentComposingWord.isNotEmpty() && !isPasswordField) {
+                if (currentComposingWord.isNotEmpty() && !isPasswordField && !isEmailField && !isUriField) {
                     PassiveSuggestionEngine.learnWord(currentComposingWord)
                 }
                 currentComposingWord = ""
@@ -949,99 +961,38 @@ class SboardIME : InputMethodService(),
             }
         }
 
+        // For clipboard/edit ops, use dual-dispatch: performContextMenuAction for
+        // native EditText fields, PLUS sendKeyEvent for Chrome/WebView/apps that
+        // only respond to KeyEvent with META_CTRL_ON. Both are safe to call.
         when (lower) {
             "a" -> {
-                if (!ic.performContextMenuAction(android.R.id.selectAll)) {
-                    sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_A)
-                }
+                ic.performContextMenuAction(android.R.id.selectAll)
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_A)
             }
             "c" -> {
-                if (!ic.performContextMenuAction(android.R.id.copy)) {
-                    sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_C)
-                }
+                ic.performContextMenuAction(android.R.id.copy)
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_C)
             }
             "v" -> {
-                if (!ic.performContextMenuAction(android.R.id.paste)) {
-                    sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_V)
-                }
+                ic.performContextMenuAction(android.R.id.paste)
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_V)
             }
             "x" -> {
-                if (!ic.performContextMenuAction(android.R.id.cut)) {
-                    sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_X)
-                }
+                ic.performContextMenuAction(android.R.id.cut)
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_X)
             }
             "z" -> {
                 if (modifierState.isShiftActive) {
-                    if (!ic.performContextMenuAction(android.R.id.redo)) {
-                        sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_Z)
-                    }
+                    ic.performContextMenuAction(android.R.id.redo)
+                    sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_Z)
                 } else {
-                    if (!ic.performContextMenuAction(android.R.id.undo)) {
-                        sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_Z)
-                    }
+                    ic.performContextMenuAction(android.R.id.undo)
+                    sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_Z)
                 }
             }
             "y" -> {
-                if (!ic.performContextMenuAction(android.R.id.redo)) {
-                    sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_Y)
-                }
-            }
-            "w" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_W)
-            }
-            "f" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_F)
-            }
-            "s" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_S)
-            }
-            "d" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_D)
-            }
-            "t" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_T)
-            }
-            "n" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_N)
-            }
-            "p" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_P)
-            }
-            "r" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_R)
-            }
-            "k" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_K)
-            }
-            "b" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_B)
-            }
-            "i" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_I)
-            }
-            "u" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_U)
-            }
-            "o" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_O)
-            }
-            "l" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_L)
-            }
-            "g" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_G)
-            }
-            "e" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_E)
-            }
-            "h" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_H)
-            }
-            "j" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_J)
-            }
-            "q" -> {
-                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_Q)
+                ic.performContextMenuAction(android.R.id.redo)
+                sendCtrlKeyEvent(ic, KeyEvent.KEYCODE_Y)
             }
             else -> {
                 val keyCode = KeyEvent.keyCodeFromString("KEYCODE_${letter.uppercase()}")

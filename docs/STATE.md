@@ -1,7 +1,7 @@
 # Sboard Project State & Evolution Log
 
-## Current Status (v1.0.26 - Dual-Endpoint Selection Edition)
-- **Active Version:** `1.0.26` (`versionCode = 10026`)
+## Current Status (v1.0.27 - Compatibility & Speed Edition)
+- **Active Version:** `1.0.27` (`versionCode = 10027`)
 - **Git Branch:** `main`
 - **NDK Architectures:** `arm64-v8a`, `x86_64`
 - **Target Android SDK:** 36 (Min SDK: 30)
@@ -100,9 +100,22 @@
    - Deteksi otomatis konteks terminal (`isTerminalField` untuk DevBox, Termux, ConnectBot, JuiceSSH):
      - `CTRL + [A–Z]` mengirimkan karakter kontrol ASCII murni (`0x01`–`0x1A`, termasuk `Ctrl+C` `SIGINT`, `Ctrl+D` `EOF`, `Ctrl+Z` `SIGTSTP`, `Ctrl+L` clear, `Ctrl+X/O/W/K/U` nano, serta `Ctrl+Enter` / `Shift+Enter` protokol Kitty).
      - `FnRowView` menampilkan **2-Row Developer & Terminal Deck**: Baris 1 (`ESC, TAB, ALT, ←, ↓, ↑, →, HOME, END, PGUP, PGDN, DEL` dengan hold-to-repeat pada panah & DEL) dan Baris 2 (`F1`–`F12` dengan pengiriman urutan escape ANSI/VT100 `\u001BOP`..`\u001B[24~` serta dukungan kombinasi modifier `Ctrl/Alt/Shift + Panah/Fn`).
-   - Pada mode non-terminal (Web/Browser/Aplikasi biasa), tetap menggunakan `performContextMenuAction` dan `KeyEvent` standar Android.
+   - Pada mode non-terminal (Web/Browser/Aplikasi biasa), menggunakan **dual-dispatch**: `performContextMenuAction` DAN `sendKeyEvent(META_CTRL_ON)` secara bersamaan untuk jaminan kompatibilitas maksimum di Chrome, WebView, dan semua aplikasi Android.
 
-7. **Gesture & Animasi:**
+7. **Kompatibilitas Form Login/Register & Field Spesial:**
+   - File: `SboardIME.kt`.
+   - **Deteksi Field Email:** `TYPE_TEXT_VARIATION_EMAIL_ADDRESS` dan `TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS` otomatis menonaktifkan word composing dan saran kata (mencegah autocorrect mengganggu alamat email).
+   - **Deteksi Field URI:** `TYPE_TEXT_VARIATION_URI` menonaktifkan saran kata sehingga URL tidak terkontaminasi autocorrect.
+   - **Password Field Presisi:** `TYPE_TEXT_VARIATION_VISIBLE_PASSWORD` hanya dianggap password jika bukan terminal field, mencegah bentrokan deteksi terminal vs password.
+   - **Pembelajaran Kata Aman:** Word learning di `PassiveSuggestionEngine` dinonaktifkan sepenuhnya untuk field password, email, dan URI — mencegah bocornya kredensial ke kamus pengguna.
+
+8. **Backspace Repeat Speed Tinggi & Anti-Stuck:**
+   - File: `SboardIME.kt`.
+   - **Initial delay:** 170ms (sebelumnya 350ms) — 2x lebih responsif saat mulai menahan tombol hapus.
+   - **Repeat interval:** 28ms (sebelumnya 45ms) — ~36 karakter/detik, mendekati kecepatan PC keyboard repeat rate.
+   - **Safety cleanup:** `stopBackspaceRepeat()` dipanggil di `onStartInput()`, `onStartInputView()`, `onWindowHidden()`, `onFinishInputView()`, `onDestroy()`, dan `DisposableEffect(Unit)` di Compose — total 6 titik pembersihan untuk jaminan anti-stuck.
+
+9. **Gesture & Animasi:**
    - Spacebar cursor glide (`KEYCODE_DPAD_LEFT`/`RIGHT`).
    - Spring physics bubble preview pada `KeyView.kt`.
    - Resize keyboard real-time overlay.
