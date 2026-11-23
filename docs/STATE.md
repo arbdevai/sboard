@@ -1,7 +1,7 @@
 # Sboard Project State & Evolution Log
 
-## Current Status (v1.0.29 - Autocorrect, Text Expansion & Dedicated Layout Edition)
-- **Active Version:** `1.0.29` (`versionCode = 10029`)
+## Current Status (v1.0.30 - Terminal Isolation & Single-Word Autocorrect Boundary Edition)
+- **Active Version:** `1.0.30` (`versionCode = 10030`)
 - **Git Branch:** `main`
 - **NDK Architectures:** `arm64-v8a`, `x86_64`
 - **Target Android SDK:** 36 (Min SDK: 30)
@@ -131,7 +131,14 @@
    - **Autocorrect Typo Otomatis:** Deteksi typo berbasis Trie fuzzy search saat Spasi ditekan dengan sakelar ON/OFF di Pengaturan.
    - **Pintasan Teks (Custom Template Expansion):** Tabel SQLite `custom_shortcuts` persisten di `/data/data/com.sahalos.sboard/` (kebal update APK). Dilengkapi menu Tambah, Edit, Hapus di Pengaturan dan auto-expansion saat spasi ditekan.
 
-11. **Gesture & Animasi:**
+11. **Isolasi Terminal Mutlak & Boundary Presisi Single-Word Autocorrect:**
+   - File: `PassiveSuggestionEngine.kt`, `SboardIME.kt`.
+   - **Isolasi Terminal 100%:** Pada emulator terminal (Termux / DevBox), proses pengumpulan kata (*composing word*), saran kata, autocorrect, dan manipulasi teks pada Spasi **dinonaktifkan secara mutlak**. Menekan tombol karakter dan Spasi di terminal beroperasi murni sebagai raw byte pass-through (`0x20`, `\u0000`, `\u001B `) tanpa merusak atau menghapus perintah shell.
+   - **Pemindaian Batas Kata Aktual (Anti-Makan Banyak Kata):** Autocorrect dan template expansion tidak lagi bergantung pada variabel in-memory `currentComposingWord.length`. Sistem kini memindai langsung karakter teks sesungguhnya di depan kursor via `getTextBeforeCursor(64)` untuk mengekstrak `lastWord` murni. Penghapusan teks kini dijamin terkunci secara matematis hanya sepanjang `lastWord.length` tanpa pernah memakan spasi atau kata sebelumnya.
+   - **Filter Typo Berkualitas Tinggi:** Autocorrect hanya aktif pada kata dengan panjang minimal 4 huruf (`length >= 4`), wajib mempertahankan huruf pertama yang sama, perbedaan panjang maksimal 1 karakter, dan frekuensi kamus $\ge 3$. Kata pendek 1-3 huruf (`di`, `ke`, `ya`, `ga`, `ok`, `sh`, `cd`, `rm`) kebal terhadap pergantian otomatis.
+   - **Pembersihan State saat Kursor Bergeser:** State composing word otomatis di-reset saat kursor berpindah posisi atau pengguna mengetuk area teks lain di `onUpdateSelection` dan `moveCursor`.
+
+12. **Gesture & Animasi:**
    - Spacebar cursor glide (`KEYCODE_DPAD_LEFT`/`RIGHT`).
    - Spring physics bubble preview pada `KeyView.kt`.
    - Resize keyboard real-time overlay.

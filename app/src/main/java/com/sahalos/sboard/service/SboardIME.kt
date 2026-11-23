@@ -663,6 +663,11 @@ class SboardIME : InputMethodService(),
         selectionStartPos = minOf(newSelStart, newSelEnd)
         selectionEndPos = maxOf(newSelStart, newSelEnd)
         hasActiveSelection = (newSelStart != newSelEnd)
+
+        // Reset composing word if cursor was moved manually
+        if (newSelStart != oldSelStart || newSelEnd != oldSelEnd) {
+            currentComposingWord = ""
+        }
     }
 
     override fun onDestroy() {
@@ -870,18 +875,18 @@ class SboardIME : InputMethodService(),
 
                 ic.commitText(charToCommit, 1)
 
-                // Update composing word for passive suggestions (skip for password/email/URI fields)
-                if (enablePassiveSuggestions && !isPasswordField && !isEmailField && !isUriField && charToCommit.length == 1 && charToCommit[0].isLetter()) {
+                // Update composing word for passive suggestions (NEVER in terminal, password, email, or URI)
+                if (enablePassiveSuggestions && !isTerminalField && !isPasswordField && !isEmailField && !isUriField && charToCommit.length == 1 && charToCommit[0].isLetter()) {
                     currentComposingWord += charToCommit
                     currentSuggestions = PassiveSuggestionEngine.getSuggestions(currentComposingWord)
                 } else {
-                    if (currentComposingWord.isNotEmpty()) {
+                    if (currentComposingWord.isNotEmpty() && !isTerminalField && !isPasswordField && !isEmailField && !isUriField) {
                         PassiveSuggestionEngine.learnWord(currentComposingWord)
                     }
                     currentComposingWord = ""
-                    if (isEmailField || isUriField) {
+                    if (!isTerminalField && (isEmailField || isUriField)) {
                         updateEmailOrUriSuggestions()
-                    } else if (charToCommit == "@" && !isPasswordField) {
+                    } else if (!isTerminalField && charToCommit == "@" && !isPasswordField) {
                         currentSuggestions = listOf("gmail.com", "yahoo.com", "outlook.com")
                     } else {
                         currentSuggestions = emptyList()
@@ -894,24 +899,58 @@ class SboardIME : InputMethodService(),
                 }
             }
             KeyType.SPACE -> {
-                // 1. Custom text expansion shortcut (e.g. "akunpro" -> template expansion)
-                val expansion = if (currentComposingWord.isNotEmpty()) {
-                    PassiveSuggestionEngine.getShortcutExpansion(currentComposingWord)
-                } else null
-
-                if (expansion != null) {
-                    ic.deleteSurroundingText(currentComposingWord.length, 0)
-                    ic.commitText("$expansion ", 1)
+                // 1. Terminal mode: completely raw pass-through, NEVER autocorrect or word-expand
+                if (isTerminalField) {
                     currentComposingWord = ""
                     currentSuggestions = emptyList()
+                    if (modifierState.isCtrlActive) {
+                        ic.commitText("\u0000", 1)
+                        if (!modifierState.isCtrlLocked) modifierState = modifierState.copy(isCtrlActive = false)
+                        if (!modifierState.isAltLocked) modifierState = modifierState.copy(isAltActive = false)
+                        return
+                    }
+                    if (modifierState.isAltActive) {
+                        ic.commitText("\u001B ", 1)
+                        if (!modifierState.isAltLocked) modifierState = modifierState.copy(isAltActive = false)
+                        return
+                    }
+                    ic.commitText(" ", 1)
                     return
                 }
 
-                // 2. Autocorrect typo replacement
-                if (enableAutocorrect && enablePassiveSuggestions && currentComposingWord.length >= 2 && !isPasswordField && !isEmailField && !isUriField) {
-                    val typoCorrection = PassiveSuggestionEngine.getAutocorrectCandidate(currentComposingWord)
-                    if (typoCorrection != null && typoCorrection.lowercase() != currentComposingWord.lowercase()) {
-                        ic.deleteSurroundingText(currentComposingWord.length, 0)
+                // 2. Read actual word boundary directly before cursor (GUARANTEES only 1 word is touched)
+                val textBefore = ic.getTextBeforeCursor(64, 0)?.toString() ?: ""
+                var wordEnd = textBefore.length - 1
+                while (wordEnd >= 0 && textBefore[wordEnd].isWhitespace()) {
+                    wordEnd--
+                }
+                var wordStart = wordEnd
+                while (wordStart >= 0 && (textBefore[wordStart].isLetter() || textBefore[wordStart] == '\'')) {
+                    wordStart--
+                }
+                val lastWord = if (wordEnd >= 0 && wordStart < wordEnd) {
+                    textBefore.substring(wordStart + 1, wordEnd + 1)
+                } else {
+                    currentComposingWord
+                }
+
+                // 3. Custom text expansion shortcut (e.g. "akunpro" -> template expansion)
+                if (lastWord.isNotEmpty()) {
+                    val expansion = PassiveSuggestionEngine.getShortcutExpansion(lastWord)
+                    if (expansion != null) {
+                        ic.deleteSurroundingText(lastWord.length, 0)
+                        ic.commitText("$expansion ", 1)
+                        currentComposingWord = ""
+                        currentSuggestions = emptyList()
+                        return
+                    }
+                }
+
+                // 4. Autocorrect typo replacement (strictly requires word >= 4 letters in normal fields)
+                if (enableAutocorrect && enablePassiveSuggestions && lastWord.length >= 4 && !isPasswordField && !isEmailField && !isUriField) {
+                    val typoCorrection = PassiveSuggestionEngine.getAutocorrectCandidate(lastWord)
+                    if (typoCorrection != null && typoCorrection.lowercase() != lastWord.lowercase()) {
+                        ic.deleteSurroundingText(lastWord.length, 0)
                         ic.commitText("$typoCorrection ", 1)
                         PassiveSuggestionEngine.learnWord(typoCorrection, boost = 3)
                         currentComposingWord = ""
@@ -920,23 +959,13 @@ class SboardIME : InputMethodService(),
                     }
                 }
 
-                if (currentComposingWord.isNotEmpty() && !isPasswordField && !isEmailField && !isUriField) {
-                    PassiveSuggestionEngine.learnWord(currentComposingWord)
+                // 5. Normal word learning on space
+                if (lastWord.isNotEmpty() && !isPasswordField && !isEmailField && !isUriField) {
+                    PassiveSuggestionEngine.learnWord(lastWord)
                 }
                 currentComposingWord = ""
                 currentSuggestions = emptyList()
 
-                if (isTerminalField && modifierState.isCtrlActive) {
-                    ic.commitText("\u0000", 1)
-                    if (!modifierState.isCtrlLocked) modifierState = modifierState.copy(isCtrlActive = false)
-                    if (!modifierState.isAltLocked) modifierState = modifierState.copy(isAltActive = false)
-                    return
-                }
-                if (isTerminalField && modifierState.isAltActive) {
-                    ic.commitText("\u001B ", 1)
-                    if (!modifierState.isAltLocked) modifierState = modifierState.copy(isAltActive = false)
-                    return
-                }
                 ic.commitText(" ", 1)
             }
             KeyType.BACKSPACE -> {
@@ -1192,6 +1221,7 @@ class SboardIME : InputMethodService(),
     }
 
     private fun moveCursor(offset: Int) {
+        currentComposingWord = ""
         triggerHaptic()
         val ic = currentInputConnection ?: return
         val count = kotlin.math.abs(offset)
