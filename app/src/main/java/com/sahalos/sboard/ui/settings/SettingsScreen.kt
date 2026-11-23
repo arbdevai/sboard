@@ -26,6 +26,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -33,9 +34,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -44,6 +47,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -65,6 +69,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sahalos.sboard.BuildConfig
 import com.sahalos.sboard.R
+import com.sahalos.sboard.core.PassiveSuggestionEngine
+import com.sahalos.sboard.data.CustomShortcut
 import com.sahalos.sboard.data.SboardPreferences
 import com.sahalos.sboard.data.UpdateManager
 import com.sahalos.sboard.data.UpdateUiState
@@ -93,6 +99,22 @@ fun SettingsScreen(
     val enableSpacebarCursorGlide by preferences.enableSpacebarCursorGlide.collectAsStateWithLifecycle(initialValue = true)
     val enableClipboardHistory by preferences.enableClipboardHistory.collectAsStateWithLifecycle(initialValue = true)
     val enableNumberRow by preferences.enableNumberRow.collectAsStateWithLifecycle(initialValue = true)
+    val enableAutocorrect by preferences.enableAutocorrect.collectAsStateWithLifecycle(initialValue = true)
+
+    // Custom Text Expansion Shortcuts
+    var shortcutsList by remember { mutableStateOf<List<CustomShortcut>>(emptyList()) }
+    var showShortcutDialog by remember { mutableStateOf(false) }
+    var editingShortcut by remember { mutableStateOf<CustomShortcut?>(null) }
+    var shortcutInput by remember { mutableStateOf("") }
+    var expansionInput by remember { mutableStateOf("") }
+
+    fun refreshShortcuts() {
+        shortcutsList = PassiveSuggestionEngine.getAllShortcuts()
+    }
+
+    LaunchedEffect(Unit) {
+        refreshShortcuts()
+    }
 
     // IME Dynamic Status on Lifecycle ON_RESUME
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -458,6 +480,17 @@ fun SettingsScreen(
                     )
 
                     SettingSwitchRow(
+                        title = "Koreksi Otomatis (Autocorrect Typo)",
+                        subtitle = "Otomatis memperbaiki salah ketik (typo) saat tombol Spasi ditekan.",
+                        checked = enableAutocorrect,
+                        onCheckedChange = { checked ->
+                            coroutineScope.launch {
+                                preferences.setEnableAutocorrect(checked)
+                            }
+                        }
+                    )
+
+                    SettingSwitchRow(
                         title = "Baris Angka",
                         subtitle = "Tampilkan baris angka khusus (1-0) permanen di atas huruf QWERTY.",
                         checked = enableNumberRow,
@@ -513,7 +546,118 @@ fun SettingsScreen(
                 }
             }
 
-            // 4. SEKSI PAPAN KLIP (CLIPBOARD)
+            // 4. SEKSI PINTASAN TEKS & TEMPLATE
+            SectionTitle(title = "Pintasan Teks & Template")
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Pengganti Kata Otomatis",
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 15.sp
+                            )
+                            Text(
+                                text = "Ketik pintasan (misal: akunpro) lalu tekan Spasi untuk otomatis mengganti dengan teks template.",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Button(
+                            onClick = {
+                                editingShortcut = null
+                                shortcutInput = ""
+                                expansionInput = ""
+                                showShortcutDialog = true
+                            },
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                        ) {
+                            Text(text = "Tambah +", fontSize = 12.5.sp)
+                        }
+                    }
+
+                    if (shortcutsList.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                    RoundedCornerShape(8.dp)
+                                )
+                                .padding(12.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Belum ada template. Tekan 'Tambah +' untuk membuat pintasan.",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            shortcutsList.forEach { item ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f))
+                                        .clickable {
+                                            editingShortcut = item
+                                            shortcutInput = item.shortcut
+                                            expansionInput = item.expansion
+                                            showShortcutDialog = true
+                                        }
+                                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = item.shortcut,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 13.5.sp,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                        Text(
+                                            text = item.expansion,
+                                            fontSize = 12.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            maxLines = 1,
+                                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = {
+                                            PassiveSuggestionEngine.deleteShortcut(item.shortcut)
+                                            refreshShortcuts()
+                                        },
+                                        modifier = Modifier.size(32.dp)
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_delete),
+                                            contentDescription = "Hapus",
+                                            tint = MaterialTheme.colorScheme.error,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 5. SEKSI PAPAN KLIP (CLIPBOARD)
             SectionTitle(title = "Papan Klip (Clipboard)")
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -768,6 +912,55 @@ fun SettingsScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+        }
+
+        if (showShortcutDialog) {
+            AlertDialog(
+                onDismissRequest = { showShortcutDialog = false },
+                title = {
+                    Text(
+                        text = if (editingShortcut != null) "Edit Pintasan Teks" else "Tambah Pintasan Teks",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 17.sp
+                    )
+                },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        OutlinedTextField(
+                            value = shortcutInput,
+                            onValueChange = { shortcutInput = it },
+                            label = { Text("Pintasan (contoh: akunpro)") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        OutlinedTextField(
+                            value = expansionInput,
+                            onValueChange = { expansionInput = it },
+                            label = { Text("Teks Pengganti / Template") },
+                            maxLines = 4,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            if (shortcutInput.isNotBlank() && expansionInput.isNotBlank()) {
+                                PassiveSuggestionEngine.addOrUpdateShortcut(shortcutInput, expansionInput)
+                                refreshShortcuts()
+                                showShortcutDialog = false
+                            }
+                        }
+                    ) {
+                        Text("Simpan")
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(onClick = { showShortcutDialog = false }) {
+                        Text("Batal")
+                    }
+                }
+            )
         }
     }
 }

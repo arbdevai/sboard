@@ -2,12 +2,14 @@ package com.sahalos.sboard.core
 
 import android.content.Context
 import android.util.Log
+import com.sahalos.sboard.data.CustomShortcut
 import com.sahalos.sboard.data.UserDictionaryDbHelper
 import com.sahalos.sboard.data.WordRecord
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import java.util.concurrent.ConcurrentHashMap
 
 object PassiveSuggestionEngine {
     private const val TAG = "AdaptiveSuggestionEngine"
@@ -17,6 +19,9 @@ object PassiveSuggestionEngine {
 
     // Production-grade Trie data structure for O(L) instant prefix and fuzzy queries
     private val trie = TrieTree()
+
+    // In-memory cache for instant text expansion shortcut lookups
+    private val shortcutsMap = ConcurrentHashMap<String, String>()
 
     @Volatile
     private var isInitialized = false
@@ -35,8 +40,13 @@ object PassiveSuggestionEngine {
                     for (w in words) {
                         trie.insert(w, accumulate = false)
                     }
+                    val shortcuts = helper.getAllShortcuts()
+                    shortcutsMap.clear()
+                    for (s in shortcuts) {
+                        shortcutsMap[s.shortcut.lowercase()] = s.expansion
+                    }
                     isInitialized = true
-                    Log.i(TAG, "Adaptive suggestion engine initialized with ${words.size} words in Trie")
+                    Log.i(TAG, "Adaptive suggestion engine initialized with ${words.size} words and ${shortcuts.size} shortcuts")
                 } catch (e: Exception) {
                     Log.e(TAG, "Failed to load words into Trie: ${e.message}")
                 }
@@ -44,7 +54,36 @@ object PassiveSuggestionEngine {
         }
     }
 
-    fun learnWord(word: String, boost: Int = 1) {
+    fun reloadShortcuts() {
+        scope.launch {
+            val list = dbHelper?.getAllShortcuts() ?: emptyList()
+            shortcutsMap.clear()
+            for (item in list) {
+                shortcutsMap[item.shortcut.lowercase()] = item.expansion
+            }
+        }
+    }
+
+    fun getShortcutExpansion(shortcut: String): String? {
+        val clean = shortcut.trim().lowercase()
+        return shortcutsMap[clean] ?: dbHelper?.getShortcutExpansion(clean)
+    }
+
+    fun getAllShortcuts(): List<CustomShortcut> {
+        return dbHelper?.getAllShortcuts() ?: emptyList()
+    }
+
+    fun addOrUpdateShortcut(shortcut: String, expansion: String) {
+        dbHelper?.addOrUpdateShortcut(shortcut, expansion)
+        shortcutsMap[shortcut.trim().lowercase()] = expansion.trim()
+    }
+
+    fun deleteShortcut(shortcut: String) {
+        dbHelper?.deleteShortcut(shortcut)
+        shortcutsMap.remove(shortcut.trim().lowercase())
+    }
+
+    fun learnWord(word: String, boost: Int = 3) {
         val clean = word.trim().lowercase()
         if (clean.length < 2 || clean.any { !it.isLetter() }) return
 
@@ -64,8 +103,19 @@ object PassiveSuggestionEngine {
 
     fun hasPrefixMatch(prefix: String): Boolean {
         if (prefix.isEmpty()) return false
-        return trie.searchPrefix(prefix, maxCount = 1, minFrequency = 2).isNotEmpty() ||
-            trie.getWordFrequency(prefix) >= 2
+        return trie.searchPrefix(prefix, maxCount = 1, minFrequency = 1).isNotEmpty() ||
+            trie.getWordFrequency(prefix) >= 1
+    }
+
+    fun getAutocorrectCandidate(composingWord: String): String? {
+        val clean = composingWord.trim().lowercase()
+        if (clean.length < 2) return null
+        // If word is already a known valid word with decent frequency, don't autocorrect
+        if (trie.getWordFrequency(clean) >= 2) return null
+        // Search fuzzy match candidates with minFrequency = 2 (valid dictionary words)
+        val fuzzyRecords = trie.searchFuzzy(clean, maxCount = 2, minFrequency = 2)
+        val best = fuzzyRecords.firstOrNull() ?: return null
+        return formatWordCase(best.word, composingWord.first().isUpperCase())
     }
 
     fun getSuggestions(composingWord: String, maxCount: Int = 3): List<String> {
@@ -74,22 +124,43 @@ object PassiveSuggestionEngine {
 
         val isFirstCharUpper = trimmed.first().isUpperCase()
         val queryLower = trimmed.lowercase()
-
-        // 1. O(L) instant prefix match from Trie (only words with frequency >= 2 to filter out 1-time typos)
-        val prefixRecords = trie.searchPrefix(queryLower, maxCount = maxCount + 1, minFrequency = 2)
         val results = mutableListOf<String>()
 
-        for (cand in prefixRecords) {
-            if (cand.word != queryLower) {
-                results.add(formatWordCase(cand.word, isFirstCharUpper))
-                if (results.size >= maxCount) break
+        // 1. Check custom text shortcuts first
+        val exactExpansion = shortcutsMap[queryLower]
+        if (exactExpansion != null) {
+            results.add(exactExpansion)
+        } else {
+            val matchingShortcut = shortcutsMap.entries.firstOrNull { it.key.startsWith(queryLower) }
+            if (matchingShortcut != null) {
+                results.add(matchingShortcut.value)
             }
         }
 
-        // 2. Branch-pruned Trie fuzzy search if prefix candidates are fewer than maxCount
+        // 2. O(L) instant prefix match from Trie (minFrequency = 1 so newly typed words appear immediately)
+        val prefixRecords = trie.searchPrefix(queryLower, maxCount = maxCount + 2, minFrequency = 1)
+        val now = System.currentTimeMillis()
+
+        // Score prefix candidates by frequency + recency bonus (words used in last 48 hours get boosted)
+        val scoredPrefix = prefixRecords
+            .filter { it.word != queryLower && it.word !in results.map { r -> r.lowercase() } }
+            .map { rec ->
+                val hoursSinceUsed = ((now - rec.lastUsed) / (1000 * 3600)).coerceAtLeast(0)
+                val recencyBonus = if (hoursSinceUsed < 48) (48 - hoursSinceUsed) / 3f else 0f
+                val finalScore = (rec.frequency * 1.5f) + recencyBonus
+                Pair(rec, finalScore)
+            }
+            .sortedByDescending { it.second }
+
+        for (pair in scoredPrefix) {
+            results.add(formatWordCase(pair.first.word, isFirstCharUpper))
+            if (results.size >= maxCount) break
+        }
+
+        // 3. Branch-pruned Trie fuzzy search if prefix candidates are fewer than maxCount
         if (results.size < maxCount && queryLower.length >= 2) {
             val needed = maxCount - results.size
-            val fuzzyRecords = trie.searchFuzzy(queryLower, maxCount = needed * 3, minFrequency = 2)
+            val fuzzyRecords = trie.searchFuzzy(queryLower, maxCount = needed * 3, minFrequency = 1)
 
             val scoredFuzzy = fuzzyRecords
                 .filter { it.word !in results.map { r -> r.lowercase() } && it.word != queryLower }
@@ -99,9 +170,10 @@ object PassiveSuggestionEngine {
                     } else {
                         0.5f
                     }
-                    // Give bonus if first letter matches what the user typed
                     val firstCharBonus = if (rec.word.firstOrNull() == queryLower.firstOrNull()) 15f else 0f
-                    val finalScore = (rec.frequency * 1.2f) + (bigramBonus * 10f) + firstCharBonus
+                    val hoursSinceUsed = ((now - rec.lastUsed) / (1000 * 3600)).coerceAtLeast(0)
+                    val recencyBonus = if (hoursSinceUsed < 48) (48 - hoursSinceUsed) / 3f else 0f
+                    val finalScore = (rec.frequency * 1.2f) + (bigramBonus * 10f) + firstCharBonus + recencyBonus
                     Pair(rec, finalScore)
                 }
                 .sortedByDescending { it.second }

@@ -240,30 +240,30 @@ fun SuggestionsBar(
                 )
             } else {
                 suggestions.take(3).forEach { word ->
-                    val isPill = word.startsWith("@") || word.contains("@") || word.startsWith(".")
+                    val isDomainOrShortcut = word.startsWith("@") || word.contains("@") || word.startsWith(".") || word.length > 12
                     Box(
                         modifier = Modifier
-                            .fillMaxHeight(if (isPill) 0.82f else 1.0f)
-                            .clip(RoundedCornerShape(if (isPill) 12.dp else 6.dp))
+                            .fillMaxHeight(0.85f)
+                            .clip(RoundedCornerShape(8.dp))
                             .background(
-                                if (isPill) accentColor.copy(alpha = 0.16f) else Color.Transparent
+                                if (isDomainOrShortcut) accentColor.copy(alpha = 0.18f)
+                                else Color(theme.keyBackgroundColor)
                             )
-                            .then(
-                                if (isPill) {
-                                    Modifier.border(0.8.dp, accentColor.copy(alpha = 0.45f), RoundedCornerShape(12.dp))
-                                } else {
-                                    Modifier
-                                }
+                            .border(
+                                1.dp,
+                                if (isDomainOrShortcut) accentColor.copy(alpha = 0.55f)
+                                else textColor.copy(alpha = 0.18f),
+                                RoundedCornerShape(8.dp)
                             )
                             .clickable { onSuggestionClick(word) }
-                            .padding(horizontal = if (isPill) 8.dp else 5.dp),
+                            .padding(horizontal = 9.dp, vertical = 2.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = word,
-                            color = if (isPill) accentColor else textColor,
-                            fontSize = if (isPill) 11.5.sp else 13.sp,
-                            fontWeight = if (isPill) FontWeight.Medium else FontWeight.Normal,
+                            color = if (isDomainOrShortcut) accentColor else textColor,
+                            fontSize = if (word.length > 10) 11.sp else 12.5.sp,
+                            fontWeight = FontWeight.Medium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )

@@ -1,7 +1,7 @@
 # Sboard Project State & Evolution Log
 
-## Current Status (v1.0.28 - Gboard-Style Email Domain & Quick Suffix Edition)
-- **Active Version:** `1.0.28` (`versionCode = 10028`)
+## Current Status (v1.0.29 - Autocorrect, Text Expansion & Dedicated Layout Edition)
+- **Active Version:** `1.0.29` (`versionCode = 10029`)
 - **Git Branch:** `main`
 - **NDK Architectures:** `arm64-v8a`, `x86_64`
 - **Target Android SDK:** 36 (Min SDK: 30)
@@ -122,7 +122,16 @@
    - **Saved Account Autofill:** Email yang pernah diinput otomatis tersimpan aman di DataStore dan ditawarkan di posisi pill pertama saat membuka field email.
    - **URI Suffix Pills:** Pada field URL/URI, toolbar menawarkan `.com`, `.id`, `.co.id`, `.org`, `.net` dengan penggantian suffix otomatis.
 
-10. **Gesture & Animasi:**
+10. **Autocorrect Typo Otomatis, Custom Text Expansion & Layout Anti-Clutter:**
+   - File: `KeyLayoutProvider.kt`, `SboardKeyboardView.kt`, `SuggestionsBar.kt`, `UserDictionaryDbHelper.kt`, `PassiveSuggestionEngine.kt`, `SboardPreferences.kt`, `SettingsScreen.kt`, `SboardIME.kt`.
+   - **Pembersihan Simbol Baris Angka (Anti-Clutter):** Saat `Baris Angka` aktif, angka sekunder `1-0` di baris `qwertyuiop` otomatis dihapus sehingga alfabet tampil bersih. Simbol sekunder baris tengah otomatis diganti dengan karakter kurung siku dan kurawal (`[ ] { } \ | - + /`) tanpa menduplikasi simbol Shift baris angka.
+   - **Kotak / Container Saran Tegas:** Seluruh pill saran kata di toolbar kini dibungkus kontainer kotak berbingkai dengan warna latar tombol yang kontras dan nyaman ditekan.
+   - **Koneksi On/Off Autosuggest:** Preference `enablePassiveSuggestions` kini tersambung langsung ke service IME untuk mematikan saran kata secara total saat dinonaktifkan.
+   - **Pembelajaran Kosakata Harian Cepat:** Mengubah `minFrequency = 1` dan menambahkan bobot *recency* 48 jam sehingga kata baru yang diketik pengguna langsung dipelajari dan disarankan di sesi berikutnya.
+   - **Autocorrect Typo Otomatis:** Deteksi typo berbasis Trie fuzzy search saat Spasi ditekan dengan sakelar ON/OFF di Pengaturan.
+   - **Pintasan Teks (Custom Template Expansion):** Tabel SQLite `custom_shortcuts` persisten di `/data/data/com.sahalos.sboard/` (kebal update APK). Dilengkapi menu Tambah, Edit, Hapus di Pengaturan dan auto-expansion saat spasi ditekan.
+
+11. **Gesture & Animasi:**
    - Spacebar cursor glide (`KEYCODE_DPAD_LEFT`/`RIGHT`).
    - Spring physics bubble preview pada `KeyView.kt`.
    - Resize keyboard real-time overlay.

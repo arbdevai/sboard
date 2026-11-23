@@ -13,18 +13,29 @@ data class WordRecord(
     val lastUsed: Long
 )
 
+data class CustomShortcut(
+    val shortcut: String,
+    val expansion: String,
+    val createdAt: Long = System.currentTimeMillis()
+)
+
 class UserDictionaryDbHelper(private val context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
         private const val TAG = "UserDictionaryDb"
         private const val DATABASE_NAME = "sboard_user_dict.db"
-        private const val DATABASE_VERSION = 1
+        private const val DATABASE_VERSION = 2
 
         const val TABLE_WORDS = "user_words"
         const val COL_WORD = "word"
         const val COL_FREQUENCY = "frequency"
         const val COL_LAST_USED = "last_used"
+
+        const val TABLE_SHORTCUTS = "custom_shortcuts"
+        const val COL_SHORTCUT = "shortcut"
+        const val COL_EXPANSION = "expansion"
+        const val COL_CREATED_AT = "created_at"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -40,11 +51,31 @@ class UserDictionaryDbHelper(private val context: Context) :
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_word_prefix ON $TABLE_WORDS($COL_WORD);")
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_word_rank ON $TABLE_WORDS($COL_FREQUENCY DESC, $COL_LAST_USED DESC);")
 
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS $TABLE_SHORTCUTS (
+                $COL_SHORTCUT TEXT PRIMARY KEY COLLATE NOCASE,
+                $COL_EXPANSION TEXT NOT NULL,
+                $COL_CREATED_AT INTEGER NOT NULL
+            );
+            """.trimIndent()
+        )
+
         seedInitialVocabulary(db)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        // Upgrade migrations
+        if (oldVersion < 2) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS $TABLE_SHORTCUTS (
+                    $COL_SHORTCUT TEXT PRIMARY KEY COLLATE NOCASE,
+                    $COL_EXPANSION TEXT NOT NULL,
+                    $COL_CREATED_AT INTEGER NOT NULL
+                );
+                """.trimIndent()
+            )
+        }
     }
 
     private fun seedInitialVocabulary(db: SQLiteDatabase) {
@@ -150,5 +181,70 @@ class UserDictionaryDbHelper(private val context: Context) :
             }
         }
         return result
+    }
+
+    fun addOrUpdateShortcut(shortcut: String, expansion: String) {
+        val cleanShortcut = shortcut.trim().lowercase()
+        val cleanExpansion = expansion.trim()
+        if (cleanShortcut.isEmpty() || cleanExpansion.isEmpty()) return
+        val db = writableDatabase
+        val now = System.currentTimeMillis()
+        try {
+            db.execSQL(
+                """
+                INSERT INTO $TABLE_SHORTCUTS ($COL_SHORTCUT, $COL_EXPANSION, $COL_CREATED_AT)
+                VALUES (?, ?, ?)
+                ON CONFLICT($COL_SHORTCUT) DO UPDATE SET
+                    $COL_EXPANSION = ?,
+                    $COL_CREATED_AT = ?;
+                """.trimIndent(),
+                arrayOf(cleanShortcut, cleanExpansion, now, cleanExpansion, now)
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error adding shortcut '$cleanShortcut': ${e.message}")
+        }
+    }
+
+    fun deleteShortcut(shortcut: String) {
+        val cleanShortcut = shortcut.trim().lowercase()
+        val db = writableDatabase
+        try {
+            db.delete(TABLE_SHORTCUTS, "$COL_SHORTCUT = ?", arrayOf(cleanShortcut))
+        } catch (e: Exception) {
+            Log.e(TAG, "Error deleting shortcut '$cleanShortcut': ${e.message}")
+        }
+    }
+
+    fun getAllShortcuts(): List<CustomShortcut> {
+        val list = mutableListOf<CustomShortcut>()
+        val db = readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT $COL_SHORTCUT, $COL_EXPANSION, $COL_CREATED_AT FROM $TABLE_SHORTCUTS ORDER BY $COL_CREATED_AT DESC",
+            null
+        )
+        cursor.use { c ->
+            val colS = c.getColumnIndexOrThrow(COL_SHORTCUT)
+            val colE = c.getColumnIndexOrThrow(COL_EXPANSION)
+            val colC = c.getColumnIndexOrThrow(COL_CREATED_AT)
+            while (c.moveToNext()) {
+                list.add(CustomShortcut(c.getString(colS), c.getString(colE), c.getLong(colC)))
+            }
+        }
+        return list
+    }
+
+    fun getShortcutExpansion(shortcut: String): String? {
+        val clean = shortcut.trim().lowercase()
+        val db = readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT $COL_EXPANSION FROM $TABLE_SHORTCUTS WHERE $COL_SHORTCUT = ? LIMIT 1",
+            arrayOf(clean)
+        )
+        cursor.use { c ->
+            if (c.moveToNext()) {
+                return c.getString(0)
+            }
+        }
+        return null
     }
 }

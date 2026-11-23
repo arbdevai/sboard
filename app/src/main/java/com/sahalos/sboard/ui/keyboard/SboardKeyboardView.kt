@@ -101,7 +101,11 @@ fun SboardKeyboardView(
         modifierState.isSymPage2Active -> KeyLayoutProvider.getSymbolsPage2Rows()
         modifierState.isSymActive -> KeyLayoutProvider.getSymbolsRows()
         else -> {
-            val qwerty = KeyLayoutProvider.getQwertyRows(isShifted = modifierState.isShiftActive)
+            val hasDedicatedNumberRow = enableNumberRow && !isNumpadActive && !isPhonepadActive
+            val qwerty = KeyLayoutProvider.getQwertyRows(
+                isShifted = modifierState.isShiftActive,
+                hasDedicatedNumberRow = hasDedicatedNumberRow
+            )
             val adjustedQwerty = if (isNumberPad || isPhonePad) {
                 qwerty.map { row ->
                     row.map { k ->

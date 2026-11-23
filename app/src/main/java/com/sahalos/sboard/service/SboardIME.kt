@@ -170,6 +170,8 @@ class SboardIME : InputMethodService(),
     private var currentActionId by mutableStateOf(EditorInfo.IME_ACTION_UNSPECIFIED)
 
     private var enableVibration = true
+    private var enablePassiveSuggestions = true
+    private var enableAutocorrect = true
     private var isPasswordField = false
     private var isTerminalField = false
     private var isEmailField = false
@@ -212,6 +214,14 @@ class SboardIME : InputMethodService(),
 
         serviceScope.launch {
             preferences.enableVibration.collect { enableVibration = it }
+        }
+
+        serviceScope.launch {
+            preferences.enablePassiveSuggestions.collect { enablePassiveSuggestions = it }
+        }
+
+        serviceScope.launch {
+            preferences.enableAutocorrect.collect { enableAutocorrect = it }
         }
 
         serviceScope.launch {
@@ -319,7 +329,7 @@ class SboardIME : InputMethodService(),
                             SboardKeyboardView(
                                 modifierState = modifierState,
                                 theme = activeTheme,
-                                suggestions = if (isPasswordField || isNumberPadField || isPhonePadField) emptyList() else currentSuggestions,
+                                suggestions = if (!enablePassiveSuggestions || isPasswordField || isNumberPadField || isPhonePadField) emptyList() else currentSuggestions,
                                 composingWord = currentComposingWord,
                                 bottomPaddingDp = bottomPadding,
                                 keyboardHeightRatio = heightRatio,
@@ -861,7 +871,7 @@ class SboardIME : InputMethodService(),
                 ic.commitText(charToCommit, 1)
 
                 // Update composing word for passive suggestions (skip for password/email/URI fields)
-                if (!isPasswordField && !isEmailField && !isUriField && charToCommit.length == 1 && charToCommit[0].isLetter()) {
+                if (enablePassiveSuggestions && !isPasswordField && !isEmailField && !isUriField && charToCommit.length == 1 && charToCommit[0].isLetter()) {
                     currentComposingWord += charToCommit
                     currentSuggestions = PassiveSuggestionEngine.getSuggestions(currentComposingWord)
                 } else {
@@ -884,6 +894,32 @@ class SboardIME : InputMethodService(),
                 }
             }
             KeyType.SPACE -> {
+                // 1. Custom text expansion shortcut (e.g. "akunpro" -> template expansion)
+                val expansion = if (currentComposingWord.isNotEmpty()) {
+                    PassiveSuggestionEngine.getShortcutExpansion(currentComposingWord)
+                } else null
+
+                if (expansion != null) {
+                    ic.deleteSurroundingText(currentComposingWord.length, 0)
+                    ic.commitText("$expansion ", 1)
+                    currentComposingWord = ""
+                    currentSuggestions = emptyList()
+                    return
+                }
+
+                // 2. Autocorrect typo replacement
+                if (enableAutocorrect && enablePassiveSuggestions && currentComposingWord.length >= 2 && !isPasswordField && !isEmailField && !isUriField) {
+                    val typoCorrection = PassiveSuggestionEngine.getAutocorrectCandidate(currentComposingWord)
+                    if (typoCorrection != null && typoCorrection.lowercase() != currentComposingWord.lowercase()) {
+                        ic.deleteSurroundingText(currentComposingWord.length, 0)
+                        ic.commitText("$typoCorrection ", 1)
+                        PassiveSuggestionEngine.learnWord(typoCorrection, boost = 3)
+                        currentComposingWord = ""
+                        currentSuggestions = emptyList()
+                        return
+                    }
+                }
+
                 if (currentComposingWord.isNotEmpty() && !isPasswordField && !isEmailField && !isUriField) {
                     PassiveSuggestionEngine.learnWord(currentComposingWord)
                 }
