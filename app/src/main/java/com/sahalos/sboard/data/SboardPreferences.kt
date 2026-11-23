@@ -30,6 +30,7 @@ class SboardPreferences(private val context: Context) {
         val KEY_CLIPBOARD_HISTORY = booleanPreferencesKey("enable_clipboard_history")
         val KEY_RECENT_EMOJIS = stringPreferencesKey("recent_emojis")
         val KEY_ENABLE_NUMBER_ROW = booleanPreferencesKey("enable_number_row")
+        val KEY_SAVED_EMAILS = stringPreferencesKey("saved_emails")
     }
 
     val bottomPaddingDp: Flow<Int> = context.dataStore.data.map { prefs ->
@@ -78,6 +79,11 @@ class SboardPreferences(private val context: Context) {
 
     val recentEmojis: Flow<List<String>> = context.dataStore.data.map { prefs ->
         val raw = prefs[KEY_RECENT_EMOJIS] ?: backupPrefs.getString("recent_emojis", "") ?: ""
+        if (raw.isEmpty()) emptyList() else raw.split("\u0001")
+    }
+
+    val savedEmails: Flow<List<String>> = context.dataStore.data.map { prefs ->
+        val raw = prefs[KEY_SAVED_EMAILS] ?: backupPrefs.getString("saved_emails", "") ?: ""
         if (raw.isEmpty()) emptyList() else raw.split("\u0001")
     }
 
@@ -146,6 +152,21 @@ class SboardPreferences(private val context: Context) {
             val joined = current.take(36).joinToString("\u0001")
             backupPrefs.edit().putString("recent_emojis", joined).apply()
             prefs[KEY_RECENT_EMOJIS] = joined
+        }
+    }
+
+    suspend fun addSavedEmail(email: String) {
+        val trimmed = email.trim().lowercase()
+        if (!trimmed.contains('@') || !trimmed.contains('.') || trimmed.length < 5) return
+        context.dataStore.edit { prefs ->
+            val current = (prefs[KEY_SAVED_EMAILS] ?: backupPrefs.getString("saved_emails", "") ?: "")
+                .split("\u0001")
+                .filter { it.isNotEmpty() && it != trimmed }
+                .toMutableList()
+            current.add(0, trimmed)
+            val joined = current.take(8).joinToString("\u0001")
+            backupPrefs.edit().putString("saved_emails", joined).apply()
+            prefs[KEY_SAVED_EMAILS] = joined
         }
     }
 }

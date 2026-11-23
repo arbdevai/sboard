@@ -1,7 +1,7 @@
 # Sboard Project State & Evolution Log
 
-## Current Status (v1.0.27 - Compatibility & Speed Edition)
-- **Active Version:** `1.0.27` (`versionCode = 10027`)
+## Current Status (v1.0.28 - Gboard-Style Email Domain & Quick Suffix Edition)
+- **Active Version:** `1.0.28` (`versionCode = 10028`)
 - **Git Branch:** `main`
 - **NDK Architectures:** `arm64-v8a`, `x86_64`
 - **Target Android SDK:** 36 (Min SDK: 30)
@@ -115,7 +115,14 @@
    - **Repeat interval:** 28ms (sebelumnya 45ms) — ~36 karakter/detik, mendekati kecepatan PC keyboard repeat rate.
    - **Safety cleanup:** `stopBackspaceRepeat()` dipanggil di `onStartInput()`, `onStartInputView()`, `onWindowHidden()`, `onFinishInputView()`, `onDestroy()`, dan `DisposableEffect(Unit)` di Compose — total 6 titik pembersihan untuk jaminan anti-stuck.
 
-9. **Gesture & Animasi:**
+9. **Saran Domain Email & Suffix URL Ala Gboard:**
+   - File: `SboardIME.kt`, `SuggestionsBar.kt`, `SboardPreferences.kt`.
+   - **Email Domain Pills:** Pada field email, toolbar saran otomatis menampilkan pill domain cepat `@gmail.com`, `@yahoo.com`, `@outlook.com`.
+   - **Prefix Matching Dinamis:** Jika pengguna mengetik `@g`, pill menyaring menjadi `gmail.com`. Mengetuk pill mengganti prefix tanpa spasi trailing.
+   - **Saved Account Autofill:** Email yang pernah diinput otomatis tersimpan aman di DataStore dan ditawarkan di posisi pill pertama saat membuka field email.
+   - **URI Suffix Pills:** Pada field URL/URI, toolbar menawarkan `.com`, `.id`, `.co.id`, `.org`, `.net` dengan penggantian suffix otomatis.
+
+10. **Gesture & Animasi:**
    - Spacebar cursor glide (`KEYCODE_DPAD_LEFT`/`RIGHT`).
    - Spring physics bubble preview pada `KeyView.kt`.
    - Resize keyboard real-time overlay.
