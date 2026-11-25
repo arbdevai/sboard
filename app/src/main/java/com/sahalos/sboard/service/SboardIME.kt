@@ -171,7 +171,6 @@ class SboardIME : InputMethodService(),
 
     private var enableVibration = true
     private var enablePassiveSuggestions = true
-    private var enableAutocorrect = true
     private var isPasswordField = false
     private var isTerminalField = false
     private var isEmailField = false
@@ -218,10 +217,6 @@ class SboardIME : InputMethodService(),
 
         serviceScope.launch {
             preferences.enablePassiveSuggestions.collect { enablePassiveSuggestions = it }
-        }
-
-        serviceScope.launch {
-            preferences.enableAutocorrect.collect { enableAutocorrect = it }
         }
 
         serviceScope.launch {
@@ -878,7 +873,15 @@ class SboardIME : InputMethodService(),
                 // Update composing word for passive suggestions (NEVER in terminal, password, email, or URI)
                 if (enablePassiveSuggestions && !isTerminalField && !isPasswordField && !isEmailField && !isUriField && charToCommit.length == 1 && charToCommit[0].isLetter()) {
                     currentComposingWord += charToCommit
-                    currentSuggestions = PassiveSuggestionEngine.getSuggestions(currentComposingWord)
+                    val textBefore = ic.getTextBeforeCursor(64, 0)?.toString() ?: ""
+                    val lastToken = textBefore.substringAfterLast(' ', textBefore).substringAfterLast('\n', textBefore)
+                    if (lastToken.contains('@')) {
+                        val prefixAfterAt = lastToken.substringAfterLast('@').lowercase()
+                        val matches = commonEmailDomains.filter { it.startsWith(prefixAfterAt) }
+                        currentSuggestions = if (matches.isNotEmpty()) matches.take(3) else emptyList()
+                    } else {
+                        currentSuggestions = PassiveSuggestionEngine.getSuggestions(currentComposingWord)
+                    }
                 } else {
                     if (currentComposingWord.isNotEmpty() && !isTerminalField && !isPasswordField && !isEmailField && !isUriField) {
                         PassiveSuggestionEngine.learnWord(currentComposingWord)
@@ -899,7 +902,7 @@ class SboardIME : InputMethodService(),
                 }
             }
             KeyType.SPACE -> {
-                // 1. Terminal mode: completely raw pass-through, NEVER autocorrect or word-expand
+                // 1. Terminal mode: completely raw pass-through, NEVER word-expand
                 if (isTerminalField) {
                     currentComposingWord = ""
                     currentSuggestions = emptyList()
@@ -946,20 +949,7 @@ class SboardIME : InputMethodService(),
                     }
                 }
 
-                // 4. Autocorrect typo replacement (strictly requires word >= 4 letters in normal fields)
-                if (enableAutocorrect && enablePassiveSuggestions && lastWord.length >= 4 && !isPasswordField && !isEmailField && !isUriField) {
-                    val typoCorrection = PassiveSuggestionEngine.getAutocorrectCandidate(lastWord)
-                    if (typoCorrection != null && typoCorrection.lowercase() != lastWord.lowercase()) {
-                        ic.deleteSurroundingText(lastWord.length, 0)
-                        ic.commitText("$typoCorrection ", 1)
-                        PassiveSuggestionEngine.learnWord(typoCorrection, boost = 3)
-                        currentComposingWord = ""
-                        currentSuggestions = emptyList()
-                        return
-                    }
-                }
-
-                // 5. Normal word learning on space
+                // 4. Normal word learning on space
                 if (lastWord.isNotEmpty() && !isPasswordField && !isEmailField && !isUriField) {
                     PassiveSuggestionEngine.learnWord(lastWord)
                 }
@@ -1214,9 +1204,25 @@ class SboardIME : InputMethodService(),
         }
         if (currentComposingWord.isNotEmpty()) {
             currentComposingWord = currentComposingWord.dropLast(1)
-            currentSuggestions = PassiveSuggestionEngine.getSuggestions(currentComposingWord)
+            val textBefore = ic.getTextBeforeCursor(64, 0)?.toString() ?: ""
+            val lastToken = textBefore.substringAfterLast(' ', textBefore).substringAfterLast('\n', textBefore)
+            if (lastToken.contains('@')) {
+                val prefixAfterAt = lastToken.substringAfterLast('@').lowercase()
+                val matches = commonEmailDomains.filter { it.startsWith(prefixAfterAt) }
+                currentSuggestions = if (matches.isNotEmpty()) matches.take(3) else emptyList()
+            } else {
+                currentSuggestions = PassiveSuggestionEngine.getSuggestions(currentComposingWord)
+            }
         } else if (isEmailField || isUriField) {
             updateEmailOrUriSuggestions()
+        } else if (!isTerminalField && !isPasswordField) {
+            val textBefore = ic.getTextBeforeCursor(64, 0)?.toString() ?: ""
+            val lastToken = textBefore.substringAfterLast(' ', textBefore).substringAfterLast('\n', textBefore)
+            if (lastToken.endsWith('@')) {
+                currentSuggestions = listOf("gmail.com", "yahoo.com", "outlook.com")
+            } else {
+                currentSuggestions = emptyList()
+            }
         }
     }
 
@@ -1296,24 +1302,44 @@ class SboardIME : InputMethodService(),
             val textBefore = ic.getTextBeforeCursor(128, 0)?.toString() ?: ""
             val lastToken = textBefore.substringAfterLast(' ', textBefore).substringAfterLast('\n', textBefore)
 
-            if (word.contains('@') && word.contains('.')) {
-                // User picked a full email, e.g. "sahal@gmail.com"
+            val isFullEmail = !word.startsWith("@") && word.contains('@') && word.contains('.')
+            val isDomainWithAt = word.startsWith("@")
+            val isDomainWithoutAt = !isFullEmail && !isDomainWithAt && !word.startsWith(".") &&
+                (commonEmailDomains.any { word.equals(it, ignoreCase = true) } ||
+                 word.endsWith(".com") || word.endsWith(".id") || word.endsWith(".org") || word.endsWith(".net") || word.endsWith(".io"))
+            val isUriSuffix = word.startsWith(".")
+
+            if (isFullEmail) {
+                // User picked a full email, e.g. "sahal@gmail.com" from saved emails
                 if (lastToken.isNotEmpty()) {
                     ic.deleteSurroundingText(lastToken.length, 0)
                 }
                 ic.commitText(word, 1)
-            } else if (lastToken.contains('@')) {
-                // User typed "@", and picked e.g. "gmail.com"
-                val prefixAfterAt = lastToken.substringAfterLast('@')
-                if (prefixAfterAt.isNotEmpty() && word.startsWith(prefixAfterAt, ignoreCase = true)) {
-                    ic.deleteSurroundingText(prefixAfterAt.length, 0)
-                }
-                ic.commitText(word, 1)
-            } else if (word.startsWith("@")) {
+            } else if (isDomainWithAt) {
                 // User picked e.g. "@gmail.com"
-                ic.commitText(word, 1)
-            } else if (word.startsWith(".")) {
-                // URI suffix
+                if (lastToken.contains('@')) {
+                    val prefixAfterAt = lastToken.substringAfterLast('@')
+                    val charsToDelete = prefixAfterAt.length + 1
+                    ic.deleteSurroundingText(charsToDelete, 0)
+                    ic.commitText(word, 1)
+                } else {
+                    // User typed username (e.g. "budi"), NEVER delete username! Just append "@gmail.com"
+                    ic.commitText(word, 1)
+                }
+            } else if (isDomainWithoutAt) {
+                // User picked e.g. "gmail.com"
+                if (lastToken.contains('@')) {
+                    val prefixAfterAt = lastToken.substringAfterLast('@')
+                    if (prefixAfterAt.isNotEmpty() && word.startsWith(prefixAfterAt, ignoreCase = true)) {
+                        ic.deleteSurroundingText(prefixAfterAt.length, 0)
+                    }
+                    ic.commitText(word, 1)
+                } else {
+                    // User typed username without '@', prepend '@' so it completes to "budi@gmail.com"
+                    ic.commitText("@$word", 1)
+                }
+            } else if (isUriSuffix) {
+                // URI suffix e.g. ".com"
                 if (lastToken.contains('.')) {
                     val suffix = "." + lastToken.substringAfterLast('.')
                     if (word.startsWith(suffix, ignoreCase = true)) {
@@ -1325,6 +1351,7 @@ class SboardIME : InputMethodService(),
                 ic.commitText(word, 1)
             }
 
+            currentComposingWord = ""
             if (isEmailField || isUriField) {
                 updateEmailOrUriSuggestions()
             } else {

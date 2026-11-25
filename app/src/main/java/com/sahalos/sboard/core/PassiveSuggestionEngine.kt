@@ -107,31 +107,6 @@ object PassiveSuggestionEngine {
             trie.getWordFrequency(prefix) >= 1
     }
 
-    fun getAutocorrectCandidate(composingWord: String): String? {
-        val clean = composingWord.trim().lowercase()
-        // 1. Never autocorrect short words (<= 3 chars, e.g. "di", "ke", "ya", "ga", "sh", "cd")
-        if (clean.length < 4) return null
-
-        // 2. If word is already a known valid word in dictionary, NEVER autocorrect!
-        if (trie.getWordFrequency(clean) >= 1) return null
-
-        // 3. Search fuzzy match candidates
-        val fuzzyRecords = trie.searchFuzzy(clean, maxCount = 5, minFrequency = 2)
-        if (fuzzyRecords.isEmpty()) return null
-
-        // 4. Critical sanity checks for typo replacement:
-        // - Must start with the same first letter (typos rarely change the first letter!)
-        // - Length difference must be at most 1 char
-        // - Candidate must have strong frequency in dictionary (>= 3)
-        val best = fuzzyRecords.firstOrNull { cand ->
-            cand.word.first() == clean.first() &&
-            kotlin.math.abs(cand.word.length - clean.length) <= 1 &&
-            cand.frequency >= 3
-        } ?: return null
-
-        return formatWordCase(best.word, composingWord.first().isUpperCase())
-    }
-
     fun getSuggestions(composingWord: String, maxCount: Int = 3): List<String> {
         val trimmed = composingWord.trim()
         if (trimmed.isEmpty()) return emptyList()

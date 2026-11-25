@@ -1,7 +1,7 @@
 # Sboard Project State & Evolution Log
 
-## Current Status (v1.0.30 - Terminal Isolation & Single-Word Autocorrect Boundary Edition)
-- **Active Version:** `1.0.30` (`versionCode = 10030`)
+## Current Status (v1.0.31 - Autocorrect Elimination & Robust Email Autocomplete Edition)
+- **Active Version:** `1.0.31` (`versionCode = 10031`)
 - **Git Branch:** `main`
 - **NDK Architectures:** `arm64-v8a`, `x86_64`
 - **Target Android SDK:** 36 (Min SDK: 30)
@@ -10,7 +10,19 @@
 
 ## Logika & Modul yang Telah Beroperasi Penuh
 
-1. **Seleksi Teks Ujung ke Ujung Presisi (Dual-Endpoint Selection Glide - Opsi 1):**
+1. **Penghapusan Total Mesin Autocorrect Berat (Lag-Free Spacebar Typing):**
+   - File: `SboardIME.kt`, `PassiveSuggestionEngine.kt`, `SboardPreferences.kt`, `SettingsScreen.kt`.
+   - Menghapus eksekusi sinkron Trie DFS fuzzy Levenshtein distance pada saat tombol Spasi ditekan.
+   - Pengetikan spasi murni seketika tanpa lag atau pergantian kata paksa.
+   - Custom Text Expansion (shortcuts) dan Saran Kata Pasif di SuggestionsBar tetap berjalan cepat dan stabil.
+
+2. **Perbaikan Tuntas Email & Domain Autocomplete (`@gmail.com` / `gmail.com`):**
+   - File: `SboardIME.kt`.
+   - Memisahkan secara tegas antara alamat email utuh (tersimpan) vs saran domain (`@gmail.com` / `gmail.com`).
+   - Teks awalan (username) dijamin utuh dan tidak terhapus saat pengguna memilih saran domain email.
+   - Menangani token dengan/tanpa `@` serta penggantian prefix domain parsial (misal `user@gm` -> `user@gmail.com`).
+
+3. **Seleksi Teks Ujung ke Ujung Presisi (Dual-Endpoint Selection Glide - Opsi 1):**
    - File: `KeyModel.kt`, `SboardIME.kt`, `SuggestionsBar.kt`, `FnRowView.kt`, `SboardKeyboardView.kt`.
    - **Pemilih Handle Batas Seleksi (`[◀ Awal]` & `[Akhir ▶]`):**
      - Ketika ada teks terseleksi (`hasActiveSelection` via `onUpdateSelection` Android atau Shift aktif), bilah alat tengah otomatis bertransformasi menjadi **Dual-Endpoint Boundary Switcher**.

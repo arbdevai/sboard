@@ -99,7 +99,6 @@ fun SettingsScreen(
     val enableSpacebarCursorGlide by preferences.enableSpacebarCursorGlide.collectAsStateWithLifecycle(initialValue = true)
     val enableClipboardHistory by preferences.enableClipboardHistory.collectAsStateWithLifecycle(initialValue = true)
     val enableNumberRow by preferences.enableNumberRow.collectAsStateWithLifecycle(initialValue = true)
-    val enableAutocorrect by preferences.enableAutocorrect.collectAsStateWithLifecycle(initialValue = true)
 
     // Custom Text Expansion Shortcuts
     var shortcutsList by remember { mutableStateOf<List<CustomShortcut>>(emptyList()) }
@@ -475,17 +474,6 @@ fun SettingsScreen(
                         onCheckedChange = { checked ->
                             coroutineScope.launch {
                                 preferences.setEnablePassiveSuggestions(checked)
-                            }
-                        }
-                    )
-
-                    SettingSwitchRow(
-                        title = "Koreksi Otomatis (Autocorrect Typo)",
-                        subtitle = "Otomatis memperbaiki salah ketik (typo) saat tombol Spasi ditekan.",
-                        checked = enableAutocorrect,
-                        onCheckedChange = { checked ->
-                            coroutineScope.launch {
-                                preferences.setEnableAutocorrect(checked)
                             }
                         }
                     )

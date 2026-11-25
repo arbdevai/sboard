@@ -31,7 +31,6 @@ class SboardPreferences(private val context: Context) {
         val KEY_RECENT_EMOJIS = stringPreferencesKey("recent_emojis")
         val KEY_ENABLE_NUMBER_ROW = booleanPreferencesKey("enable_number_row")
         val KEY_SAVED_EMAILS = stringPreferencesKey("saved_emails")
-        val KEY_AUTOCORRECT = booleanPreferencesKey("enable_autocorrect")
     }
 
     val bottomPaddingDp: Flow<Int> = context.dataStore.data.map { prefs ->
@@ -76,10 +75,6 @@ class SboardPreferences(private val context: Context) {
 
     val enableNumberRow: Flow<Boolean> = context.dataStore.data.map { prefs ->
         prefs[KEY_ENABLE_NUMBER_ROW] ?: backupPrefs.getBoolean("enable_number_row", true)
-    }
-
-    val enableAutocorrect: Flow<Boolean> = context.dataStore.data.map { prefs ->
-        prefs[KEY_AUTOCORRECT] ?: backupPrefs.getBoolean("enable_autocorrect", true)
     }
 
     val recentEmojis: Flow<List<String>> = context.dataStore.data.map { prefs ->
@@ -145,11 +140,6 @@ class SboardPreferences(private val context: Context) {
     suspend fun setEnableNumberRow(enabled: Boolean) {
         backupPrefs.edit().putBoolean("enable_number_row", enabled).apply()
         context.dataStore.edit { it[KEY_ENABLE_NUMBER_ROW] = enabled }
-    }
-
-    suspend fun setEnableAutocorrect(enabled: Boolean) {
-        backupPrefs.edit().putBoolean("enable_autocorrect", enabled).apply()
-        context.dataStore.edit { it[KEY_AUTOCORRECT] = enabled }
     }
 
     suspend fun addRecentEmoji(emoji: String) {
