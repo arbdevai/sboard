@@ -78,6 +78,8 @@ fun SboardKeyboardView(
     onFnToggle: () -> Unit,
     onFunctionKeyClick: (Int) -> Unit,
     showSuggestionsBar: Boolean = true,
+    enableSpacebarCursorGlide: Boolean = true,
+    longPressDelayMs: Long = 300L,
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -237,13 +239,15 @@ fun SboardKeyboardView(
                                                         val totalDy = change.position.y - startY
 
                                                         if (!isDragging && !hasTriggeredLongPress) {
-                                                            if (kotlin.math.abs(totalDx) > 16f && kotlin.math.abs(totalDx) > kotlin.math.abs(totalDy) * 1.2f) {
+                                                            if (enableSpacebarCursorGlide &&
+                                                                kotlin.math.abs(totalDx) > 16f && kotlin.math.abs(totalDx) > kotlin.math.abs(totalDy) * 1.2f
+                                                            ) {
                                                                 isDragging = true
                                                                 longPressJob.cancel()
                                                             }
                                                         }
 
-                                                        if (isDragging) {
+                                                        if (enableSpacebarCursorGlide && isDragging) {
                                                             val deltaX = change.position.x - change.previousPosition.x
                                                             dragAccumulatorPx += deltaX
                                                             if (dragAccumulatorPx >= glideThresholdPx) {
@@ -321,6 +325,7 @@ fun SboardKeyboardView(
                                         .weight(keyWeight)
                                         .fillMaxHeight(),
                                     rolloverController = rolloverController,
+                                    longPressDelayMs = longPressDelayMs,
                                     onClickWithCoord = { normX, normY ->
                                         val resolvedKey = resolveSpatialAndBigramKey(
                                             tappedKey = key,

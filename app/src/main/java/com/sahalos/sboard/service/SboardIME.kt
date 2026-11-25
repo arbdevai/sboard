@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -190,7 +191,7 @@ class SboardIME : InputMethodService(),
         backspaceRepeatJob = serviceScope.launch {
             delay(170L)
             while (isActive) {
-                performBackspace()
+                performBackspace(vibrate = false)
                 delay(28L)
             }
         }
@@ -221,6 +222,10 @@ class SboardIME : InputMethodService(),
 
         serviceScope.launch {
             preferences.savedEmails.collect { savedEmailsList = it }
+        }
+
+        serviceScope.launch {
+            preferences.enableClipboardHistory.collect { clipboardManager.setHistoryEnabled(it) }
         }
 
         serviceScope.launch(Dispatchers.IO) {
@@ -298,6 +303,8 @@ class SboardIME : InputMethodService(),
                 val enableKeyPopup by preferences.enableKeyPopupPreview.collectAsStateWithLifecycle(initialValue = true)
                 val enableNumberRow by preferences.enableNumberRow.collectAsStateWithLifecycle(initialValue = true)
                 val themeId by preferences.themeId.collectAsStateWithLifecycle(initialValue = "oled_black")
+                val enableSpacebarCursorGlide by preferences.enableSpacebarCursorGlide.collectAsStateWithLifecycle(initialValue = true)
+                val longPressDelayMs by preferences.longPressDelayMs.collectAsStateWithLifecycle(initialValue = 300L)
                 val clips by clipboardManager.clips.collectAsStateWithLifecycle()
                 val recentEmojis by preferences.recentEmojis.collectAsStateWithLifecycle(initialValue = emptyList())
 
@@ -384,7 +391,9 @@ class SboardIME : InputMethodService(),
                                         )
                                     }
                                 },
-                                onFunctionKeyClick = { keyCode -> sendFunctionKey(keyCode) }
+                                onFunctionKeyClick = { keyCode -> sendFunctionKey(keyCode) },
+                                enableSpacebarCursorGlide = enableSpacebarCursorGlide,
+                                longPressDelayMs = longPressDelayMs
                             )
                         }
                         KeyboardMode.CLIPBOARD -> {
@@ -422,11 +431,16 @@ class SboardIME : InputMethodService(),
                             )
                         }
                         KeyboardMode.EMOJI_SEARCH -> {
-                            val searchResults = remember(emojiSearchQuery) {
-                                if (emojiSearchQuery.isBlank()) {
+                            var debouncedQuery by remember { mutableStateOf("") }
+                            LaunchedEffect(emojiSearchQuery) {
+                                delay(150L)
+                                debouncedQuery = emojiSearchQuery
+                            }
+                            val searchResults = remember(debouncedQuery) {
+                                if (debouncedQuery.isBlank()) {
                                     emptyList()
                                 } else {
-                                    EmojiProvider.search(this@SboardIME, emojiSearchQuery)
+                                    EmojiProvider.search(this@SboardIME, debouncedQuery)
                                 }
                             }
 
@@ -1148,8 +1162,8 @@ class SboardIME : InputMethodService(),
         ic.sendKeyEvent(KeyEvent(now, now, KeyEvent.ACTION_UP, keyCode, 0, meta))
     }
 
-    private fun performBackspace() {
-        triggerHaptic()
+    private fun performBackspace(vibrate: Boolean = true) {
+        if (vibrate) triggerHaptic()
         val ic = currentInputConnection ?: return
         if (isTerminalField) {
             if (modifierState.isAltActive) {

@@ -69,6 +69,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sahalos.sboard.BuildConfig
 import com.sahalos.sboard.R
+import com.sahalos.sboard.clipboard.SboardClipboardManager
 import com.sahalos.sboard.core.PassiveSuggestionEngine
 import com.sahalos.sboard.data.CustomShortcut
 import com.sahalos.sboard.data.SboardPreferences
@@ -81,6 +82,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsScreen(
     preferences: SboardPreferences,
+    clipboardManager: SboardClipboardManager,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -657,7 +659,7 @@ fun SettingsScreen(
                 ) {
                     SettingSwitchRow(
                         title = "Riwayat Papan Klip",
-                        subtitle = "Menyimpan teks yang disalin secara otomatis (Maks. 30 klip FIFO).",
+                        subtitle = "Menyimpan teks yang disalin secara otomatis (Maks. 40 klip FIFO).",
                         checked = enableClipboardHistory,
                         onCheckedChange = { checked ->
                             coroutineScope.launch {
@@ -668,6 +670,7 @@ fun SettingsScreen(
 
                     OutlinedButton(
                         onClick = {
+                            clipboardManager.clearAllUnpinned()
                             Toast.makeText(context, "Riwayat klip tidak tersemat telah dibersihkan.", Toast.LENGTH_SHORT).show()
                         },
                         modifier = Modifier.fillMaxWidth(),

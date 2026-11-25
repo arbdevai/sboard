@@ -41,6 +41,14 @@ class SboardClipboardManager(private val context: Context) {
 
     private var lastObservedClipText: String? = null
 
+    @Volatile
+    private var historyEnabled = true
+
+    /** Wired to the "Riwayat Papan Klip" toggle so turning it off stops auto-capture. */
+    fun setHistoryEnabled(enabled: Boolean) {
+        historyEnabled = enabled
+    }
+
     private val clipListener = ClipboardManager.OnPrimaryClipChangedListener {
         onPrimaryClipChanged()
     }
@@ -121,6 +129,9 @@ class SboardClipboardManager(private val context: Context) {
             val text = clip.getItemAt(0)?.coerceToText(context)?.toString()?.trim() ?: return
             if (text.isEmpty() || text == lastObservedClipText) return
             lastObservedClipText = text
+
+            // Respect the "Riwayat Papan Klip" toggle: disabled = stop auto-capturing new clips
+            if (!historyEnabled) return
 
             addClip(text, isPinned = false, isSensitive = isSensitive)
         }

@@ -56,7 +56,8 @@ fun KeyView(
     onClick: (() -> Unit)? = null,
     onClickWithCoord: ((normalizedX: Float, normalizedY: Float) -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
-    rolloverController: KeyRolloverController? = null
+    rolloverController: KeyRolloverController? = null,
+    longPressDelayMs: Long = 300L
 ) {
     var isGesturePressed by remember { mutableStateOf(false) }
     var isLongPressed by remember { mutableStateOf(false) }
@@ -125,7 +126,7 @@ fun KeyView(
 
                 val longPressJob = if (currentOnLongClick != null) {
                     coroutineScope.launch {
-                        delay(280L)
+                        delay(longPressDelayMs)
                         if (!isCancelled && !committedByRollover && isGesturePressed) {
                             longPressTriggered = true
                             isLongPressed = true

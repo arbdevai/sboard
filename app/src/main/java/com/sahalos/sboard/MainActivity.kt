@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import com.sahalos.sboard.clipboard.SboardClipboardManager
 import com.sahalos.sboard.data.SboardPreferences
 import com.sahalos.sboard.ui.settings.SettingsScreen
 import com.sahalos.sboard.ui.theme.SboardAppTheme
@@ -13,18 +14,25 @@ import com.sahalos.sboard.ui.theme.SboardAppTheme
 class MainActivity : ComponentActivity() {
 
     private lateinit var preferences: SboardPreferences
+    private lateinit var clipboardManager: SboardClipboardManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         preferences = SboardPreferences(this)
+        clipboardManager = SboardClipboardManager(this)
 
         handleIncomingIntent(intent)
 
         setContent {
             SboardAppTheme {
-                SettingsScreen(preferences = preferences)
+                SettingsScreen(preferences = preferences, clipboardManager = clipboardManager)
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        clipboardManager.destroy()
     }
 
     override fun onNewIntent(intent: Intent) {
